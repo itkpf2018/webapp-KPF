@@ -34,7 +34,8 @@
       "Bash(for file in src/lib/configStore.ts src/lib/autoBackup.ts src/app/admin/reports/sales/SalesReportPageClient.tsx src/app/api/auth/login/route.ts src/app/sales/page.tsx src/app/api/auth/logout/route.ts src/app/api/sales/route.ts src/app/api/admin/reports/sales/route.ts src/app/admin/employees/page.tsx src/lib/salesComparisonQuery.ts src/lib/observability.ts)",
       "Bash(if [ -f \"$file\" ])",
       "Bash(then)",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(perl:*)"
     ],
     "deny": [],
     "ask": []

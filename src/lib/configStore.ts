@@ -529,7 +529,7 @@ export async function createEmployee(input: EmployeeInput) {
     updatedAt: now,
   };
   data.employees.push(employee);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "employee",
@@ -566,7 +566,7 @@ export async function createStore(input: StoreInput) {
     updatedAt: now,
   };
   data.stores.push(store);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "store",
@@ -636,7 +636,7 @@ export async function updateEmployee(id: string, input: EmployeeInput) {
     defaultStoreId,
     updatedAt,
   };
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "employee",
@@ -676,7 +676,7 @@ export async function updateStore(id: string, input: StoreInput) {
     radius: input.radius ?? null,
     updatedAt: new Date().toISOString(),
   };
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "store",
@@ -706,7 +706,7 @@ export async function deleteEmployee(id: string) {
       (assignment) => assignment.employeeId !== id,
     );
   }
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "employee",
@@ -744,7 +744,7 @@ export async function deleteStore(id: string) {
     );
   }
   data.stores = data.stores.filter((store) => store.id !== id);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "store",
@@ -848,7 +848,7 @@ export async function createLeave(input: LeaveInput) {
     updatedAt: now,
   };
   data.leaves.push(leave);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "leave",
@@ -902,7 +902,7 @@ export async function updateLeave(id: string, input: Partial<LeaveInput>) {
   };
 
   data.leaves[index] = updated;
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "leave",
@@ -926,7 +926,7 @@ export async function deleteLeave(id: string) {
     throw new Error("ไม่พบข้อมูลวันลาที่ต้องการลบ");
   }
   data.leaves = data.leaves.filter((leave) => leave.id !== id);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "leave",
@@ -1053,7 +1053,7 @@ export async function createProductAssignments({
     return [];
   }
 
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -1080,7 +1080,7 @@ export async function deleteProductAssignment(id: string) {
   const storeName = removed.storeId
     ? data.stores.find((store) => store.id === removed.storeId)?.name
     : null;
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -1219,7 +1219,7 @@ export async function createProduct({
     updatedAt: now,
   };
   data.products.push(product);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -1288,7 +1288,7 @@ export async function updateProduct(
     isActive: input.isActive !== undefined ? input.isActive : data.products[index].isActive,
     updatedAt: new Date().toISOString(),
   };
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -1311,7 +1311,7 @@ export async function deleteProduct(id: string) {
       (assignment) => assignment.productId !== id,
     );
   }
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -1339,7 +1339,7 @@ export async function appendLog({ scope, action, message, meta }: AppendLogArgs)
     meta,
   };
   data.logs = [log, ...data.logs].slice(0, LOG_LIMIT);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   return log;
 }
 
@@ -3328,7 +3328,7 @@ export async function createCategory({
     updatedAt: now,
   };
   data.categories.push(category);
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -3366,7 +3366,7 @@ export async function updateCategory(
     color: color || "#3b82f6",
     updatedAt: new Date().toISOString(),
   };
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   await supabaseLogs.addLog({
     timestamp: new Date().toISOString(),
     scope: "product",
@@ -3394,7 +3394,7 @@ export async function deleteCategory(id: string) {
     categoryId: product.categoryId === id ? null : product.categoryId,
     updatedAt: product.categoryId === id ? new Date().toISOString() : product.updatedAt,
   }));
-  await writeData(data);
+  // await writeData(data); // Disabled: Netlify read-only filesystem
   */
 
   // Delete from Supabase
