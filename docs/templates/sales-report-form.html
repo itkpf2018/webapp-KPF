@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <title>Attendance PWA – แบบฟอร์มรายงานยอดขาย (PC)</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-size: 12pt;
+      }
+
+      @page {
+        size: A4;
+        margin: 18mm;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "TH Sarabun New", "Sarabun", "Noto Sans Thai", Arial, sans-serif;
+        color: #111827;
+        background: #ffffff;
+      }
+
+      h1 {
+        font-size: 18pt;
+        margin: 0 0 8mm;
+        text-align: center;
+        letter-spacing: 0.2pt;
+      }
+
+      .sheet {
+        page-break-inside: avoid;
+      }
+
+      .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 4mm 6mm;
+        margin-bottom: 8mm;
+      }
+
+      .meta-field {
+        border-bottom: 0.6pt solid #9ca3af;
+        padding-bottom: 2mm;
+        min-height: 9mm;
+      }
+
+      .meta-field .label {
+        font-size: 11pt;
+        color: #4b5563;
+        display: block;
+        margin-bottom: 1.2mm;
+      }
+
+      table.sales-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11pt;
+      }
+
+      table.sales-table thead th {
+        border: 0.6pt solid #0f172a;
+        padding: 3mm 2mm;
+        text-align: center;
+        background: #f1f5f9;
+        font-size: 10pt;
+        line-height: 1.2;
+      }
+
+      table.sales-table tbody td {
+        border: 0.6pt solid #0f172a;
+        padding: 2.4mm 2mm;
+        vertical-align: middle;
+      }
+
+      table.sales-table tbody td.index {
+        text-align: center;
+        width: 12mm;
+      }
+
+      table.sales-table tbody td.time {
+        text-align: center;
+        width: 18mm;
+        letter-spacing: 0.4pt;
+      }
+
+      table.sales-table tbody td.code {
+        text-align: center;
+        width: 22mm;
+        letter-spacing: 0.6pt;
+        font-weight: 600;
+      }
+
+      table.sales-table tbody td.units {
+        width: 28mm;
+      }
+
+      table.sales-table tbody td.price {
+        width: 24mm;
+        text-align: right;
+        padding-right: 3mm;
+      }
+
+      table.sales-table tbody td.quantity {
+        width: 38mm;
+      }
+
+      .unit-options {
+        display: flex;
+        gap: 2mm;
+        flex-wrap: wrap;
+        justify-content: center;
+        font-size: 9pt;
+      }
+
+      .unit-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 1mm;
+      }
+
+      .unit-box .mark {
+        display: inline-block;
+        width: 4mm;
+        height: 4mm;
+        border: 0.6pt solid #1f2937;
+      }
+
+      .unit-box .mark.checked {
+        background: #2563eb;
+        border-color: #1d4ed8;
+      }
+
+      .quantity-boxes {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 1.6mm;
+      }
+
+      .digit-box {
+        border: 0.6pt solid #1f2937;
+        height: 11mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11pt;
+        font-weight: 600;
+        letter-spacing: 0.6pt;
+      }
+
+      .summary {
+        margin-top: 8mm;
+        border: 0.6pt solid #0f172a;
+        padding: 6mm;
+        display: grid;
+        gap: 5mm;
+      }
+
+      .summary .row {
+        display: flex;
+        align-items: baseline;
+        gap: 4mm;
+      }
+
+      .summary label {
+        min-width: 58mm;
+        font-weight: 600;
+        letter-spacing: 0.1pt;
+      }
+
+      .summary .blank {
+        flex: 1;
+        border-bottom: 0.6pt solid #94a3b8;
+        min-height: 6mm;
+      }
+
+      .signature-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8mm;
+        margin-top: 10mm;
+      }
+
+      .signature-block {
+        border-top: 0.6pt solid #1f2937;
+        padding-top: 2mm;
+        min-height: 22mm;
+      }
+
+      .signature-block .label {
+        font-size: 10pt;
+        color: #4b5563;
+        margin-bottom: 4mm;
+      }
+
+      .page-break {
+        page-break-before: always;
+      }
+
+      .demo h1 {
+        text-align: left;
+        margin-bottom: 6mm;
+      }
+
+      .demo .meta-field {
+        border-bottom-style: dashed;
+      }
+
+      .demo .summary {
+        border-color: #1d4ed8;
+        background: #eff6ff;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="sheet blank">
+      <h1>Attendance PWA – รายงานยอดขาย (PC)</h1>
+      <div class="meta-grid">
+        <div class="meta-field">
+          <span class="label">วันที่</span>
+        </div>
+        <div class="meta-field">
+          <span class="label">เวลาเริ่มกะ / เวลาเลิกกะ</span>
+        </div>
+        <div class="meta-field">
+          <span class="label">ชื่อพนักงาน / รหัสพนักงาน</span>
+        </div>
+        <div class="meta-field">
+          <span class="label">สาขา / จุดขาย / จังหวัด</span>
+        </div>
+        <div class="meta-field">
+          <span class="label">รหัสสาขา</span>
+        </div>
+        <div class="meta-field">
+          <span class="label">เลขที่ใบรายงาน</span>
+        </div>
+      </div>
+
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เวลา<br />(24 ชม.)</th>
+            <th>รหัสสินค้า</th>
+            <th>ชื่อสินค้า</th>
+            <th>หน่วย</th>
+            <th>ราคาต่อหน่วย<br />(บาท)</th>
+            <th>จำนวนขาย</th>
+            <th>หมายเหตุ / โปรโมชัน</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="index">1</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">2</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">3</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">4</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">5</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">6</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">7</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">8</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">9</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">10</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <div class="row">
+          <label>จำนวน SKU ที่ขายทั้งหมด</label>
+          <div class="blank"></div>
+          <span>รายการ</span>
+        </div>
+        <div class="row">
+          <label>จำนวนชิ้นรวม</label>
+          <div class="blank"></div>
+          <span>ชิ้น</span>
+        </div>
+        <div class="row">
+          <label>ยอดรวมทั้งวัน</label>
+          <div class="blank"></div>
+          <span>บาท</span>
+        </div>
+        <div class="row">
+          <label>เงินสดรับจริง / ช่องทางอื่น</label>
+          <div class="blank"></div>
+        </div>
+        <div class="row">
+          <label>หมายเหตุเพิ่มเติม</label>
+          <div class="blank"></div>
+        </div>
+      </div>
+
+      <div class="signature-grid">
+        <div class="signature-block">
+          <div class="label">ลายเซ็นพนักงาน / วันที่-เวลา</div>
+        </div>
+        <div class="signature-block">
+          <div class="label">ลายเซ็นหัวหน้ากะ / วันที่-เวลา</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="page-break"></div>
+
+    <section class="sheet demo">
+      <h1>Attendance PWA – รายงานยอดขาย (ตัวอย่างการกรอก)</h1>
+      <div class="meta-grid">
+        <div class="meta-field">
+          <span class="label">วันที่</span>
+          29 / 10 / 2568
+        </div>
+        <div class="meta-field">
+          <span class="label">เวลาเริ่มกะ / เวลาเลิกกะ</span>
+          10:00 – 21:30
+        </div>
+        <div class="meta-field">
+          <span class="label">ชื่อพนักงาน / รหัสพนักงาน</span>
+          น.ส. ศมน ชัยธวัช / PC023
+        </div>
+        <div class="meta-field">
+          <span class="label">สาขา / จุดขาย / จังหวัด</span>
+          เซ็นทรัล พระราม 9 / กรุงเทพมหานคร
+        </div>
+        <div class="meta-field">
+          <span class="label">รหัสสาขา</span>
+          CR9
+        </div>
+        <div class="meta-field">
+          <span class="label">เลขที่ใบรายงาน</span>
+          CR9-20251029-01
+        </div>
+      </div>
+
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>เวลา<br />(24 ชม.)</th>
+            <th>รหัสสินค้า</th>
+            <th>ชื่อสินค้า</th>
+            <th>หน่วย</th>
+            <th>ราคาต่อหน่วย<br />(บาท)</th>
+            <th>จำนวนขาย</th>
+            <th>หมายเหตุ / โปรโมชัน</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="index">1</td>
+            <td class="time">11:05</td>
+            <td class="code">STK001</td>
+            <td>SHISEIDO SPF50 50ML</td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark checked"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price">฿890</td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">2</span>
+            </div>
+            </td>
+            <td>ซื้อคู่รับส่วนลด</td>
+          </tr>
+          <tr>
+            <td class="index">2</td>
+            <td class="time">14:32</td>
+            <td class="code">STK014</td>
+            <td>SHISEIDO CLEANSER 120g</td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark checked"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price">฿450</td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">5</span>
+            </div>
+            </td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td class="index">3</td>
+            <td class="time">15:47</td>
+            <td class="code">STK021</td>
+            <td>ANESSA MILK 20ML</td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark checked"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price">฿1,250</td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">1</span>
+            </div>
+            </td>
+            <td>โปรของแถม</td>
+          </tr>
+          <tr>
+            <td class="index">4</td>
+            <td class="time">19:58</td>
+            <td class="code">STK001</td>
+            <td>SHISEIDO SPF50 50ML</td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark checked"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price">฿890</td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">1</span>
+            </div>
+            </td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td class="index">5</td>
+            <td class="time">20:15</td>
+            <td class="code">STK033</td>
+            <td>ANESSA PERFECT UV SPRAY 60g</td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark checked"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price">฿520</td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">0</span>
+                <span class="digit-box">2</span>
+            </div>
+            </td>
+            <td>-</td>
+          </tr>
+          <tr>
+            <td class="index">6</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">7</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">8</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">9</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+          <tr>
+            <td class="index">10</td>
+            <td class="time"></td>
+            <td class="code"></td>
+            <td></td>
+            <td class="units">
+            <div class="unit-options">
+                <span class="unit-box"><span class="mark"></span><span>BX</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PK</span></span>
+                <span class="unit-box"><span class="mark"></span><span>PC</span></span>
+                <span class="unit-box"><span class="mark"></span><span>SP</span></span>
+            </div>
+            </td>
+            <td class="price"></td>
+            <td class="quantity">
+            <div class="quantity-boxes">
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+                <span class="digit-box">&nbsp;</span>
+            </div>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <div class="row">
+          <label>จำนวน SKU ที่ขายทั้งหมด</label>
+          <span>4 รายการ</span>
+        </div>
+        <div class="row">
+          <label>จำนวนชิ้นรวม</label>
+          <span>11 ชิ้น</span>
+        </div>
+        <div class="row">
+          <label>ยอดรวมทั้งวัน</label>
+          <span>8,880 บาท</span>
+        </div>
+        <div class="row">
+          <label>เงินสดรับจริง / ช่องทางอื่น</label>
+          <span>เงินสด 6,000 บาท / QR &amp; บัตร 2,880 บาท</span>
+        </div>
+        <div class="row">
+          <label>หมายเหตุเพิ่มเติม</label>
+          <span>เติม SPF50 BX 10 ชิ้น เวลา 16:00</span>
+        </div>
+      </div>
+
+      <div class="signature-grid">
+        <div class="signature-block">
+          <div class="label">ลายเซ็นพนักงาน / วันที่-เวลา</div>
+          น.ส. ศมน ชัยธวัช — 29/10/2568 21:35
+        </div>
+        <div class="signature-block">
+          <div class="label">ลายเซ็นหัวหน้ากะ / วันที่-เวลา</div>
+          นายธีรวัฒน์ อริยะวงศ์ — 29/10/2568 21:40
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

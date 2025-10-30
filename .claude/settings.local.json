@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run dev:*)",
+      "Bash(gh pr list:*)",
+      "Bash(cp:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(tee:*)",
+      "Read(//tmp/**)",
+      "Bash(pkill -f:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(xargs -r kill -9)",
+      "Bash(npx supabase --version)",
+      "Bash(test:*)",
+      "Bash(npx tsx:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(find:*)",
+      "Bash(awk:*)",
+      "Bash(npm --version)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

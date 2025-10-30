@@ -1,0 +1,29 @@
+
+> attendance-pwa@0.1.0 build
+> next build --turbopack
+
+   ▲ Next.js 15.5.5 (Turbopack)
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Webpack is configured while Turbopack is not, which may cause problems.
+ ⚠ See instructions if you need to configure Turbopack:
+  https://nextjs.org/docs/app/api-reference/next-config-js/turbopack
+
+ ⚠ Slow filesystem detected. The benchmark took 278ms. If /mnt/d/Desktop/DEV/attendance-pwa/.next is a network drive, consider moving it to a local folder. If you have an antivirus enabled, consider excluding your project directory.
+ ✓ Finished writing to disk in 6.1s
+ ✓ Compiled successfully in 57s
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/app/admin/user-pins/UserPinsClient.tsx:13:45
+Type error: Property 'user_pins' does not exist on type '{ attendance_records: { Row: { accuracy: number | null; created_at: string; employee_name: string; id: string; latitude: number | null; location_display: string | null; longitude: number | null; ... 7 more ...; submitted_at: string; }; Insert: { ...; }; Update: { ...; }; Relationships: []; }; ... 7 more ...; stores:...'.
+
+[0m [90m 11 |[39m [36mimport[39m type { [33mDatabase[39m } [36mfrom[39m [32m'@/types/supabase'[39m[33m;[39m
+ [90m 12 |[39m
+[31m[1m>[22m[39m[90m 13 |[39m type [33mUserPin[39m [33m=[39m [33mDatabase[39m[[32m'public'[39m][[32m'Tables'[39m][[32m'user_pins'[39m][[32m'Row'[39m][33m;[39m
+ [90m    |[39m                                             [31m[1m^[22m[39m
+ [90m 14 |[39m type [33mUserRole[39m [33m=[39m [32m'employee'[39m [33m|[39m [32m'sales'[39m [33m|[39m [32m'admin'[39m [33m|[39m [32m'super_admin'[39m[33m;[39m
+ [90m 15 |[39m
+ [90m 16 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mUserPinsClient[39m() {[0m
+Next.js build worker exited with code: 1 and signal: null

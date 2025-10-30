@@ -1,0 +1,3363 @@
+{
+  "employees": [
+    {
+      "id": "ab0b43bf-7b82-4798-b64a-d12f8c758236",
+      "name": "คุณปาตีเมาะ สาเหมาะ",
+      "employeeCode": "EMP005",
+      "phone": "081-3684149",
+      "regularDayOff": null,
+      "province": "อุบลราชธานี",
+      "region": "อีสานล่าง",
+      "defaultStoreId": "1f07a0b0-e5a6-4fa0-9bb7-23a2e126e712",
+      "createdAt": "2025-10-24T02:00:09.657Z",
+      "updatedAt": "2025-10-25T15:48:14.383Z"
+    },
+    {
+      "id": "d3208733-6804-40e2-aaa4-dcba3ade674d",
+      "name": "นางสาวอารีนา มาหะ(นา)",
+      "employeeCode": "EMP003",
+      "phone": "080-8653867",
+      "regularDayOff": "พุธ",
+      "province": "นราธิวาส",
+      "region": "ภาคใต้",
+      "defaultStoreId": "caa38483-d8ae-417c-9915-e29bb47f69e8",
+      "createdAt": "2025-10-24T01:58:06.913Z",
+      "updatedAt": "2025-10-25T16:06:14.296Z"
+    },
+    {
+      "id": "557f6b4e-9f81-4768-b6ab-3a3a0ed69a43",
+      "name": "นายไชยวัฒน์ ทองสุทธิ์",
+      "employeeCode": "EMP004",
+      "phone": "066-1482276",
+      "regularDayOff": null,
+      "province": "ระยอง",
+      "region": "ภาคตะวันออก",
+      "defaultStoreId": "c9f32a58-aa6c-4f6e-a480-d38efe6ecb27",
+      "createdAt": "2025-10-24T01:59:05.444Z",
+      "updatedAt": "2025-10-25T04:55:29.539Z"
+    },
+    {
+      "id": "66b4e8a3-0fb7-41bb-a743-da3bda18abcd",
+      "name": "นายธนพงษ์ แซ่ตั้ง(พีท)",
+      "employeeCode": "EMP002",
+      "phone": "082-8298696",
+      "regularDayOff": null,
+      "province": "ยะลา",
+      "region": "ภาคใต้",
+      "defaultStoreId": "db906a85-f447-446e-aa0d-23c07f05a4c6",
+      "createdAt": "2025-10-24T01:57:11.087Z",
+      "updatedAt": "2025-10-28T02:31:07.131Z"
+    },
+    {
+      "id": "3ddc399c-b56b-4596-a2a1-7283d86ef69d",
+      "name": "นายA",
+      "employeeCode": "EMP001",
+      "phone": "091-7699794",
+      "regularDayOff": "อังคาร",
+      "province": "นครปฐม",
+      "region": "ภาคกลาง",
+      "defaultStoreId": "6b52cc3a-b019-4021-898b-26060163f7e0",
+      "createdAt": "2025-10-24T01:49:05.637Z",
+      "updatedAt": "2025-10-28T01:37:55.057Z"
+    },
+    {
+      "id": "9dec1964-dff9-4f54-a367-ca3c07b54b5d",
+      "name": "นายB",
+      "employeeCode": "EMP006",
+      "phone": "091-7365560",
+      "regularDayOff": "พฤหัสบดี",
+      "province": "นครปฐม",
+      "region": "ภาคกลาง",
+      "defaultStoreId": "3097a90a-2ac3-46fe-930c-d2577b696537",
+      "createdAt": "2025-10-25T14:07:55.690Z",
+      "updatedAt": "2025-10-28T02:30:57.512Z"
+    },
+    {
+      "id": "4b348b01-e0d6-4dd1-8c47-e02c835d085e",
+      "name": "SUN",
+      "employeeCode": "EMP009",
+      "phone": "123456789",
+      "regularDayOff": "เสาร์",
+      "province": "นครปฐม",
+      "region": "ภาคกลาง",
+      "defaultStoreId": "671f74ca-5e78-4166-9a18-da08e7e90113",
+      "createdAt": "2025-10-28T13:03:04.835Z",
+      "updatedAt": "2025-10-28T13:03:04.835Z"
+    }
+  ],
+  "stores": [
+    {
+      "id": "db906a85-f447-446e-aa0d-23c07f05a4c6",
+      "name": "แฟมิลี่ ไฮเปอร์มาร์ท",
+      "province": "ยะลา",
+      "address": "43/12-13 หมู่9 อำเภอเมืองยะลา ยะลา 95000",
+      "latitude": 6.549104,
+      "longitude": 101.296208,
+      "radius": 300,
+      "createdAt": "2025-10-24T01:51:31.353Z",
+      "updatedAt": "2025-10-24T01:51:31.353Z"
+    },
+    {
+      "id": "1f07a0b0-e5a6-4fa0-9bb7-23a2e126e712",
+      "name": "ยงสงวน ศูนย์ค้าส่ง",
+      "province": "อุบลราชธานี",
+      "address": "6V76+5FW ตำบล วารินชำราบ อำเภอวารินชำราบ อุบลราชธานี 34190",
+      "latitude": 15.21301,
+      "longitude": 104.8612,
+      "radius": 100,
+      "createdAt": "2025-10-24T01:54:28.799Z",
+      "updatedAt": "2025-10-24T01:54:28.799Z"
+    },
+    {
+      "id": "3097a90a-2ac3-46fe-930c-d2577b696537",
+      "name": "ร้านค้าB",
+      "province": "นครปฐม",
+      "address": "Q8R2+5WQ ถ. พุทธมณฑลสาย 5 ตำบล บางเตย อำเภอสามพราน นครปฐม 73170",
+      "latitude": 13.790439,
+      "longitude": 100.302374,
+      "radius": 500,
+      "createdAt": "2025-10-25T14:06:38.641Z",
+      "updatedAt": "2025-10-25T14:06:38.641Z"
+    },
+    {
+      "id": "c9f32a58-aa6c-4f6e-a480-d38efe6ecb27",
+      "name": "ร้านวัชรวรรณ",
+      "province": "ระยอง",
+      "address": "136 ถนน ราษฎร์อุทิศ ค.2 ตำบลเชิงเนิน อำเภอเมืองระยอง ระยอง 21000",
+      "latitude": 12.686025,
+      "longitude": 101.268098,
+      "radius": 370,
+      "createdAt": "2025-10-24T01:53:33.597Z",
+      "updatedAt": "2025-10-24T02:00:31.059Z"
+    },
+    {
+      "id": "caa38483-d8ae-417c-9915-e29bb47f69e8",
+      "name": "ร้านศรีมัย",
+      "province": "นราธิวาส",
+      "address": "ต 24/2 อำเภอเมืองนราธิวาส นราธิวาส 96000",
+      "latitude": 6.424557,
+      "longitude": 101.815053,
+      "radius": 100,
+      "createdAt": "2025-10-24T01:52:38.931Z",
+      "updatedAt": "2025-10-24T01:52:38.931Z"
+    },
+    {
+      "id": "63e67624-f0b0-4ea3-93c1-ec8a134a1fb2",
+      "name": "อุบลดีมาร์ท",
+      "province": "อุบลราชธานี",
+      "address": "46 แก้วเสนา วารินชำราบ วารินชำราบ, อุบลราชธานี 34190",
+      "latitude": 15.212206,
+      "longitude": 104.863143,
+      "radius": 100,
+      "createdAt": "2025-10-25T15:35:54.811Z",
+      "updatedAt": "2025-10-25T15:35:54.811Z"
+    },
+    {
+      "id": "671f74ca-5e78-4166-9a18-da08e7e90113",
+      "name": "Bundit",
+      "province": "นครปฐม",
+      "address": "Q8R2+5WQ ถ. พุทธมณฑลสาย 5 ตำบล บางเตย อำเภอสามพราน นครปฐม 73170",
+      "latitude": 13.790503,
+      "longitude": 100.302374,
+      "radius": 500,
+      "createdAt": "2025-10-28T13:02:11.075Z",
+      "updatedAt": "2025-10-28T13:02:11.075Z"
+    },
+    {
+      "id": "6b52cc3a-b019-4021-898b-26060163f7e0",
+      "name": "KPF",
+      "province": "นครปฐม",
+      "address": "R5QW+RWR ตำบล ดอนแฝก อำเภอนครชัยศรี นครปฐม 73120",
+      "latitude": 13.839628,
+      "longitude": 100.197294,
+      "radius": 500,
+      "createdAt": "2025-10-24T01:55:20.883Z",
+      "updatedAt": "2025-10-24T03:42:54.373Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "3b1ea693-62ea-43cc-9d35-225059bfe692",
+      "name": "ปี๊บ 5กก.",
+      "color": "#3b82f6",
+      "createdAt": "2025-10-21T16:36:57.345Z",
+      "updatedAt": "2025-10-21T16:36:57.345Z"
+    },
+    {
+      "id": "cd23c1fb-5349-4634-83fc-ba0b38e0adac",
+      "name": "ปี๊บ 400ก.",
+      "color": "#06b6d4",
+      "createdAt": "2025-10-21T16:37:26.707Z",
+      "updatedAt": "2025-10-21T18:14:20.503Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "2bc2c56e-de96-46df-91f7-14a43f7646ef",
+      "code": "KL0-5010",
+      "name": "ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:08:51.149Z",
+      "updatedAt": "2025-10-21T16:07:21.610Z",
+      "isActive": true
+    },
+    {
+      "id": "5bf93e8c-e103-469e-8801-f8ef2d1c4a35",
+      "code": "KL0-5009",
+      "name": "ข้าวเกรียบกุ้ง รสหมึกย่าง105ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:09:47.364Z",
+      "updatedAt": "2025-10-21T16:07:21.591Z",
+      "isActive": true
+    },
+    {
+      "id": "bc0092fb-2f23-4e3d-a73e-636c66543635",
+      "code": "KL0-5013",
+      "name": "ข้าวเกรียบหมึก รสซอสโชยุ105ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:11:28.090Z",
+      "updatedAt": "2025-10-21T16:07:21.695Z",
+      "isActive": true
+    },
+    {
+      "id": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b",
+      "code": "CL0-5001",
+      "name": "โฟกัส คาราเมล",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:12:07.785Z",
+      "updatedAt": "2025-10-21T16:07:11.069Z",
+      "isActive": true
+    },
+    {
+      "id": "be46475c-442f-4b19-a2cb-16d4e259ee75",
+      "code": "KL0-5005",
+      "name": "แดกูดั้งเดิม",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:12:32.754Z",
+      "updatedAt": "2025-10-21T16:07:21.539Z",
+      "isActive": true
+    },
+    {
+      "id": "9a4ec73b-6534-4161-98ef-4630ce8d1a12",
+      "code": "KL0-5006",
+      "name": "แดกูฮอตโทเมโท",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:12:52.252Z",
+      "updatedAt": "2025-10-21T16:07:21.562Z",
+      "isActive": true
+    },
+    {
+      "id": "a991ec89-f7db-462a-ae59-b8287edba363",
+      "code": "CL0-5004",
+      "name": "คอร์นวอยซ์ รสช็อก",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:13:55.268Z",
+      "updatedAt": "2025-10-21T16:07:11.100Z",
+      "isActive": true
+    },
+    {
+      "id": "e9e3ba49-69c4-4ee5-9e51-8594c3904a4b",
+      "code": "CL0-5005",
+      "name": "คอร์นวอย รสนม",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:14:19.949Z",
+      "updatedAt": "2025-10-21T16:07:11.140Z",
+      "isActive": true
+    },
+    {
+      "id": "b05fb1ee-8733-4b9d-a656-1fd8ce3e9d82",
+      "code": "CL0-2002",
+      "name": "คอร์นโด รสนมน้ำผึ้ง95ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:15:15.739Z",
+      "updatedAt": "2025-10-21T16:07:11.030Z",
+      "isActive": true
+    },
+    {
+      "id": "dabb0c6e-b263-4031-aa6d-bbd681911a89",
+      "code": "CL0-2001",
+      "name": "คอร์นโด รสนมน้ำผึ้ง20ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:15:29.620Z",
+      "updatedAt": "2025-10-21T16:07:10.996Z",
+      "isActive": true
+    },
+    {
+      "id": "d77ade79-07f4-4d9e-aa7a-f435e4b140a1",
+      "code": "KL0-1002",
+      "name": "ไฮไรซ์ รสสไปซี่โทเมโท",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:18:30.873Z",
+      "updatedAt": "2025-10-21T16:07:11.178Z",
+      "isActive": true
+    },
+    {
+      "id": "ea748b9f-8403-4e7f-97be-4fa7ca347d06",
+      "code": "BL0-4004",
+      "name": "แยมสับปะรด 400 ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:19:26.785Z",
+      "updatedAt": "2025-10-21T18:38:31.296Z",
+      "isActive": true,
+      "categoryId": "cd23c1fb-5349-4634-83fc-ba0b38e0adac",
+      "sku": null,
+      "description": null,
+      "imageUrl": null
+    },
+    {
+      "id": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc",
+      "code": "BL0-4002",
+      "name": "คุกกี้แซนวิสช็อก 400ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:19:57.763Z",
+      "updatedAt": "2025-10-21T18:36:00.391Z",
+      "isActive": true,
+      "categoryId": "cd23c1fb-5349-4634-83fc-ba0b38e0adac",
+      "sku": null,
+      "description": null,
+      "imageUrl": null
+    },
+    {
+      "id": "7d741a21-8ec0-4404-98b9-dd81c50ce0f3",
+      "code": "BL0-4003",
+      "name": "คุกกี้ก้นหอยวานิลลา 400ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:20:24.223Z",
+      "updatedAt": "2025-10-21T16:07:10.633Z",
+      "isActive": true
+    },
+    {
+      "id": "f423c23e-3c2a-4541-b926-f205ba87cfe0",
+      "code": "VL0-4005",
+      "name": "เวเฟอร์สติ๊กรสช็อก 400ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:20:50.314Z",
+      "updatedAt": "2025-10-21T16:07:21.780Z",
+      "isActive": true
+    },
+    {
+      "id": "797a3a01-7659-4342-b252-4c57ed1ec39d",
+      "code": "KL0-4014",
+      "name": "ปิ๊บขาไก่ทรงเครื่อง 5 รส 400ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:21:13.067Z",
+      "updatedAt": "2025-10-21T16:07:21.282Z",
+      "isActive": true
+    },
+    {
+      "id": "72bf4769-dd2f-4578-9809-7073fb09677c",
+      "code": "KL0-1202",
+      "name": "ปังไก่รสวิงซ์แซ่บ",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:22:16.837Z",
+      "updatedAt": "2025-10-21T16:07:11.253Z",
+      "isActive": true
+    },
+    {
+      "id": "16294bbb-d33c-41d0-91f1-80f50eb69fee",
+      "code": "KL0-1201",
+      "name": "ปังไก่รสสาหร่าย",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:22:47.880Z",
+      "updatedAt": "2025-10-21T16:07:11.215Z",
+      "isActive": true
+    },
+    {
+      "id": "f3438e99-8126-47a0-86a0-ee26b4f7f86d",
+      "code": "BL0-1104",
+      "name": "แยมสับปะรด 1.1 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:25:48.066Z",
+      "updatedAt": "2025-10-21T16:07:10.175Z",
+      "isActive": true
+    },
+    {
+      "id": "a4a3effc-45ea-423b-b3e8-69b8541d71c0",
+      "code": "BL0-1108",
+      "name": "ABC 1.1 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:26:47.483Z",
+      "updatedAt": "2025-10-21T16:07:10.444Z",
+      "isActive": true
+    },
+    {
+      "id": "3628460f-480a-4632-8d43-ac6b9c751390",
+      "code": "BL0-1105",
+      "name": "ก้นหอย วานิลลา 1.1 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:28:25.504Z",
+      "updatedAt": "2025-10-21T16:07:10.290Z",
+      "isActive": true
+    },
+    {
+      "id": "6d5fab48-073e-44dc-8c9c-ea14a5023dab",
+      "code": "BL0-1005",
+      "name": "คุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:29:08.162Z",
+      "updatedAt": "2025-10-21T16:07:10.067Z",
+      "categoryId": null,
+      "sku": null,
+      "description": null,
+      "imageUrl": null,
+      "isActive": true
+    },
+    {
+      "id": "772fbe45-7990-47b9-aeb7-8e8809fe1cb6",
+      "code": "VL0-1104",
+      "name": "เวเฟอร์สติ๊กช็อก 1.1 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:29:30.945Z",
+      "updatedAt": "2025-10-21T16:07:21.740Z",
+      "isActive": true
+    },
+    {
+      "id": "9cfbf392-7e26-4e76-af27-679cc7ff077a",
+      "code": "VL0-1001",
+      "name": "ปี๊บเวเฟอร์สติ๊กช็อก 1.2 กก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:29:55.758Z",
+      "updatedAt": "2025-10-21T16:07:21.720Z",
+      "isActive": true
+    },
+    {
+      "id": "c6adffee-f5b9-44c6-b237-ebabf24ded93",
+      "code": "BL0-5026",
+      "name": "คุกกี้ก้นหอยวานิลลา 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:30:35.682Z",
+      "updatedAt": "2025-10-21T16:07:10.960Z",
+      "isActive": true
+    },
+    {
+      "id": "6f3ea4fd-b41d-4b24-8238-2babf4c1a246",
+      "code": "BL0-5024",
+      "name": "คุกกี้ก้นหอยทุเรียน 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:32:05.439Z",
+      "updatedAt": "2025-10-21T16:07:10.922Z",
+      "isActive": true
+    },
+    {
+      "id": "602d8361-eb07-4741-8356-a6d25303078c",
+      "code": "BL0-5004",
+      "name": "คุกกี้แซนวิสช็อก 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:33:37.197Z",
+      "updatedAt": "2025-10-21T16:07:10.885Z",
+      "isActive": true
+    },
+    {
+      "id": "a2896163-6c79-44ae-a643-3d3915ba44f4",
+      "code": "BL0-5001",
+      "name": "แยมสับปะรด 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:34:01.803Z",
+      "updatedAt": "2025-10-21T16:07:10.827Z",
+      "isActive": true
+    },
+    {
+      "id": "385cbe0a-2b06-4c9d-a15b-995f7d393325",
+      "code": "KL0-5002",
+      "name": "ขาไก่รสดั้งเดิม 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:34:22.750Z",
+      "updatedAt": "2025-10-21T16:07:21.466Z",
+      "isActive": true
+    },
+    {
+      "id": "0de3047c-5bfe-47f6-92d0-d272720bfca8",
+      "code": "KL0-5003",
+      "name": "ขาไก่ทรงเครื่อง 5 รส 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:34:48.245Z",
+      "updatedAt": "2025-10-21T16:07:21.489Z",
+      "isActive": true
+    },
+    {
+      "id": "455e9b8e-2717-4983-a947-a344383e01ad",
+      "code": "KL0-5001",
+      "name": "ทับทิมทองทรงเครื่อง 5 รส 5.5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:35:01.823Z",
+      "updatedAt": "2025-10-21T16:07:21.385Z",
+      "isActive": true
+    },
+    {
+      "id": "9de85cc1-703f-4279-bea3-2445d8ae98f8",
+      "code": "VL0-5001",
+      "name": "เวเฟอร์สติ๊กช็อก 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:35:32.839Z",
+      "updatedAt": "2025-10-21T16:07:21.860Z",
+      "isActive": true
+    },
+    {
+      "id": "0fa3c22d-e960-4b98-ad5e-da1a299dc867",
+      "code": "VL0-5004",
+      "name": "เวเฟอร์สติ๊กสตรอ 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:36:01.188Z",
+      "updatedAt": "2025-10-21T16:07:22.023Z",
+      "isActive": true
+    },
+    {
+      "id": "1208682d-72fd-4075-82ff-5d87aac55b04",
+      "code": "VL0-5002",
+      "name": "เวเฟอร์สติ๊กใบเตย 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:36:17.664Z",
+      "updatedAt": "2025-10-21T16:07:21.955Z",
+      "isActive": true
+    },
+    {
+      "id": "fa79f6c2-2da8-41f4-b6d8-685f863f0723",
+      "code": "VL0-5009",
+      "name": "เวเฟอร์สติ๊กแฟนซี ใบเตย-ช็อก 5 กก.",
+      "unitPrice": 280,
+      "createdAt": "2025-10-21T09:39:13.975Z",
+      "updatedAt": "2025-10-21T16:07:22.045Z",
+      "isActive": true
+    },
+    {
+      "id": "1c73b4bc-b442-4c03-9f06-4960358f83b4",
+      "code": "KL0-4008",
+      "name": "ข้าวเกรียบหมึกรสเผ็ดหวาน 400 ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:40:33.851Z",
+      "updatedAt": "2025-10-21T16:07:11.296Z",
+      "isActive": true
+    },
+    {
+      "id": "9ef865e4-fe78-4044-b3d1-34ce161a7daa",
+      "code": "KL0-4010",
+      "name": "ข้าวเกรียบกุ้งรสหมึกย่าง 400 ก.",
+      "unitPrice": 60,
+      "createdAt": "2025-10-21T09:41:19.079Z",
+      "updatedAt": "2025-10-21T16:07:21.225Z",
+      "isActive": true
+    },
+    {
+      "id": "2c33e607-a5aa-4b59-96b5-88cf2126c69b",
+      "code": "KL0-5011",
+      "name": "ข้าวเกรียบกุ้งรสหมึกย่าง 20 ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:41:54.445Z",
+      "updatedAt": "2025-10-21T16:07:21.635Z",
+      "isActive": true
+    },
+    {
+      "id": "a5993b70-b04c-46ff-9ac2-6aacce9e1ccd",
+      "code": "KL0-5012",
+      "name": "ข้าวเกรียบหมึกรสเผ็ดหวาน 20 ก.",
+      "unitPrice": 20,
+      "createdAt": "2025-10-21T09:42:07.455Z",
+      "updatedAt": "2025-10-21T16:07:21.672Z",
+      "isActive": true
+    }
+  ],
+  "productAssignments": [],
+  "leaves": [],
+  "logs": [
+    {
+      "id": "f89d1ea5-0eea-4844-a7d0-fa65e9cd5efe",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: คุณปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-29T09:02:30.892Z",
+      "meta": {
+        "employeeId": "ab0b43bf-7b82-4798-b64a-d12f8c758236"
+      }
+    },
+    {
+      "id": "6a7937a3-148a-4a2d-9543-5a4618fb0b24",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 5 รายการ โดย นายA",
+      "timestamp": "2025-10-29T05:05:15.419Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 74,
+            "total": 740
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 5,
+            "unitPrice": 700,
+            "total": 3500
+          },
+          {
+            "productCode": "BOL-5001",
+            "productName": "แยมสับปะรด 5 กก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 320,
+            "total": 3200
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ซอง",
+            "quantity": 5,
+            "unitPrice": 20,
+            "total": 100
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ลัง",
+            "quantity": 5,
+            "unitPrice": 600,
+            "total": 3000
+          }
+        ],
+        "total": 10540,
+        "submittedAt": "2025-10-29T05:05:14.475Z"
+      }
+    },
+    {
+      "id": "19a09f39-e5c7-4e27-a9d8-c9002f3be623",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายธนพงษ์ แซ่ตั้ง(พีท)",
+      "timestamp": "2025-10-28T02:31:08.349Z",
+      "meta": {
+        "employeeId": "66b4e8a3-0fb7-41bb-a743-da3bda18abcd"
+      }
+    },
+    {
+      "id": "a2f21d10-d807-4a1e-bcdb-45d93cd3a36c",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายB",
+      "timestamp": "2025-10-28T02:30:58.777Z",
+      "meta": {
+        "employeeId": "9dec1964-dff9-4f54-a367-ca3c07b54b5d"
+      }
+    },
+    {
+      "id": "984b4b0a-074b-4414-af43-2e96b22a9ad7",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - คุณปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-28T02:30:15.790Z",
+      "meta": {
+        "storeName": "ยงสงวน ศูนย์ค้าส่ง",
+        "employeeName": "คุณปาตีเมาะ สาเหมาะ",
+        "status": "check-in",
+        "submittedAt": "2025-10-28T02:30:14.853Z",
+        "location": null,
+        "locationDisplay": "",
+        "distance": null,
+        "radius": null,
+        "warning": null,
+        "storagePath": "attendance/2025/10/28/265df342-b6d3-43f6-a50b-fa6addff1fdc.jpg"
+      }
+    },
+    {
+      "id": "8e88ce94-036d-4312-b0ae-94feeb828be4",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - คุณปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-28T01:42:06.212Z",
+      "meta": {
+        "storeName": "ยงสงวน ศูนย์ค้าส่ง",
+        "employeeName": "คุณปาตีเมาะ สาเหมาะ",
+        "status": "check-in",
+        "submittedAt": "2025-10-28T01:42:04.687Z",
+        "location": null,
+        "locationDisplay": "",
+        "distance": null,
+        "radius": null,
+        "warning": null,
+        "storagePath": "attendance/2025/10/28/32f178c6-e8cd-4b93-b419-f0de21e0be88.jpg"
+      }
+    },
+    {
+      "id": "dc78a4d0-3f1f-4439-8296-6bd6e6e1006c",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายA",
+      "timestamp": "2025-10-28T01:37:56.330Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "67d2ff19-6c83-4eb7-a7a0-f91e122cbd28",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 1 รายการ โดย นายB",
+      "timestamp": "2025-10-27T22:32:50.360Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 84,
+            "total": 840
+          }
+        ],
+        "total": 840,
+        "submittedAt": "2025-10-27T22:32:49.809Z"
+      }
+    },
+    {
+      "id": "2643c289-a6e3-4efa-a3ba-b621b03853b0",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 2 รายการ โดย นายB",
+      "timestamp": "2025-10-27T19:50:38.363Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 84,
+            "total": 840
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 840,
+            "total": 8400
+          }
+        ],
+        "total": 9240,
+        "submittedAt": "2025-10-27T19:50:37.930Z"
+      }
+    },
+    {
+      "id": "0a04e03d-c484-421c-88ee-24256961719a",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 2 รายการ โดย นายB",
+      "timestamp": "2025-10-27T19:47:58.619Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 87,
+            "total": 870
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 840,
+            "total": 8400
+          }
+        ],
+        "total": 9270,
+        "submittedAt": "2025-10-27T19:47:58.069Z"
+      }
+    },
+    {
+      "id": "f9cf5ab6-2972-4bac-a6b2-c022646adaf2",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 3 รายการ โดย นายA",
+      "timestamp": "2025-10-27T06:09:41.655Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ซอง",
+            "quantity": 10,
+            "unitPrice": 20,
+            "total": 200
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "แพ็ค",
+            "quantity": 30,
+            "unitPrice": 60,
+            "total": 1800
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ลัง",
+            "quantity": 3,
+            "unitPrice": 600,
+            "total": 1800
+          }
+        ],
+        "total": 3800,
+        "submittedAt": "2025-10-27T06:09:40.737Z"
+      }
+    },
+    {
+      "id": "5e42f2dc-8ede-4a69-a348-c9b23af22927",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - นายA",
+      "timestamp": "2025-10-27T06:08:44.403Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "status": "check-in",
+        "submittedAt": "2025-10-27T06:08:42.729Z",
+        "location": {
+          "latitude": 13.839463739760795,
+          "longitude": 100.19667272208393,
+          "accuracy": 19.244711403807813
+        },
+        "locationDisplay": "13.839464,100.196673 ±19m",
+        "distance": 69.51970119395061,
+        "radius": 500,
+        "warning": null,
+        "storagePath": "attendance/2025/10/27/d571c2e4-4f87-4adf-8f4b-ec469dbcd712.jpg"
+      }
+    },
+    {
+      "id": "5e8b43db-625e-49b0-bbfa-b16a7e2d826b",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-27T04:35:15.136Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761539714551-eadb8136-f54b-4fd6-9984-faff1b56620c.jpg"
+      }
+    },
+    {
+      "id": "3746cf1e-cba5-47d4-9063-64be4753c1a9",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-27T04:35:07.642Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761539706780-785986ec-2da7-45c2-bcd9-74730a077687.png"
+      }
+    },
+    {
+      "id": "88ab4af7-9d75-4342-a069-3efd388fd524",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-27T04:34:51.102Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761539690564-537ab619-a033-42bb-9d0b-f51dbaa6edf8.jpg"
+      }
+    },
+    {
+      "id": "5addeea2-1f8a-49be-b5f4-7f6f3495640a",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-27T04:34:46.730Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761539686065-5e818ac0-18b5-4b45-8007-86d1f7314413.png"
+      }
+    },
+    {
+      "id": "0239b650-1ab9-48ac-95d1-92f2957f8176",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-27T04:34:26.389Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761539665632-18f3fbc3-8d76-452e-815c-4410684dd9a2.png"
+      }
+    },
+    {
+      "id": "ba979749-df3d-4aeb-a881-5b211f215697",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-26T15:53:49.784Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761494028649-4ddd63ad-44a1-4a65-886f-198b93622081.png"
+      }
+    },
+    {
+      "id": "65232826-ded1-42f5-8f78-5cfe556382bc",
+      "scope": "employee",
+      "action": "delete",
+      "message": "ลบพนักงาน: นายC",
+      "timestamp": "2025-10-25T16:09:08.646Z",
+      "meta": {
+        "employeeId": "aab28938-fa86-4590-948d-4e984e515009"
+      }
+    },
+    {
+      "id": "6b72e8f6-a067-45eb-8e79-135fc4cc9b10",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายB",
+      "timestamp": "2025-10-25T16:08:57.243Z",
+      "meta": {
+        "employeeId": "9dec1964-dff9-4f54-a367-ca3c07b54b5d"
+      }
+    },
+    {
+      "id": "76155bc8-d475-4430-80bf-6fc87a1f778f",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายA",
+      "timestamp": "2025-10-25T16:08:41.791Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "49303c6b-c15b-4770-8e4a-909ce0ed2ad8",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นางสาวอารีนา มาหะ(นา)",
+      "timestamp": "2025-10-25T16:06:14.042Z",
+      "meta": {
+        "employeeId": "d3208733-6804-40e2-aaa4-dcba3ade674d"
+      }
+    },
+    {
+      "id": "dd0bffa1-65ff-40b7-b3b7-15f6b74af575",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายC",
+      "timestamp": "2025-10-25T15:56:35.640Z",
+      "meta": {
+        "employeeId": "aab28938-fa86-4590-948d-4e984e515009"
+      }
+    },
+    {
+      "id": "1515e84b-fe4d-4a1f-967c-94e4138cb3ee",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายA",
+      "timestamp": "2025-10-25T15:54:04.309Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "b81a7a54-4c89-4f68-8f80-725803f2d889",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายA",
+      "timestamp": "2025-10-25T15:49:37.183Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "732f54d6-b94e-43f7-9bd4-b9dea66a96fd",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: คุณปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-25T15:48:14.068Z",
+      "meta": {
+        "employeeId": "ab0b43bf-7b82-4798-b64a-d12f8c758236"
+      }
+    },
+    {
+      "id": "ff9dab66-43e6-4501-9487-bc15a028a1c7",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: อุบลดีมาร์ท",
+      "timestamp": "2025-10-25T15:35:55.399Z",
+      "meta": {
+        "storeId": "63e67624-f0b0-4ea3-93c1-ec8a134a1fb2",
+        "province": "อุบลราชธานี"
+      }
+    },
+    {
+      "id": "1c0224b7-68d4-416f-bb11-08f4a477183a",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 4 รายการ โดย นายB",
+      "timestamp": "2025-10-25T14:34:19.453Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 87,
+            "total": 870
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 840,
+            "total": 8400
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 5,
+            "unitPrice": 87,
+            "total": 435
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 840,
+            "total": 8400
+          }
+        ],
+        "total": 18105,
+        "submittedAt": "2025-10-25T14:34:19.040Z"
+      }
+    },
+    {
+      "id": "95a19e8d-712e-4cd0-b64e-4e0d803e045a",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 2 รายการ โดย นายB",
+      "timestamp": "2025-10-25T14:34:05.089Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "BL0-4002",
+            "productName": "แซนวิสครีมช็อก 400ก",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 84,
+            "total": 840
+          },
+          {
+            "productCode": "BL0-4002",
+            "productName": "แซนวิสครีมช็อก 400ก",
+            "unitName": "ลัง",
+            "quantity": 1,
+            "unitPrice": 840,
+            "total": 840
+          }
+        ],
+        "total": 1680,
+        "submittedAt": "2025-10-25T14:34:04.544Z"
+      }
+    },
+    {
+      "id": "f83d4b57-ce12-4c68-bf47-5769b906bbdf",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 6 รายการ โดย นายB",
+      "timestamp": "2025-10-25T14:32:31.974Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "items": [
+          {
+            "productCode": "BL0-4002",
+            "productName": "แซนวิสครีมช็อก 400ก",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 84,
+            "total": 840
+          },
+          {
+            "productCode": "BL0-4002",
+            "productName": "แซนวิสครีมช็อก 400ก",
+            "unitName": "ลัง",
+            "quantity": 3,
+            "unitPrice": 840,
+            "total": 2520
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 87,
+            "total": 870
+          },
+          {
+            "productCode": "BL0-4003",
+            "productName": "ก้นหอยครีมวานิลลา 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 840,
+            "total": 8400
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 50,
+            "unitPrice": 84,
+            "total": 4200
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 1,
+            "unitPrice": 840,
+            "total": 840
+          }
+        ],
+        "total": 17670,
+        "submittedAt": "2025-10-25T14:32:31.675Z"
+      }
+    },
+    {
+      "id": "274e3750-cbdd-4fad-9397-9e634ac90b19",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - นายB",
+      "timestamp": "2025-10-25T14:24:10.603Z",
+      "meta": {
+        "storeName": "ร้านค้าB",
+        "employeeName": "นายB",
+        "status": "check-in",
+        "submittedAt": "2025-10-25T14:24:08.783Z",
+        "location": {
+          "latitude": 13.791075623008286,
+          "longitude": 100.30297916698535,
+          "accuracy": 73
+        },
+        "locationDisplay": "13.791076,100.302979 ±73m",
+        "distance": 96.34292102782437,
+        "radius": 500,
+        "warning": null,
+        "storagePath": "attendance/2025/10/25/384ebe50-ac3e-4135-98ae-7500b14cf41c.jpg"
+      }
+    },
+    {
+      "id": "92a9306c-868b-4194-855e-b083c47a9260",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายB",
+      "timestamp": "2025-10-25T14:20:09.999Z",
+      "meta": {
+        "employeeId": "9dec1964-dff9-4f54-a367-ca3c07b54b5d"
+      }
+    },
+    {
+      "id": "da9d1a2a-d8f5-467c-afdd-0339c37d29b9",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายB",
+      "timestamp": "2025-10-25T14:11:01.883Z",
+      "meta": {
+        "employeeId": "9dec1964-dff9-4f54-a367-ca3c07b54b5d"
+      }
+    },
+    {
+      "id": "c52a847e-03d5-4598-927d-9af7b985ac50",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายB",
+      "timestamp": "2025-10-25T14:07:56.177Z",
+      "meta": {
+        "employeeId": "9dec1964-dff9-4f54-a367-ca3c07b54b5d"
+      }
+    },
+    {
+      "id": "cfb756b0-7066-4f3e-b38e-d0ac857297d6",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านค้าB",
+      "timestamp": "2025-10-25T14:06:56.822Z",
+      "meta": {
+        "storeId": "3097a90a-2ac3-46fe-930c-d2577b696537",
+        "province": "นครปฐม"
+      }
+    },
+    {
+      "id": "55f0cf82-9145-4955-bcc9-e44c75136dd6",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 4 รายการ โดย นายA",
+      "timestamp": "2025-10-24T13:54:47.844Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "BOL-5001",
+            "productName": "แยมสับปะรด 5 กก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 320,
+            "total": 3200
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ซอง",
+            "quantity": 20,
+            "unitPrice": 20,
+            "total": 400
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "แพ็ค",
+            "quantity": 3,
+            "unitPrice": 60,
+            "total": 180
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ลัง",
+            "quantity": 5,
+            "unitPrice": 600,
+            "total": 3000
+          }
+        ],
+        "total": 6780,
+        "submittedAt": "2025-10-24T13:54:46.695Z"
+      }
+    },
+    {
+      "id": "81768205-ed83-47da-b2a8-11f3364feeca",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 5 รายการ โดย นายA",
+      "timestamp": "2025-10-24T07:30:23.367Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ซอง",
+            "quantity": 20,
+            "unitPrice": 20,
+            "total": 400
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "แพ็ค",
+            "quantity": 5,
+            "unitPrice": 60,
+            "total": 300
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ลัง",
+            "quantity": 5,
+            "unitPrice": 600,
+            "total": 3000
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 74,
+            "total": 740
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 2,
+            "unitPrice": 700,
+            "total": 1400
+          }
+        ],
+        "total": 5840,
+        "submittedAt": "2025-10-24T07:30:22.954Z"
+      }
+    },
+    {
+      "id": "bdfa314d-9799-4591-82d1-98131cc2f142",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 3 รายการ โดย นายA",
+      "timestamp": "2025-10-24T07:19:45.713Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ซอง",
+            "quantity": 10,
+            "unitPrice": 20,
+            "total": 200
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "แพ็ค",
+            "quantity": 10,
+            "unitPrice": 60,
+            "total": 600
+          },
+          {
+            "productCode": "CL0-5001",
+            "productName": "โฟกัส คาราเมล",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 600,
+            "total": 6000
+          }
+        ],
+        "total": 6800,
+        "submittedAt": "2025-10-24T07:19:44.977Z"
+      }
+    },
+    {
+      "id": "f9d13d1f-c7df-466d-a91f-917ff6f1bb2d",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 3 รายการ โดย นายA",
+      "timestamp": "2025-10-24T03:43:41.682Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "BOL-5001",
+            "productName": "แยมสับปะรด 5 กก.",
+            "unitName": "ปี๊บ",
+            "quantity": 5,
+            "unitPrice": 320,
+            "total": 1600
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 74,
+            "total": 740
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 1,
+            "unitPrice": 700,
+            "total": 700
+          }
+        ],
+        "total": 3040,
+        "submittedAt": "2025-10-24T03:43:41.400Z"
+      }
+    },
+    {
+      "id": "f8f65970-7570-4241-bb8e-6e9fc26fbfe4",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 1 รายการ โดย นายA",
+      "timestamp": "2025-10-24T03:43:32.951Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "BOL-5001",
+            "productName": "แยมสับปะรด 5 กก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 320,
+            "total": 3200
+          }
+        ],
+        "total": 3200,
+        "submittedAt": "2025-10-24T03:43:32.644Z"
+      }
+    },
+    {
+      "id": "a7e8b7c5-5c73-427e-a27a-83f72619e694",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาออก - นายA",
+      "timestamp": "2025-10-24T03:43:20.600Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "status": "check-out",
+        "submittedAt": "2025-10-24T03:43:19.498Z",
+        "location": {
+          "latitude": 13.839422013572241,
+          "longitude": 100.1962343833885,
+          "accuracy": 99
+        },
+        "locationDisplay": "13.839422,100.196234 ±99m",
+        "distance": 116.67383609111884,
+        "radius": 500,
+        "warning": null,
+        "storagePath": "attendance/2025/10/24/5ddcf886-59fb-4bcc-8943-f80bf7ea8488.jpg"
+      }
+    },
+    {
+      "id": "ca538aed-23ad-470c-b9c0-cddb219fa24d",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - นายA",
+      "timestamp": "2025-10-24T03:43:06.755Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "status": "check-in",
+        "submittedAt": "2025-10-24T03:43:05.236Z",
+        "location": {
+          "latitude": 13.839421489786691,
+          "longitude": 100.19623515465565,
+          "accuracy": 100
+        },
+        "locationDisplay": "13.839421,100.196235 ±100m",
+        "distance": 116.60364215293747,
+        "radius": 500,
+        "warning": null,
+        "storagePath": "attendance/2025/10/24/ec4b8cd0-c9c6-466a-a4e2-c4eefd063963.jpg"
+      }
+    },
+    {
+      "id": "41d75c34-7c49-4511-a1bb-29097b2bc006",
+      "scope": "store",
+      "action": "update",
+      "message": "ปรับปรุงร้าน/หน่วยงาน: KPF",
+      "timestamp": "2025-10-24T03:42:54.260Z",
+      "meta": {
+        "storeId": "6b52cc3a-b019-4021-898b-26060163f7e0",
+        "province": "นครปฐม"
+      }
+    },
+    {
+      "id": "298f5568-88d0-4685-838f-d43cf567c096",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 2 รายการ โดย นายA",
+      "timestamp": "2025-10-24T02:57:52.247Z",
+      "meta": {
+        "storeName": "KPF",
+        "employeeName": "นายA",
+        "items": [
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ปี๊บ",
+            "quantity": 10,
+            "unitPrice": 74,
+            "total": 740
+          },
+          {
+            "productCode": "KL0-4014",
+            "productName": "ขาไก่ทรงเครื่อง 5 รส 400ก.",
+            "unitName": "ลัง",
+            "quantity": 10,
+            "unitPrice": 700,
+            "total": 7000
+          }
+        ],
+        "total": 7740,
+        "submittedAt": "2025-10-24T02:57:51.870Z"
+      }
+    },
+    {
+      "id": "38835897-69a6-44ef-81b3-9140502f86d1",
+      "scope": "store",
+      "action": "update",
+      "message": "ปรับปรุงร้าน/หน่วยงาน: ร้านวัชรวรรณ",
+      "timestamp": "2025-10-24T02:00:30.963Z",
+      "meta": {
+        "storeId": "c9f32a58-aa6c-4f6e-a480-d38efe6ecb27",
+        "province": "ระยอง"
+      }
+    },
+    {
+      "id": "64d89677-cf94-45b2-bfdc-3211f6a14bc9",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: คุณปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-24T02:00:10.224Z",
+      "meta": {
+        "employeeId": "ab0b43bf-7b82-4798-b64a-d12f8c758236"
+      }
+    },
+    {
+      "id": "17216437-57a5-48cb-8417-f245f1b2e3bf",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:59:06.136Z",
+      "meta": {
+        "employeeId": "557f6b4e-9f81-4768-b6ab-3a3a0ed69a43"
+      }
+    },
+    {
+      "id": "9af17ab9-5adf-4b03-a183-d462ea75a4bd",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นางสาวอารีนา มาหะ(นา)",
+      "timestamp": "2025-10-24T01:58:07.319Z",
+      "meta": {
+        "employeeId": "d3208733-6804-40e2-aaa4-dcba3ade674d"
+      }
+    },
+    {
+      "id": "0c3caba2-f496-47f4-a0e3-f7bbfd723329",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายธนพงษ์ แซ่ตั้ง(พีท)",
+      "timestamp": "2025-10-24T01:57:11.729Z",
+      "meta": {
+        "employeeId": "66b4e8a3-0fb7-41bb-a743-da3bda18abcd"
+      }
+    },
+    {
+      "id": "7f4af2f1-a5b9-4433-bed9-43943e3eeacc",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายA",
+      "timestamp": "2025-10-24T01:55:56.759Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "5f59a538-e4ce-4190-924f-6f1bcea346fd",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: KPF",
+      "timestamp": "2025-10-24T01:55:21.591Z",
+      "meta": {
+        "storeId": "6b52cc3a-b019-4021-898b-26060163f7e0",
+        "province": "นครปฐม"
+      }
+    },
+    {
+      "id": "d5c6464e-09f9-4087-871e-5ab6b9eabc88",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ยงสงวน ศูนย์ค้าส่ง",
+      "timestamp": "2025-10-24T01:54:29.222Z",
+      "meta": {
+        "storeId": "1f07a0b0-e5a6-4fa0-9bb7-23a2e126e712",
+        "province": "อุบลราชธานี"
+      }
+    },
+    {
+      "id": "2b86efc2-f662-4857-8d1f-3852392099d6",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านวรรณ",
+      "timestamp": "2025-10-24T01:53:34.263Z",
+      "meta": {
+        "storeId": "c9f32a58-aa6c-4f6e-a480-d38efe6ecb27",
+        "province": "ระยอง"
+      }
+    },
+    {
+      "id": "aab1746f-fa69-4f92-acc7-ac7009151ac1",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านศรีมัย",
+      "timestamp": "2025-10-24T01:52:39.494Z",
+      "meta": {
+        "storeId": "caa38483-d8ae-417c-9915-e29bb47f69e8",
+        "province": "นราธิวาส"
+      }
+    },
+    {
+      "id": "9d8dd300-c538-42fa-ae2b-73928d93f009",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: แฟมิลี่ ไฮเปอร์มาร์ท",
+      "timestamp": "2025-10-24T01:51:32.034Z",
+      "meta": {
+        "storeId": "db906a85-f447-446e-aa0d-23c07f05a4c6",
+        "province": "ยะลา"
+      }
+    },
+    {
+      "id": "30a36801-04c7-497e-8fa6-c0e70830f054",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: SUN",
+      "timestamp": "2025-10-24T01:49:06.383Z",
+      "meta": {
+        "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d"
+      }
+    },
+    {
+      "id": "ed874df4-1441-4561-89be-1a6747d2b5ff",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายซัน",
+      "timestamp": "2025-10-24T01:46:12.599Z",
+      "meta": {
+        "employeeId": "66272950-5a27-4c7e-b8f6-bae6e06fffbb"
+      }
+    },
+    {
+      "id": "e124a82c-12db-4941-9735-2b4f53a35241",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-5010 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:55.643Z",
+      "meta": {
+        "assignmentId": "362c3648-5957-4bdf-afc2-31f2abe51ddd",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-5010"
+      }
+    },
+    {
+      "id": "c540c376-825a-4b86-ae6e-558905f22225",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-5009 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:55.112Z",
+      "meta": {
+        "assignmentId": "e6e2064c-b90b-4989-b952-159d5f6cc0f4",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "5bf93e8c-e103-469e-8801-f8ef2d1c4a35",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-5009"
+      }
+    },
+    {
+      "id": "7ab00865-d407-473c-971c-9a1d568b3a3b",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-5006 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:54.456Z",
+      "meta": {
+        "assignmentId": "995f7050-c938-4e16-87fc-215efa24d216",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "9a4ec73b-6534-4161-98ef-4630ce8d1a12",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-5006"
+      }
+    },
+    {
+      "id": "4c7b03ef-75c6-4ea0-b340-9cc9e40024dc",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-5005 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:53.933Z",
+      "meta": {
+        "assignmentId": "7db1ec2f-4d3b-4826-9614-50bb72738a1b",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "be46475c-442f-4b19-a2cb-16d4e259ee75",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-5005"
+      }
+    },
+    {
+      "id": "3582a9d8-253d-46c8-bbd5-383559c14d2e",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-1202 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:53.177Z",
+      "meta": {
+        "assignmentId": "4b512399-a8fc-4330-aabc-c8e44bf901a2",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "72bf4769-dd2f-4578-9809-7073fb09677c",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-1202"
+      }
+    },
+    {
+      "id": "363a7a2a-55ca-48a2-b64b-b849cb82c84f",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-1201 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:52.692Z",
+      "meta": {
+        "assignmentId": "7d12ee47-4fe1-4def-b898-ee0e03859bd2",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-1201"
+      }
+    },
+    {
+      "id": "b3a70aa1-3265-41b6-915f-096de5f12b96",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า KL0-1002 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:51.984Z",
+      "meta": {
+        "assignmentId": "01bd3675-ce84-4b4d-be85-c11905474a4b",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "d77ade79-07f4-4d9e-aa7a-f435e4b140a1",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "KL0-1002"
+      }
+    },
+    {
+      "id": "5f9f0686-0a87-4487-84ed-94ac2f1fa976",
+      "scope": "product",
+      "action": "unassign",
+      "message": "ยกเลิกการผูกสินค้า CL0-5001 กับ นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-24T01:09:51.270Z",
+      "meta": {
+        "assignmentId": "5f6b1b80-792c-4c4c-badd-a2026448090a",
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productId": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b",
+        "employeeName": "นายไชยวัฒน์ ทองสุทธิ์",
+        "storeName": "ร้านวัชราวรรณ",
+        "productCode": "CL0-5001"
+      }
+    },
+    {
+      "id": "426bdcae-b08e-415e-97f4-34316ef0b27c",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 2 รายการ โดย นายริว",
+      "timestamp": "2025-10-23T04:18:33.313Z",
+      "meta": {
+        "storeName": "บริษัท เคพีฟู้ดส์ จำกัด",
+        "employeeName": "นายริว",
+        "items": [
+          {
+            "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee",
+            "productCode": "KL0-1201",
+            "productName": "ปังไก่รสสาหร่าย",
+            "quantity": 20,
+            "unitPrice": 20,
+            "total": 400
+          },
+          {
+            "productId": "b05fb1ee-8733-4b9d-a656-1fd8ce3e9d82",
+            "productCode": "CL0-2002",
+            "productName": "คอร์นโด รสนมน้ำผึ้ง95ก.",
+            "quantity": 10,
+            "unitPrice": 20,
+            "total": 200
+          }
+        ],
+        "total": 600,
+        "submittedAt": "2025-10-23T04:18:33.004Z"
+      }
+    },
+    {
+      "id": "a0827618-c6f5-4d50-8494-132237c2de01",
+      "scope": "sales",
+      "action": "create",
+      "message": "บันทึกยอดขาย 1 รายการ โดย นายริว",
+      "timestamp": "2025-10-23T04:18:20.595Z",
+      "meta": {
+        "storeName": "บริษัท เคพีฟู้ดส์ จำกัด",
+        "employeeName": "นายริว",
+        "items": [
+          {
+            "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee",
+            "productCode": "KL0-1201",
+            "productName": "ปังไก่รสสาหร่าย",
+            "quantity": 100,
+            "unitPrice": 20,
+            "total": 2000
+          }
+        ],
+        "total": 2000,
+        "submittedAt": "2025-10-23T04:18:19.766Z"
+      }
+    },
+    {
+      "id": "5f91dce1-72d7-4772-9f20-469a6c4c7b28",
+      "scope": "attendance",
+      "action": "create",
+      "message": "บันทึกเวลาเข้า - นายริว",
+      "timestamp": "2025-10-23T04:11:52.338Z",
+      "meta": {
+        "storeName": "บริษัท เคพีฟู้ดส์ จำกัด",
+        "employeeName": "นายริว",
+        "status": "check-in",
+        "submittedAt": "2025-10-23T04:11:50.393Z",
+        "location": {
+          "latitude": 13.8394085,
+          "longitude": 100.1966472,
+          "accuracy": 22.192
+        },
+        "locationDisplay": "13.839408,100.196647 ±22m",
+        "distance": 74.63777357302762,
+        "radius": 380,
+        "warning": null,
+        "storagePath": "attendance/2025/10/23/59c0e536-43fa-450b-a6cc-a78462d62a3d.jpg"
+      }
+    },
+    {
+      "id": "4975c1a0-e7ae-4dc9-a837-b5c70b9f5c33",
+      "scope": "store",
+      "action": "update",
+      "message": "ปรับปรุงร้าน/หน่วยงาน: บริษัท เคพีฟู้ดส์ จำกัด",
+      "timestamp": "2025-10-22T04:56:16.092Z",
+      "meta": {
+        "storeId": "c7fab475-e8cc-4bf2-ba6a-397c7f310d0c",
+        "province": "นครปฐม"
+      }
+    },
+    {
+      "id": "e3db83d6-df1f-47f8-aa3f-227a7c186d28",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายริว",
+      "timestamp": "2025-10-22T04:54:34.207Z",
+      "meta": {
+        "employeeId": "883068c1-63d7-4edb-830c-5d6cffeef95c"
+      }
+    },
+    {
+      "id": "648667d2-13d7-4106-a2ee-7119313cb677",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: บริษัท เคพีฟู้ดส์ จำกัด",
+      "timestamp": "2025-10-22T04:54:06.224Z",
+      "meta": {
+        "storeId": "c7fab475-e8cc-4bf2-ba6a-397c7f310d0c",
+        "province": "นครปฐม"
+      }
+    },
+    {
+      "id": "6b0e739c-ccf7-4386-ab67-fe3d62c81d2a",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4004 - แยมสับปะรด 400 ก.",
+      "timestamp": "2025-10-21T18:38:31.423Z",
+      "meta": {
+        "productId": "ea748b9f-8403-4e7f-97be-4fa7ca347d06"
+      }
+    },
+    {
+      "id": "c7f7ce0c-6aed-48a7-acbb-998b3095ff22",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4002 - คุกกี้แซนวิสช็อก 400ก.",
+      "timestamp": "2025-10-21T18:36:00.401Z",
+      "meta": {
+        "productId": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc"
+      }
+    },
+    {
+      "id": "33737ff3-94f8-4c82-bd62-79a5e5461280",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงหมวดหมู่: ปี๊บ 400ก.",
+      "timestamp": "2025-10-21T18:14:20.516Z",
+      "meta": {
+        "categoryId": "cd23c1fb-5349-4634-83fc-ba0b38e0adac"
+      }
+    },
+    {
+      "id": "8fe229e9-8ad2-42ed-bfc1-6481b5b251e1",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มหมวดหมู่ใหม่: ปี๊บ 400ก.",
+      "timestamp": "2025-10-21T16:37:26.716Z",
+      "meta": {
+        "categoryId": "cd23c1fb-5349-4634-83fc-ba0b38e0adac"
+      }
+    },
+    {
+      "id": "365c49e8-def3-413e-830c-1560aac50cfe",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มหมวดหมู่ใหม่: ปี๊บ 5กก.",
+      "timestamp": "2025-10-21T16:36:57.357Z",
+      "meta": {
+        "categoryId": "3b1ea693-62ea-43cc-9d35-225059bfe692"
+      }
+    },
+    {
+      "id": "865d2806-7eeb-4bb0-8501-c273b8aa4623",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5009 - เวเฟอร์สติ๊กแฟนซี ใบเตย-ช็อก 5 กก.",
+      "timestamp": "2025-10-21T16:07:22.055Z",
+      "meta": {
+        "productId": "fa79f6c2-2da8-41f4-b6d8-685f863f0723"
+      }
+    },
+    {
+      "id": "e9560c02-9670-4f71-9efd-871653276083",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5004 - เวเฟอร์สติ๊กสตรอ 5 กก.",
+      "timestamp": "2025-10-21T16:07:22.028Z",
+      "meta": {
+        "productId": "0fa3c22d-e960-4b98-ad5e-da1a299dc867"
+      }
+    },
+    {
+      "id": "8a4252fa-7579-484e-9c8f-4ccd74b6dc0a",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5002 - เวเฟอร์สติ๊กใบเตย 5 กก.",
+      "timestamp": "2025-10-21T16:07:21.967Z",
+      "meta": {
+        "productId": "1208682d-72fd-4075-82ff-5d87aac55b04"
+      }
+    },
+    {
+      "id": "f9c0a700-a291-45e2-9a68-1aa73303a0b5",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5001 - เวเฟอร์สติ๊กช็อก 5 กก.",
+      "timestamp": "2025-10-21T16:07:21.889Z",
+      "meta": {
+        "productId": "9de85cc1-703f-4279-bea3-2445d8ae98f8"
+      }
+    },
+    {
+      "id": "3d04d864-b91b-4bae-af85-3f953b8bf31a",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-4005 - เวเฟอร์สติ๊กรสช็อก 400ก.",
+      "timestamp": "2025-10-21T16:07:21.801Z",
+      "meta": {
+        "productId": "f423c23e-3c2a-4541-b926-f205ba87cfe0"
+      }
+    },
+    {
+      "id": "cc6b514f-4506-4372-87f0-53291d2ab7b5",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-1104 - เวเฟอร์สติ๊กช็อก 1.1 กก.",
+      "timestamp": "2025-10-21T16:07:21.746Z",
+      "meta": {
+        "productId": "772fbe45-7990-47b9-aeb7-8e8809fe1cb6"
+      }
+    },
+    {
+      "id": "360cf928-64b8-4ae1-8ca2-009bea2953b0",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-1001 - ปี๊บเวเฟอร์สติ๊กช็อก 1.2 กก.",
+      "timestamp": "2025-10-21T16:07:21.725Z",
+      "meta": {
+        "productId": "9cfbf392-7e26-4e76-af27-679cc7ff077a"
+      }
+    },
+    {
+      "id": "164a710b-84b4-4769-bf90-554ec3b057e9",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5013 - ข้าวเกรียบหมึก รสซอสโชยุ105ก.",
+      "timestamp": "2025-10-21T16:07:21.700Z",
+      "meta": {
+        "productId": "bc0092fb-2f23-4e3d-a73e-636c66543635"
+      }
+    },
+    {
+      "id": "78f24402-721b-4b41-85b7-0fb6df1899d1",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5012 - ข้าวเกรียบหมึกรสเผ็ดหวาน 20 ก.",
+      "timestamp": "2025-10-21T16:07:21.678Z",
+      "meta": {
+        "productId": "a5993b70-b04c-46ff-9ac2-6aacce9e1ccd"
+      }
+    },
+    {
+      "id": "a3c720b6-6266-44c7-93f1-099132df3498",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5011 - ข้าวเกรียบกุ้งรสหมึกย่าง 20 ก.",
+      "timestamp": "2025-10-21T16:07:21.642Z",
+      "meta": {
+        "productId": "2c33e607-a5aa-4b59-96b5-88cf2126c69b"
+      }
+    },
+    {
+      "id": "037210ca-cf5e-4208-bfb5-677d66d0c528",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5010 - ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "timestamp": "2025-10-21T16:07:21.616Z",
+      "meta": {
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef"
+      }
+    },
+    {
+      "id": "4e2d4472-ac26-41e0-bad6-25608db0083c",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5009 - ข้าวเกรียบกุ้ง รสหมึกย่าง105ก.",
+      "timestamp": "2025-10-21T16:07:21.596Z",
+      "meta": {
+        "productId": "5bf93e8c-e103-469e-8801-f8ef2d1c4a35"
+      }
+    },
+    {
+      "id": "339885f2-7485-4cc4-8e27-0fa0aea4f82e",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5006 - แดกูฮอตโทเมโท",
+      "timestamp": "2025-10-21T16:07:21.568Z",
+      "meta": {
+        "productId": "9a4ec73b-6534-4161-98ef-4630ce8d1a12"
+      }
+    },
+    {
+      "id": "9520fd6e-ce81-4ab9-a265-58fde909c734",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5005 - แดกูดั้งเดิม",
+      "timestamp": "2025-10-21T16:07:21.546Z",
+      "meta": {
+        "productId": "be46475c-442f-4b19-a2cb-16d4e259ee75"
+      }
+    },
+    {
+      "id": "288baa42-16f8-4ef1-a693-71a3a2258574",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5003 - ขาไก่ทรงเครื่อง 5 รส 5 กก.",
+      "timestamp": "2025-10-21T16:07:21.498Z",
+      "meta": {
+        "productId": "0de3047c-5bfe-47f6-92d0-d272720bfca8"
+      }
+    },
+    {
+      "id": "9a43d059-871d-4dd2-95c5-0ee056a21f68",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5002 - ขาไก่รสดั้งเดิม 5 กก.",
+      "timestamp": "2025-10-21T16:07:21.474Z",
+      "meta": {
+        "productId": "385cbe0a-2b06-4c9d-a15b-995f7d393325"
+      }
+    },
+    {
+      "id": "513b555b-631f-4ac2-9c13-453e9165305b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5001 - ทับทิมทองทรงเครื่อง 5 รส 5.5 กก.",
+      "timestamp": "2025-10-21T16:07:21.414Z",
+      "meta": {
+        "productId": "455e9b8e-2717-4983-a947-a344383e01ad"
+      }
+    },
+    {
+      "id": "bcc08ee2-9305-45e6-b7ec-44e09c8b41e7",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4014 - ปิ๊บขาไก่ทรงเครื่อง 5 รส 400ก.",
+      "timestamp": "2025-10-21T16:07:21.312Z",
+      "meta": {
+        "productId": "797a3a01-7659-4342-b252-4c57ed1ec39d"
+      }
+    },
+    {
+      "id": "8dcda6e2-1898-49a1-b7e2-78c78508ac36",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4010 - ข้าวเกรียบกุ้งรสหมึกย่าง 400 ก.",
+      "timestamp": "2025-10-21T16:07:21.242Z",
+      "meta": {
+        "productId": "9ef865e4-fe78-4044-b3d1-34ce161a7daa"
+      }
+    },
+    {
+      "id": "383cc7f3-7f8c-48ba-a9f7-b9b3c702e74b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4008 - ข้าวเกรียบหมึกรสเผ็ดหวาน 400 ก.",
+      "timestamp": "2025-10-21T16:07:11.309Z",
+      "meta": {
+        "productId": "1c73b4bc-b442-4c03-9f06-4960358f83b4"
+      }
+    },
+    {
+      "id": "6451ee7c-0603-4177-a59d-ffe55fa1cdbc",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1202 - ปังไก่รสวิงซ์แซ่บ",
+      "timestamp": "2025-10-21T16:07:11.266Z",
+      "meta": {
+        "productId": "72bf4769-dd2f-4578-9809-7073fb09677c"
+      }
+    },
+    {
+      "id": "d14413db-6f22-4323-b7e9-51a8836532e1",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1201 - ปังไก่รสสาหร่าย",
+      "timestamp": "2025-10-21T16:07:11.226Z",
+      "meta": {
+        "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee"
+      }
+    },
+    {
+      "id": "6262a987-99d5-4293-b635-a07540f4331f",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1002 - ไฮไรซ์ รสสไปซี่โทเมโท",
+      "timestamp": "2025-10-21T16:07:11.192Z",
+      "meta": {
+        "productId": "d77ade79-07f4-4d9e-aa7a-f435e4b140a1"
+      }
+    },
+    {
+      "id": "922654b5-5524-487e-bafe-67e352f14709",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5005 - คอร์นวอย รสนม",
+      "timestamp": "2025-10-21T16:07:11.148Z",
+      "meta": {
+        "productId": "e9e3ba49-69c4-4ee5-9e51-8594c3904a4b"
+      }
+    },
+    {
+      "id": "b789a232-097d-4415-a877-5c66689e2b10",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5004 - คอร์นวอยซ์ รสช็อก",
+      "timestamp": "2025-10-21T16:07:11.110Z",
+      "meta": {
+        "productId": "a991ec89-f7db-462a-ae59-b8287edba363"
+      }
+    },
+    {
+      "id": "9e7a9688-a7e7-490c-9b92-0a3149a83bbb",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5001 - โฟกัส คาราเมล",
+      "timestamp": "2025-10-21T16:07:11.077Z",
+      "meta": {
+        "productId": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b"
+      }
+    },
+    {
+      "id": "993e1942-3a52-4a92-aa13-bcb3c0e4bcbf",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-2002 - คอร์นโด รสนมน้ำผึ้ง95ก.",
+      "timestamp": "2025-10-21T16:07:11.042Z",
+      "meta": {
+        "productId": "b05fb1ee-8733-4b9d-a656-1fd8ce3e9d82"
+      }
+    },
+    {
+      "id": "3df7cec8-ae50-44f9-a027-13cbba04868c",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-2001 - คอร์นโด รสนมน้ำผึ้ง20ก.",
+      "timestamp": "2025-10-21T16:07:11.006Z",
+      "meta": {
+        "productId": "dabb0c6e-b263-4031-aa6d-bbd681911a89"
+      }
+    },
+    {
+      "id": "265fc707-51cb-463f-8c02-1380fe2864de",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5026 - คุกกี้ก้นหอยวานิลลา 5 กก.",
+      "timestamp": "2025-10-21T16:07:10.973Z",
+      "meta": {
+        "productId": "c6adffee-f5b9-44c6-b237-ebabf24ded93"
+      }
+    },
+    {
+      "id": "e8ba803f-c5e5-4e94-ad2e-2192ca44bedb",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5024 - คุกกี้ก้นหอยทุเรียน 5 กก.",
+      "timestamp": "2025-10-21T16:07:10.934Z",
+      "meta": {
+        "productId": "6f3ea4fd-b41d-4b24-8238-2babf4c1a246"
+      }
+    },
+    {
+      "id": "675afe64-6353-4b77-a7af-1ed9f95cb89e",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5004 - คุกกี้แซนวิสช็อก 5 กก.",
+      "timestamp": "2025-10-21T16:07:10.894Z",
+      "meta": {
+        "productId": "602d8361-eb07-4741-8356-a6d25303078c"
+      }
+    },
+    {
+      "id": "f3cb190c-50e2-44f3-9840-89d3007931c7",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5001 - แยมสับปะรด 5 กก.",
+      "timestamp": "2025-10-21T16:07:10.849Z",
+      "meta": {
+        "productId": "a2896163-6c79-44ae-a643-3d3915ba44f4"
+      }
+    },
+    {
+      "id": "d828edf9-907b-41d1-90d1-a1305b3d0d0b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4004 - แยมสับปะรด 400 ก.",
+      "timestamp": "2025-10-21T16:07:10.781Z",
+      "meta": {
+        "productId": "ea748b9f-8403-4e7f-97be-4fa7ca347d06"
+      }
+    },
+    {
+      "id": "a4a09e10-fe33-414b-a0b6-91a313336a35",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4003 - คุกกี้ก้นหอยวานิลลา 400ก.",
+      "timestamp": "2025-10-21T16:07:10.672Z",
+      "meta": {
+        "productId": "7d741a21-8ec0-4404-98b9-dd81c50ce0f3"
+      }
+    },
+    {
+      "id": "5286a03f-3fe3-4ead-a49d-6b23497d34dc",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4002 - คุกกี้แซนวิสช็อก 400ก.",
+      "timestamp": "2025-10-21T16:07:10.587Z",
+      "meta": {
+        "productId": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc"
+      }
+    },
+    {
+      "id": "8ff34ae4-5e49-46d1-9148-bc2bb20b1217",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1108 - ABC 1.1 กก.",
+      "timestamp": "2025-10-21T16:07:10.460Z",
+      "meta": {
+        "productId": "a4a3effc-45ea-423b-b3e8-69b8541d71c0"
+      }
+    },
+    {
+      "id": "9fed511f-c12c-45ca-bf1b-dc1d2c957e81",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1105 - ก้นหอย วานิลลา 1.1 กก.",
+      "timestamp": "2025-10-21T16:07:10.343Z",
+      "meta": {
+        "productId": "3628460f-480a-4632-8d43-ac6b9c751390"
+      }
+    },
+    {
+      "id": "3ec81860-d8a5-42db-a7f9-eed400501d9a",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1104 - แยมสับปะรด 1.1 กก.",
+      "timestamp": "2025-10-21T16:07:10.209Z",
+      "meta": {
+        "productId": "f3438e99-8126-47a0-86a0-ee26b4f7f86d"
+      }
+    },
+    {
+      "id": "4a704b86-f0ce-4eea-9fa1-e721f3292e92",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1005 - คุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "timestamp": "2025-10-21T16:07:10.096Z",
+      "meta": {
+        "productId": "6d5fab48-073e-44dc-8c9c-ea14a5023dab"
+      }
+    },
+    {
+      "id": "0a920c52-4f0d-4406-8187-dacafc9d1d15",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5009 - เวเฟอร์สติ๊กแฟนซี ใบเตย-ช็อก 5 กก.",
+      "timestamp": "2025-10-21T15:33:25.758Z",
+      "meta": {
+        "productId": "fa79f6c2-2da8-41f4-b6d8-685f863f0723"
+      }
+    },
+    {
+      "id": "aec76078-29e0-4a0e-a451-61677639d5f9",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5004 - เวเฟอร์สติ๊กสตรอ 5 กก.",
+      "timestamp": "2025-10-21T15:33:25.058Z",
+      "meta": {
+        "productId": "0fa3c22d-e960-4b98-ad5e-da1a299dc867"
+      }
+    },
+    {
+      "id": "920a2fe1-0326-45fd-ab19-59e9718fde87",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5002 - เวเฟอร์สติ๊กใบเตย 5 กก.",
+      "timestamp": "2025-10-21T15:33:24.285Z",
+      "meta": {
+        "productId": "1208682d-72fd-4075-82ff-5d87aac55b04"
+      }
+    },
+    {
+      "id": "7ae1a806-1cc2-4c3f-baee-3a2cc94bd7bc",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-5001 - เวเฟอร์สติ๊กช็อก 5 กก.",
+      "timestamp": "2025-10-21T15:33:23.446Z",
+      "meta": {
+        "productId": "9de85cc1-703f-4279-bea3-2445d8ae98f8"
+      }
+    },
+    {
+      "id": "5ac42dd1-a64f-465f-a109-736ebd0f36dd",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-4005 - เวเฟอร์สติ๊กรสช็อก 400ก.",
+      "timestamp": "2025-10-21T15:33:22.243Z",
+      "meta": {
+        "productId": "f423c23e-3c2a-4541-b926-f205ba87cfe0"
+      }
+    },
+    {
+      "id": "bd64b86f-7cd9-42aa-82de-5134533993fe",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-1104 - เวเฟอร์สติ๊กช็อก 1.1 กก.",
+      "timestamp": "2025-10-21T15:33:20.059Z",
+      "meta": {
+        "productId": "772fbe45-7990-47b9-aeb7-8e8809fe1cb6"
+      }
+    },
+    {
+      "id": "6c2f5888-f3d6-4580-b05b-2c5fcfb80006",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-1001 - ปี๊บเวเฟอร์สติ๊กช็อก 1.2 กก.",
+      "timestamp": "2025-10-21T15:33:18.512Z",
+      "meta": {
+        "productId": "9cfbf392-7e26-4e76-af27-679cc7ff077a"
+      }
+    },
+    {
+      "id": "22eb8f33-0658-4b13-a54a-52f2f184b6f6",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5013 - ข้าวเกรียบหมึก รสซอสโชยุ105ก.",
+      "timestamp": "2025-10-21T15:33:15.778Z",
+      "meta": {
+        "productId": "bc0092fb-2f23-4e3d-a73e-636c66543635"
+      }
+    },
+    {
+      "id": "ac2e21c1-4502-4134-b0ba-ed52e21ad6a6",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5012 - ข้าวเกรียบหมึกรสเผ็ดหวาน 20 ก.",
+      "timestamp": "2025-10-21T15:33:13.226Z",
+      "meta": {
+        "productId": "a5993b70-b04c-46ff-9ac2-6aacce9e1ccd"
+      }
+    },
+    {
+      "id": "86787bab-bd00-4926-b25f-8104efe56565",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5011 - ข้าวเกรียบกุ้งรสหมึกย่าง 20 ก.",
+      "timestamp": "2025-10-21T15:33:10.880Z",
+      "meta": {
+        "productId": "2c33e607-a5aa-4b59-96b5-88cf2126c69b"
+      }
+    },
+    {
+      "id": "4a0edaa7-3f8d-468e-922b-f51b0ed11353",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5010 - ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "timestamp": "2025-10-21T15:33:08.397Z",
+      "meta": {
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef"
+      }
+    },
+    {
+      "id": "bbb89e51-1e37-406b-add8-930c9944626c",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5009 - ข้าวเกรียบกุ้ง รสหมึกย่าง105ก.",
+      "timestamp": "2025-10-21T15:33:05.728Z",
+      "meta": {
+        "productId": "5bf93e8c-e103-469e-8801-f8ef2d1c4a35"
+      }
+    },
+    {
+      "id": "314b6a5e-7a16-460f-be2b-5b164188a4e3",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5006 - แดกูฮอตโทเมโท",
+      "timestamp": "2025-10-21T15:33:03.479Z",
+      "meta": {
+        "productId": "9a4ec73b-6534-4161-98ef-4630ce8d1a12"
+      }
+    },
+    {
+      "id": "8fb9c39c-6948-4aea-84ff-84f2efebf4c8",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5005 - แดกูดั้งเดิม",
+      "timestamp": "2025-10-21T15:33:01.208Z",
+      "meta": {
+        "productId": "be46475c-442f-4b19-a2cb-16d4e259ee75"
+      }
+    },
+    {
+      "id": "00f4360c-c8a0-435b-8b1e-eb90ee92c131",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5003 - ขาไก่ทรงเครื่อง 5 รส 5 กก.",
+      "timestamp": "2025-10-21T15:32:58.478Z",
+      "meta": {
+        "productId": "0de3047c-5bfe-47f6-92d0-d272720bfca8"
+      }
+    },
+    {
+      "id": "36545233-6c89-4629-a196-1124a2668d4c",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5002 - ขาไก่รสดั้งเดิม 5 กก.",
+      "timestamp": "2025-10-21T15:32:56.747Z",
+      "meta": {
+        "productId": "385cbe0a-2b06-4c9d-a15b-995f7d393325"
+      }
+    },
+    {
+      "id": "8919993a-1120-4bc9-a9a8-a8fa1f45aa6c",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5001 - ทับทิมทองทรงเครื่อง 5 รส 5.5 กก.",
+      "timestamp": "2025-10-21T15:32:55.028Z",
+      "meta": {
+        "productId": "455e9b8e-2717-4983-a947-a344383e01ad"
+      }
+    },
+    {
+      "id": "4d6b4bcb-3cb7-4e7c-8bed-235f5385eda7",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4014 - ปิ๊บขาไก่ทรงเครื่อง 5 รส 400ก.",
+      "timestamp": "2025-10-21T15:32:52.430Z",
+      "meta": {
+        "productId": "797a3a01-7659-4342-b252-4c57ed1ec39d"
+      }
+    },
+    {
+      "id": "cef1e85c-8e03-4bb0-9618-b63f32fcfbd9",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4010 - ข้าวเกรียบกุ้งรสหมึกย่าง 400 ก.",
+      "timestamp": "2025-10-21T15:32:50.697Z",
+      "meta": {
+        "productId": "9ef865e4-fe78-4044-b3d1-34ce161a7daa"
+      }
+    },
+    {
+      "id": "e3ad86be-6a5b-4aba-87c9-5d5020102592",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-4008 - ข้าวเกรียบหมึกรสเผ็ดหวาน 400 ก.",
+      "timestamp": "2025-10-21T15:31:51.050Z",
+      "meta": {
+        "productId": "1c73b4bc-b442-4c03-9f06-4960358f83b4"
+      }
+    },
+    {
+      "id": "102cd444-0ba6-47d6-ad5d-7d6f27fe338b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1202 - ปังไก่รสวิงซ์แซ่บ",
+      "timestamp": "2025-10-21T15:31:50.084Z",
+      "meta": {
+        "productId": "72bf4769-dd2f-4578-9809-7073fb09677c"
+      }
+    },
+    {
+      "id": "4ded3722-597a-45a9-a61b-73256b14616b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1201 - ปังไก่รสสาหร่าย",
+      "timestamp": "2025-10-21T15:31:49.058Z",
+      "meta": {
+        "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee"
+      }
+    },
+    {
+      "id": "d9f71aea-e5d0-4050-b1a6-879747559bd0",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-1002 - ไฮไรซ์ รสสไปซี่โทเมโท",
+      "timestamp": "2025-10-21T15:31:48.018Z",
+      "meta": {
+        "productId": "d77ade79-07f4-4d9e-aa7a-f435e4b140a1"
+      }
+    },
+    {
+      "id": "3a5fd4a6-a088-4b25-b679-40af2c112fa7",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5005 - คอร์นวอย รสนม",
+      "timestamp": "2025-10-21T15:31:47.146Z",
+      "meta": {
+        "productId": "e9e3ba49-69c4-4ee5-9e51-8594c3904a4b"
+      }
+    },
+    {
+      "id": "8ead2f48-ece9-4ad8-bfc0-737829004700",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5004 - คอร์นวอยซ์ รสช็อก",
+      "timestamp": "2025-10-21T15:31:46.097Z",
+      "meta": {
+        "productId": "a991ec89-f7db-462a-ae59-b8287edba363"
+      }
+    },
+    {
+      "id": "ad6f7dca-b139-4d1e-a5a0-e75c851c4206",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5001 - โฟกัส คาราเมล",
+      "timestamp": "2025-10-21T15:31:44.853Z",
+      "meta": {
+        "productId": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b"
+      }
+    },
+    {
+      "id": "c56462e7-46d4-42bc-815d-30b1c275be9a",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-2002 - คอร์นโด รสนมน้ำผึ้ง95ก.",
+      "timestamp": "2025-10-21T15:31:43.419Z",
+      "meta": {
+        "productId": "b05fb1ee-8733-4b9d-a656-1fd8ce3e9d82"
+      }
+    },
+    {
+      "id": "171a3f7f-1ebc-4c44-9901-9adb47d13e5f",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-2001 - คอร์นโด รสนมน้ำผึ้ง20ก.",
+      "timestamp": "2025-10-21T15:31:42.061Z",
+      "meta": {
+        "productId": "dabb0c6e-b263-4031-aa6d-bbd681911a89"
+      }
+    },
+    {
+      "id": "5ed3f357-d2e2-488e-b817-71eea31e9d59",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5026 - คุกกี้ก้นหอยวานิลลา 5 กก.",
+      "timestamp": "2025-10-21T15:31:40.445Z",
+      "meta": {
+        "productId": "c6adffee-f5b9-44c6-b237-ebabf24ded93"
+      }
+    },
+    {
+      "id": "1677ba66-d6e0-4671-ba49-69937a3403a3",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5024 - คุกกี้ก้นหอยทุเรียน 5 กก.",
+      "timestamp": "2025-10-21T15:31:38.970Z",
+      "meta": {
+        "productId": "6f3ea4fd-b41d-4b24-8238-2babf4c1a246"
+      }
+    },
+    {
+      "id": "cadf29b3-0015-46b1-89ac-3a2b51772e25",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5004 - คุกกี้แซนวิสช็อก 5 กก.",
+      "timestamp": "2025-10-21T15:31:37.298Z",
+      "meta": {
+        "productId": "602d8361-eb07-4741-8356-a6d25303078c"
+      }
+    },
+    {
+      "id": "94c57d98-97da-4e83-a6a5-c38b72a88773",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-5001 - แยมสับปะรด 5 กก.",
+      "timestamp": "2025-10-21T15:31:35.343Z",
+      "meta": {
+        "productId": "a2896163-6c79-44ae-a643-3d3915ba44f4"
+      }
+    },
+    {
+      "id": "9a1dc7a3-13b7-4a1b-8d86-eb51c254d6de",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4004 - แยมสับปะรด 400 ก.",
+      "timestamp": "2025-10-21T15:31:33.706Z",
+      "meta": {
+        "productId": "ea748b9f-8403-4e7f-97be-4fa7ca347d06"
+      }
+    },
+    {
+      "id": "2dc41bcc-deb2-4866-b6b0-2a9c288841ab",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4003 - คุกกี้ก้นหอยวานิลลา 400ก.",
+      "timestamp": "2025-10-21T15:31:32.113Z",
+      "meta": {
+        "productId": "7d741a21-8ec0-4404-98b9-dd81c50ce0f3"
+      }
+    },
+    {
+      "id": "6f92ce9a-6fc7-4113-9210-d5ecd4bb0989",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4002 - คุกกี้แซนวิสช็อก 400ก.",
+      "timestamp": "2025-10-21T15:31:30.717Z",
+      "meta": {
+        "productId": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc"
+      }
+    },
+    {
+      "id": "dc524a02-19f3-4114-9272-556734f25a77",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1108 - ABC 1.1 กก.",
+      "timestamp": "2025-10-21T15:31:29.092Z",
+      "meta": {
+        "productId": "a4a3effc-45ea-423b-b3e8-69b8541d71c0"
+      }
+    },
+    {
+      "id": "bc7acea5-9031-465f-a7a3-6c98af83a8ad",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1105 - ก้นหอย วานิลลา 1.1 กก.",
+      "timestamp": "2025-10-21T15:31:27.825Z",
+      "meta": {
+        "productId": "3628460f-480a-4632-8d43-ac6b9c751390"
+      }
+    },
+    {
+      "id": "2e315859-df5e-43a5-8595-6ea48faa696f",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1104 - แยมสับปะรด 1.1 กก.",
+      "timestamp": "2025-10-21T15:31:26.665Z",
+      "meta": {
+        "productId": "f3438e99-8126-47a0-86a0-ee26b4f7f86d"
+      }
+    },
+    {
+      "id": "e369e6fe-cce9-4596-931c-a5ef0dce517b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1005 - คุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "timestamp": "2025-10-21T15:31:25.569Z",
+      "meta": {
+        "productId": "6d5fab48-073e-44dc-8c9c-ea14a5023dab"
+      }
+    },
+    {
+      "id": "df21a356-c17c-49c5-9fe3-efe1222581ec",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1005 - คุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "timestamp": "2025-10-21T15:05:13.295Z",
+      "meta": {
+        "productId": "6d5fab48-073e-44dc-8c9c-ea14a5023dab"
+      }
+    },
+    {
+      "id": "03194dd6-5159-4d1d-901f-68749bca660a",
+      "scope": "system",
+      "action": "update",
+      "message": "อัปเดตโลโก้ระบบ",
+      "timestamp": "2025-10-21T14:36:37.090Z",
+      "meta": {
+        "logoPath": "/uploads/branding-logo-1761057396845-06ca73f2-067d-4ffd-bff6-563d6c245294.png"
+      }
+    },
+    {
+      "id": "cfb81461-a08f-4dec-8744-12007cfc88a1",
+      "scope": "product",
+      "action": "assign",
+      "message": "ผูกสินค้า 8 รายการกับ นายไชยวัฒน์ ทองสุทธิ์ (สาขา ร้านวัชราวรรณ)",
+      "timestamp": "2025-10-21T14:35:31.039Z",
+      "meta": {
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb",
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "productIds": [
+          "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b",
+          "9a4ec73b-6534-4161-98ef-4630ce8d1a12",
+          "be46475c-442f-4b19-a2cb-16d4e259ee75",
+          "d77ade79-07f4-4d9e-aa7a-f435e4b140a1",
+          "2bc2c56e-de96-46df-91f7-14a43f7646ef",
+          "5bf93e8c-e103-469e-8801-f8ef2d1c4a35",
+          "16294bbb-d33c-41d0-91f1-80f50eb69fee",
+          "72bf4769-dd2f-4578-9809-7073fb09677c"
+        ]
+      }
+    },
+    {
+      "id": "dcf4243c-b6b8-451e-a251-5a3f3f9866a2",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายปาตีเมาะ สาเหมาะ",
+      "timestamp": "2025-10-21T14:32:21.470Z",
+      "meta": {
+        "employeeId": "baee562c-beb4-4cb9-b8cc-5ae537fc9fe1"
+      }
+    },
+    {
+      "id": "46368e20-ca57-4bef-b8d7-00ddfb4ad581",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นายไชยวัฒน์ ทองสุทธิ์",
+      "timestamp": "2025-10-21T14:31:30.120Z",
+      "meta": {
+        "employeeId": "a582f648-3665-49a2-bb02-64d4f94d16eb"
+      }
+    },
+    {
+      "id": "ad32f8e3-1012-42b6-892b-ada9600bf1af",
+      "scope": "employee",
+      "action": "update",
+      "message": "ปรับปรุงข้อมูลพนักงาน: นายธนพงษ์ แซ่ตั้ง(พีท)",
+      "timestamp": "2025-10-21T14:30:51.321Z",
+      "meta": {
+        "employeeId": "3898c4f4-7333-418a-9a2a-25e22f50247c"
+      }
+    },
+    {
+      "id": "19a2b3ee-df5b-453e-a581-edcce19baa37",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: นางสาวอารีนา มาหะ(นา)",
+      "timestamp": "2025-10-21T14:30:40.893Z",
+      "meta": {
+        "employeeId": "5454eb24-c5c5-48c9-a898-99ddc5f72906"
+      }
+    },
+    {
+      "id": "6242225f-0bd2-4c3b-bc48-4732cd21a4f9",
+      "scope": "employee",
+      "action": "create",
+      "message": "เพิ่มพนักงานใหม่: ธนพงษ์ แซ่ตั้ง(พีท)",
+      "timestamp": "2025-10-21T14:29:56.633Z",
+      "meta": {
+        "employeeId": "3898c4f4-7333-418a-9a2a-25e22f50247c"
+      }
+    },
+    {
+      "id": "46a87f71-5560-47a2-8107-b9a65bc9e035",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5012 - ข้าวเกรียบหมึกรสเผ็ดหวาน 20 ก.",
+      "timestamp": "2025-10-21T09:42:07.473Z",
+      "meta": {
+        "productId": "a5993b70-b04c-46ff-9ac2-6aacce9e1ccd"
+      }
+    },
+    {
+      "id": "9ef7167e-b058-43e1-b30c-1bc4fb74d459",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5011 - ข้าวเกรียบกุ้งรสหมึกย่าง 20 ก.",
+      "timestamp": "2025-10-21T09:41:54.464Z",
+      "meta": {
+        "productId": "2c33e607-a5aa-4b59-96b5-88cf2126c69b"
+      }
+    },
+    {
+      "id": "63bda743-fb17-46a5-aa96-8d17b1789374",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-4010 - ข้าวเกรียบกุ้งรสหมึกย่าง 400 ก.",
+      "timestamp": "2025-10-21T09:41:19.157Z",
+      "meta": {
+        "productId": "9ef865e4-fe78-4044-b3d1-34ce161a7daa"
+      }
+    },
+    {
+      "id": "15e41cb9-15eb-49fb-8413-f38296d39dde",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-4008 - ข้าวเกรียบหมึกรสเผ็ดหวาน 400 ก.",
+      "timestamp": "2025-10-21T09:40:33.872Z",
+      "meta": {
+        "productId": "1c73b4bc-b442-4c03-9f06-4960358f83b4"
+      }
+    },
+    {
+      "id": "f75d716f-020c-4b72-a3ab-2d03a44f423b",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-5009 - เวเฟอร์สติ๊กแฟนซี ใบเตย-ช็อก 5 กก.",
+      "timestamp": "2025-10-21T09:39:14.036Z",
+      "meta": {
+        "productId": "fa79f6c2-2da8-41f4-b6d8-685f863f0723"
+      }
+    },
+    {
+      "id": "9513133c-7f17-42ba-baa1-60517a2a489f",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-5002 - เวเฟอร์สติ๊กใบเตย 5 กก.",
+      "timestamp": "2025-10-21T09:36:17.686Z",
+      "meta": {
+        "productId": "1208682d-72fd-4075-82ff-5d87aac55b04"
+      }
+    },
+    {
+      "id": "91f4287c-0cf5-42ab-9d97-90a929e8e685",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-5004 - เวเฟอร์สติ๊กสตรอ 5 กก.",
+      "timestamp": "2025-10-21T09:36:01.227Z",
+      "meta": {
+        "productId": "0fa3c22d-e960-4b98-ad5e-da1a299dc867"
+      }
+    },
+    {
+      "id": "12a73154-1a1c-4bfe-b561-5aebd5080db1",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-5001 - เวเฟอร์สติ๊กช็อก 5 กก.",
+      "timestamp": "2025-10-21T09:35:32.977Z",
+      "meta": {
+        "productId": "9de85cc1-703f-4279-bea3-2445d8ae98f8"
+      }
+    },
+    {
+      "id": "e85f8932-2261-423e-8f2e-5c6a296a905a",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5001 - ทับทิมทองทรงเครื่อง 5 รส 5.5 กก.",
+      "timestamp": "2025-10-21T09:35:01.842Z",
+      "meta": {
+        "productId": "455e9b8e-2717-4983-a947-a344383e01ad"
+      }
+    },
+    {
+      "id": "dd1d992d-db16-4402-8139-c70365e528fd",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5003 - ขาไก่ทรงเครื่อง 5 รส 5 กก.",
+      "timestamp": "2025-10-21T09:34:48.264Z",
+      "meta": {
+        "productId": "0de3047c-5bfe-47f6-92d0-d272720bfca8"
+      }
+    },
+    {
+      "id": "4e2492ed-faa4-4c28-8642-dcd5ea86700b",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5002 - ขาไก่รสดั้งเดิม 5 กก.",
+      "timestamp": "2025-10-21T09:34:22.771Z",
+      "meta": {
+        "productId": "385cbe0a-2b06-4c9d-a15b-995f7d393325"
+      }
+    },
+    {
+      "id": "91421344-8352-4aca-a5e7-6a98263db0ba",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-5001 - แยมสับปะรด 5 กก.",
+      "timestamp": "2025-10-21T09:34:01.820Z",
+      "meta": {
+        "productId": "a2896163-6c79-44ae-a643-3d3915ba44f4"
+      }
+    },
+    {
+      "id": "008163a8-bccb-43e6-9680-8df86cb0e3ee",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-5004 - คุกกี้แซนวิสช็อก 5 กก.",
+      "timestamp": "2025-10-21T09:33:37.220Z",
+      "meta": {
+        "productId": "602d8361-eb07-4741-8356-a6d25303078c"
+      }
+    },
+    {
+      "id": "3c2098b6-36a2-4f2c-a7be-cef9d6928c25",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-5024 - คุกกี้ก้นหอยทุเรียน 5 กก.",
+      "timestamp": "2025-10-21T09:32:05.460Z",
+      "meta": {
+        "productId": "6f3ea4fd-b41d-4b24-8238-2babf4c1a246"
+      }
+    },
+    {
+      "id": "86d01ede-3c46-44f0-a06b-f0b417b92059",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-4005 - เวเฟอร์สติ๊กรสช็อก 400ก.",
+      "timestamp": "2025-10-21T09:31:39.132Z",
+      "meta": {
+        "productId": "f423c23e-3c2a-4541-b926-f205ba87cfe0"
+      }
+    },
+    {
+      "id": "034926cf-f2e3-4d88-8216-645d01981370",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: VL0-1104 - เวเฟอร์สติ๊กช็อก 1.1 กก.",
+      "timestamp": "2025-10-21T09:31:31.964Z",
+      "meta": {
+        "productId": "772fbe45-7990-47b9-aeb7-8e8809fe1cb6"
+      }
+    },
+    {
+      "id": "8fd57552-b3bd-4ea9-93f7-e54bc2d46339",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4004 - แยมสับปะรด 400 ก.",
+      "timestamp": "2025-10-21T09:31:16.906Z",
+      "meta": {
+        "productId": "ea748b9f-8403-4e7f-97be-4fa7ca347d06"
+      }
+    },
+    {
+      "id": "0d24d906-a004-4906-a3bf-2181790f7137",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4003 - คุกกี้ก้นหอยวานิลลา 400ก.",
+      "timestamp": "2025-10-21T09:31:10.948Z",
+      "meta": {
+        "productId": "7d741a21-8ec0-4404-98b9-dd81c50ce0f3"
+      }
+    },
+    {
+      "id": "485238df-c155-4685-876c-8dc942aa80c7",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-4002 - คุกกี้แซนวิสช็อก 400ก.",
+      "timestamp": "2025-10-21T09:31:05.540Z",
+      "meta": {
+        "productId": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc"
+      }
+    },
+    {
+      "id": "f16946c9-b184-47f5-bcd6-2f2149e1c6fd",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1108 - ABC 1.1 กก.",
+      "timestamp": "2025-10-21T09:31:01.334Z",
+      "meta": {
+        "productId": "a4a3effc-45ea-423b-b3e8-69b8541d71c0"
+      }
+    },
+    {
+      "id": "5358626b-0dec-449d-9c0a-18943c666a77",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1105 - ก้นหอย วานิลลา 1.1 กก.",
+      "timestamp": "2025-10-21T09:30:56.230Z",
+      "meta": {
+        "productId": "3628460f-480a-4632-8d43-ac6b9c751390"
+      }
+    },
+    {
+      "id": "6120b153-fe97-4f60-9ba2-f1bc875192be",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1104 - แยมสับปะรด 1.1 กก.",
+      "timestamp": "2025-10-21T09:30:50.409Z",
+      "meta": {
+        "productId": "f3438e99-8126-47a0-86a0-ee26b4f7f86d"
+      }
+    },
+    {
+      "id": "c5c7bd36-06e0-46d8-9fc1-7df383f86a5b",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: BL0-1005 - คุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "timestamp": "2025-10-21T09:30:44.912Z",
+      "meta": {
+        "productId": "6d5fab48-073e-44dc-8c9c-ea14a5023dab"
+      }
+    },
+    {
+      "id": "8c13f11d-d8f7-49f5-b499-d036b2a475c4",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-5026 - คุกกี้ก้นหอยวานิลลา 5 กก.",
+      "timestamp": "2025-10-21T09:30:35.711Z",
+      "meta": {
+        "productId": "c6adffee-f5b9-44c6-b237-ebabf24ded93"
+      }
+    },
+    {
+      "id": "97825a65-05ad-4a87-8c3c-1d962cfc5c29",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-1001 - ปี๊บเวเฟอร์สติ๊กช็อก 1.2 กก.",
+      "timestamp": "2025-10-21T09:29:55.782Z",
+      "meta": {
+        "productId": "9cfbf392-7e26-4e76-af27-679cc7ff077a"
+      }
+    },
+    {
+      "id": "b04dc47c-42fe-4c81-bdbc-f9a28e6d337a",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-1104 - ปี๊บเวเฟอร์สติ๊กช็อก 1.1 กก.",
+      "timestamp": "2025-10-21T09:29:30.963Z",
+      "meta": {
+        "productId": "772fbe45-7990-47b9-aeb7-8e8809fe1cb6"
+      }
+    },
+    {
+      "id": "281a6d70-4ce5-4684-85ce-858c396e1766",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-1005 - ปี๊บคุกกี้ก้นหอย วานิลลา 1.2 กก.",
+      "timestamp": "2025-10-21T09:29:08.178Z",
+      "meta": {
+        "productId": "6d5fab48-073e-44dc-8c9c-ea14a5023dab"
+      }
+    },
+    {
+      "id": "0d72b414-cd3f-4530-9fc9-2efbb93de169",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-1105 - ปิ๊บก้นหอย วานิลลา 1.1 กก.",
+      "timestamp": "2025-10-21T09:28:25.918Z",
+      "meta": {
+        "productId": "3628460f-480a-4632-8d43-ac6b9c751390"
+      }
+    },
+    {
+      "id": "36460136-3689-43ff-a074-c41e2c4fb2b9",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-1108 - ปิ๊บABC 1.1 กก.",
+      "timestamp": "2025-10-21T09:26:47.502Z",
+      "meta": {
+        "productId": "a4a3effc-45ea-423b-b3e8-69b8541d71c0"
+      }
+    },
+    {
+      "id": "4f7e6239-8288-44f4-801a-cdbe5327b767",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-1104 - ปี๊บแยมสับปะรด 1.1 กก.",
+      "timestamp": "2025-10-21T09:25:48.083Z",
+      "meta": {
+        "productId": "f3438e99-8126-47a0-86a0-ee26b4f7f86d"
+      }
+    },
+    {
+      "id": "0cea5de3-76e6-4f5f-84c6-98887fb65f47",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-1201 - ปังไก่รสสาหร่าย",
+      "timestamp": "2025-10-21T09:22:47.902Z",
+      "meta": {
+        "productId": "16294bbb-d33c-41d0-91f1-80f50eb69fee"
+      }
+    },
+    {
+      "id": "25d5fce4-5c05-4f79-86d3-60ea9c2c9a69",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-1202 - ปังไก่รสวิงซ์แซ่บ",
+      "timestamp": "2025-10-21T09:22:16.858Z",
+      "meta": {
+        "productId": "72bf4769-dd2f-4578-9809-7073fb09677c"
+      }
+    },
+    {
+      "id": "14eb076c-71fe-48b5-ae8d-95bdb000f76b",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-4014 - ปิ๊บขาไก่ทรงเครื่อง 5 รส 400ก.",
+      "timestamp": "2025-10-21T09:21:13.088Z",
+      "meta": {
+        "productId": "797a3a01-7659-4342-b252-4c57ed1ec39d"
+      }
+    },
+    {
+      "id": "5437ab6a-e533-4bff-9423-4f0ac66fe627",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: VL0-4005 - ปิ๊บเวเฟอร์สติ๊กรสช็อก 400ก.",
+      "timestamp": "2025-10-21T09:20:50.332Z",
+      "meta": {
+        "productId": "f423c23e-3c2a-4541-b926-f205ba87cfe0"
+      }
+    },
+    {
+      "id": "02ebfc77-3227-4b81-9f30-3908d7cf5ac2",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-4003 - ปิ๊บคุกกี้ก้นหอยวานิลลา 400ก.",
+      "timestamp": "2025-10-21T09:20:24.242Z",
+      "meta": {
+        "productId": "7d741a21-8ec0-4404-98b9-dd81c50ce0f3"
+      }
+    },
+    {
+      "id": "121d0525-0de9-4548-8e9d-5f8a5d334588",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-4002 - ปิ๊บคุกกี้แซนวิสช็อก 400ก.",
+      "timestamp": "2025-10-21T09:19:57.780Z",
+      "meta": {
+        "productId": "5dc88ba2-b8cb-41cc-8f27-6dc8ee92cffc"
+      }
+    },
+    {
+      "id": "2d45e5c8-93ab-4755-9cac-8c482e6dc91a",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: BL0-4004 - ปิ๊บแยมสับปะรด 400 ก.",
+      "timestamp": "2025-10-21T09:19:26.823Z",
+      "meta": {
+        "productId": "ea748b9f-8403-4e7f-97be-4fa7ca347d06"
+      }
+    },
+    {
+      "id": "b92c02b3-894d-440e-961b-2a351c79f4eb",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-1002 - ไฮไรซ์ รสสไปซี่โทเมโท",
+      "timestamp": "2025-10-21T09:18:30.889Z",
+      "meta": {
+        "productId": "d77ade79-07f4-4d9e-aa7a-f435e4b140a1"
+      }
+    },
+    {
+      "id": "ece4b474-e340-4457-8634-06bb5aaeba95",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: CL0-2001 - คอร์นโด รสนมน้ำผึ้ง20ก.",
+      "timestamp": "2025-10-21T09:15:29.639Z",
+      "meta": {
+        "productId": "dabb0c6e-b263-4031-aa6d-bbd681911a89"
+      }
+    },
+    {
+      "id": "8ce73227-24de-43f6-9ab3-f6328650ba5f",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: CL0-2002 - คอร์นโด รสนมน้ำผึ้ง95ก.",
+      "timestamp": "2025-10-21T09:15:15.779Z",
+      "meta": {
+        "productId": "b05fb1ee-8733-4b9d-a656-1fd8ce3e9d82"
+      }
+    },
+    {
+      "id": "a9faf3d5-21df-431d-b426-d4f68db63872",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5004 - คอร์นวอยซ์ รสช็อก",
+      "timestamp": "2025-10-21T09:14:23.017Z",
+      "meta": {
+        "productId": "a991ec89-f7db-462a-ae59-b8287edba363"
+      }
+    },
+    {
+      "id": "40694817-fb2a-4f32-b6c1-34a41b0a3679",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: CL0-5005 - คอร์นวอย รสนม",
+      "timestamp": "2025-10-21T09:14:19.967Z",
+      "meta": {
+        "productId": "e9e3ba49-69c4-4ee5-9e51-8594c3904a4b"
+      }
+    },
+    {
+      "id": "cf0bfdc0-7112-4de4-bbb6-2832c134437d",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: CL0-5004 - คอร์นวอยซ์ รสช็อก",
+      "timestamp": "2025-10-21T09:13:55.286Z",
+      "meta": {
+        "productId": "a991ec89-f7db-462a-ae59-b8287edba363"
+      }
+    },
+    {
+      "id": "7333951d-1955-423c-be7f-81aa1f3e8efb",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: CL0-5001 - โฟกัส คาราเมล",
+      "timestamp": "2025-10-21T09:12:57.423Z",
+      "meta": {
+        "productId": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b"
+      }
+    },
+    {
+      "id": "d76da89a-c2b3-4e71-b4fa-6ecbf057c4ee",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5006 - แดกูฮอตโทเมโท",
+      "timestamp": "2025-10-21T09:12:52.277Z",
+      "meta": {
+        "productId": "9a4ec73b-6534-4161-98ef-4630ce8d1a12"
+      }
+    },
+    {
+      "id": "be79ac97-b095-4c4a-9005-55587d21e443",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5005 - แดกูดั้งเดิม",
+      "timestamp": "2025-10-21T09:12:32.773Z",
+      "meta": {
+        "productId": "be46475c-442f-4b19-a2cb-16d4e259ee75"
+      }
+    },
+    {
+      "id": "b51d8d79-0bd8-47e1-8d4a-3554788bd4f9",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: CL0-5001 - โฟกัส คาราเมล75ก.",
+      "timestamp": "2025-10-21T09:12:07.803Z",
+      "meta": {
+        "productId": "7ac4f982-4340-42fb-a7d9-ee7e7db6fe4b"
+      }
+    },
+    {
+      "id": "6c8a89f0-e5e6-40ce-9f85-52a4fac14100",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5013 - ข้าวเกรียบหมึก รสซอสโชยุ105ก.",
+      "timestamp": "2025-10-21T09:11:28.111Z",
+      "meta": {
+        "productId": "bc0092fb-2f23-4e3d-a73e-636c66543635"
+      }
+    },
+    {
+      "id": "b112b58d-ff43-4824-be5d-0228eaeadfcc",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5009 - ข้าวเกรียบกุ้ง รสหมึกย่าง105ก.",
+      "timestamp": "2025-10-21T09:09:47.383Z",
+      "meta": {
+        "productId": "5bf93e8c-e103-469e-8801-f8ef2d1c4a35"
+      }
+    },
+    {
+      "id": "46a3442a-69a9-449d-8e6a-5d56501fd8db",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5010 - ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "timestamp": "2025-10-21T09:09:27.489Z",
+      "meta": {
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef"
+      }
+    },
+    {
+      "id": "59915fc1-c12a-463f-a44b-cf0267104e04",
+      "scope": "product",
+      "action": "update",
+      "message": "ปรับปรุงสินค้า: KL0-5009 - ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "timestamp": "2025-10-21T09:09:19.019Z",
+      "meta": {
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef"
+      }
+    },
+    {
+      "id": "94b1ae5b-669a-4a78-a2f7-bfcba21393a0",
+      "scope": "product",
+      "action": "create",
+      "message": "เพิ่มสินค้าใหม่: KL0-5008 - ข้าวเกรียบหมึก รสเผ็ดหวาน 105ก.",
+      "timestamp": "2025-10-21T09:08:51.164Z",
+      "meta": {
+        "productId": "2bc2c56e-de96-46df-91f7-14a43f7646ef"
+      }
+    },
+    {
+      "id": "c3cba721-177c-41b6-ac1a-f24dc11afefb",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ศรีสมัย",
+      "timestamp": "2025-10-21T09:06:21.428Z",
+      "meta": {
+        "storeId": "58184e29-6f93-47a0-a332-4fab42b5c22f",
+        "province": "นราธิวาส"
+      }
+    },
+    {
+      "id": "018f33f7-7dbc-42aa-9104-d0eab4f7cdec",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: แฟมลี่ไฮเปอร์มาร์ท",
+      "timestamp": "2025-10-21T09:04:26.707Z",
+      "meta": {
+        "storeId": "0c32395c-a8d9-4fea-962b-59c5e37ec89d",
+        "province": "สงขลา"
+      }
+    },
+    {
+      "id": "84ff5d70-9fd4-4d08-9bbc-39db0c9e7305",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านวัชราวรรณ",
+      "timestamp": "2025-10-21T09:02:09.567Z",
+      "meta": {
+        "storeId": "f06b7a7e-d4e3-4542-b2e1-c5c3628b31e7",
+        "province": "ระยอง"
+      }
+    },
+    {
+      "id": "8d3e4ee8-d181-4f60-b999-4490eff00849",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านยงสงวน",
+      "timestamp": "2025-10-21T09:01:10.620Z",
+      "meta": {
+        "storeId": "197e4cc5-21a1-4040-b558-da704281fc97",
+        "province": "อุบลราชธานี"
+      }
+    },
+    {
+      "id": "8c60c979-20ad-4a82-bb7b-c9d8039048fa",
+      "scope": "store",
+      "action": "create",
+      "message": "เพิ่มร้าน/หน่วยงาน: ร้านอุบลดีมาร์ท",
+      "timestamp": "2025-10-21T08:58:58.460Z",
+      "meta": {
+        "storeId": "974571d3-b502-409e-afb9-a844b2c22d5d",
+        "province": "อุบลราชธานี"
+      }
+    }
+  ],
+  "branding": {
+    "logoPath": "/uploads/branding-logo-1761539714551-eadb8136-f54b-4fd6-9984-faff1b56620c.jpg",
+    "updatedAt": "2025-10-27T04:35:14.938Z"
+  }
+}

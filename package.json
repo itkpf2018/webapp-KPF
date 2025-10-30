@@ -1,0 +1,44 @@
+{
+  "name": "attendance-pwa",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint",
+    "gen:types": "supabase gen types typescript --project-id mzfbxgxxtvvjuqvkjcqo --schema public > src/types/supabase.ts"
+  },
+  "dependencies": {
+    "@supabase/mcp-server-supabase": "^0.5.8",
+    "@supabase/supabase-js": "^2.48.0",
+    "@tanstack/react-query": "^5.90.5",
+    "bcryptjs": "^3.0.2",
+    "csv-parse": "^6.1.0",
+    "csv-stringify": "^6.6.0",
+    "date-fns": "^4.1.0",
+    "exceljs": "^4.4.0",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^0.546.0",
+    "next": "15.5.5",
+    "next-pwa": "^5.6.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-leaflet": "^5.0.0",
+    "recharts": "^3.3.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/leaflet": "^1.9.21",
+    "@types/next-pwa": "^5.6.9",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,117 @@
+[
+  {
+    "id": "113cc071-b4ec-4a57-ad0b-d3079dd24bff-2025-10",
+    "employeeId": "113cc071-b4ec-4a57-ad0b-d3079dd24bff",
+    "name": "คุณปาตีเมาะ สาเหมาะ",
+    "role": "ไม่ระบุบทบาท",
+    "store": "ยงสงวน-ดีมาร์ท",
+    "baseline": 15500,
+    "currency": "THB",
+    "items": [
+      {
+        "id": "df45c75b-9a3a-4660-b54b-1b720d11e770",
+        "label": "โทรศัพท์",
+        "amount": 500
+      },
+      {
+        "id": "5ac59a7c-062e-4c2c-921a-82ae9736897e",
+        "label": "เงินเดือน",
+        "amount": 15000
+      }
+    ],
+    "effectiveMonth": "2025-10",
+    "lastUpdated": "2025-10-18T17:56:26.259Z"
+  },
+  {
+    "id": "64402536-71cb-4156-8354-eb2e820811bb-2025-10",
+    "employeeId": "64402536-71cb-4156-8354-eb2e820811bb",
+    "name": "นางสาวอารีนา มาหะ(นา)",
+    "role": "ไม่ระบุบทบาท",
+    "store": "ร้านศรีสมัย",
+    "baseline": 15500,
+    "currency": "THB",
+    "items": [
+      {
+        "id": "b1872844-7cce-44cd-9b2b-38e9ae809987",
+        "label": "เงินเดือน",
+        "amount": 15000
+      },
+      {
+        "id": "1fb0b704-e2f5-4f6a-88ae-e30cdb5a34ef",
+        "label": "ค่าโทรศัพท์",
+        "amount": 500
+      }
+    ],
+    "effectiveMonth": "2025-10",
+    "lastUpdated": "2025-10-19T05:03:34.288Z"
+  },
+  {
+    "id": "cde6b12e-351d-4911-a9a9-a63ccf224878-2025-10",
+    "employeeId": "cde6b12e-351d-4911-a9a9-a63ccf224878",
+    "name": "นายไชยวัฒน์ ทองสุทธิ์",
+    "role": "ไม่ระบุบทบาท",
+    "store": "ร้านวัชรวรรณ",
+    "baseline": 15500,
+    "currency": "THB",
+    "items": [
+      {
+        "id": "a54b9cb0-ec5a-47c9-a937-24e814daa0fc",
+        "label": "เงินเดือน",
+        "amount": 15000
+      },
+      {
+        "id": "41b5402f-eafa-4930-b68d-2aa3abf226b9",
+        "label": "ค่าโทรศัพท์",
+        "amount": 500
+      }
+    ],
+    "effectiveMonth": "2025-10",
+    "lastUpdated": "2025-10-19T05:04:01.838Z"
+  },
+  {
+    "id": "758d3c9c-3e50-40cc-9e26-33cb1bb8567b-2025-10",
+    "employeeId": "758d3c9c-3e50-40cc-9e26-33cb1bb8567b",
+    "name": "นาย ธนพงษ์ แซ่ตั้ง(พีท)",
+    "role": "ไม่ระบุบทบาท",
+    "store": "แฟมลี่ไฮเปอร์มาร์ท",
+    "baseline": 15500,
+    "currency": "THB",
+    "items": [
+      {
+        "id": "9f8fde12-5f1d-482f-8b3d-cdfe03c56a7c",
+        "label": "เงินเดือน",
+        "amount": 15000
+      },
+      {
+        "id": "654c953e-a41c-4e6f-9cd1-08212f960b0f",
+        "label": "ค่าโทรศัพท์",
+        "amount": 500
+      }
+    ],
+    "effectiveMonth": "2025-10",
+    "lastUpdated": "2025-10-19T05:04:27.707Z"
+  },
+  {
+    "id": "3ddc399c-b56b-4596-a2a1-7283d86ef69d-2025-10",
+    "employeeId": "3ddc399c-b56b-4596-a2a1-7283d86ef69d",
+    "name": "นายA",
+    "role": "ไม่ระบุบทบาท",
+    "store": "KPF",
+    "baseline": 15500,
+    "currency": "THB",
+    "items": [
+      {
+        "id": "ab221aa9-4f90-4a4e-b9e9-c1941e5d6de2",
+        "label": "ค่าโทรศัพท์",
+        "amount": 500
+      },
+      {
+        "id": "acd9fb62-db74-401d-94aa-119025252169",
+        "label": "เงินเดือน",
+        "amount": 15000
+      }
+    ],
+    "effectiveMonth": "2025-10",
+    "lastUpdated": "2025-10-24T03:47:41.548Z"
+  }
+]

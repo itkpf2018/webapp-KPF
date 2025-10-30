@@ -1,0 +1,283 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f4f8ff;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #e2e8f0;
+  }
+}
+
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #eef5ff 0%, #e3ecff 55%, #f7fbff 100%);
+  color: var(--foreground);
+  font-family: "Inter", var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(
+      120deg,
+      rgba(59, 130, 246, 0.08) 0%,
+      transparent 45%
+    ),
+    linear-gradient(0deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: auto, 100px 100px, 100px 100px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+@layer components {
+  .form-input {
+    @apply w-full rounded-2xl border border-blue-100/80 bg-white/80 px-4 py-3 text-sm text-slate-800 shadow-inner shadow-slate-100/60 transition focus:border-blue-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100;
+  }
+}
+
+/* Print styles for better compatibility */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html {
+    background: white !important;
+    height: auto !important;
+  }
+
+  body {
+    background: white !important;
+    background-image: none !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove background decorations */
+  body::before,
+  body::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* A4 page break support */
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .print-page-break-before {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Avoid page breaks inside elements */
+  .print-avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Ensure tables handle page breaks properly */
+  table {
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group; /* Repeat header on each page */
+  }
+
+  tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid-page;
+  }
+
+  /* Keep related elements together */
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Signature sections should stay together */
+  .print-signatures {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-top: auto; /* Push to bottom of page if space allows */
+  }
+
+  /* Ensure tables are visible */
+  table,
+  thead,
+  tbody,
+  tfoot,
+  tr,
+  th,
+  td {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Make sure print containers are visible */
+  #report-print-root,
+  #report-print-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Hide non-print elements */
+  nav,
+  header:not(.print-header),
+  footer,
+  aside,
+  .no-print,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Dashboard print styles */
+  .print\:break-inside-avoid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .print\:space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1rem;
+  }
+
+  /* Ensure charts are visible in print */
+  .recharts-wrapper {
+    page-break-inside: avoid;
+  }
+
+  /* Ensure gradients print properly */
+  .bg-gradient-to-r,
+  .bg-gradient-to-br,
+  .bg-gradient-to-l {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Force shadows for print */
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Ensure dark mode styles don't print */
+  .dark {
+    background: white !important;
+    color: black !important;
+  }
+
+  .dark * {
+    background: white !important;
+    color: black !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Preserve colored elements in print */
+  .dark .bg-blue-50,
+  .dark .bg-emerald-50,
+  .dark .bg-violet-50,
+  .dark .bg-amber-50,
+  .dark .bg-pink-50,
+  .dark .bg-cyan-50 {
+    background-color: inherit !important;
+  }
+
+  /* Print-specific layouts */
+  @page {
+    size: A4 landscape;
+  }
+
+  .print-landscape {
+    width: 297mm;
+    height: 210mm;
+  }
+
+  /* Optimize chart printing */
+  .recharts-surface {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ensure text remains readable */
+  .dark .text-slate-100,
+  .dark .text-slate-200,
+  .dark .text-slate-300,
+  .dark .text-slate-400 {
+    color: #1e293b !important;
+  }
+
+  /* Keep button colors visible in print */
+  button {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ensure proper A4 dimensions */
+  .print-a4 {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 10mm;
+    margin: 0 auto;
+    background: white;
+  }
+
+  /* Handle long tables that span multiple pages */
+  .print-table-container {
+    page-break-inside: auto;
+  }
+
+  /* Add padding to avoid cutting off content */
+  .print-content {
+    padding-bottom: 10mm;
+  }
+}
+
+/* PIN Keypad Shake Animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}

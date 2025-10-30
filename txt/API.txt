@@ -1,0 +1,28 @@
+ทั้งหมด Login ด้วย itkpf2018@gmail.com
+
+
+Email-Supabase
+itkpf2018@gmail.com
+Kapefoods#123456
+
+
+Project Name: Webapp-kpf
+Password : Kapefoods#123456
+
+URL: https://mzfbxgxxtvvjuqvkjcqo.supabase.co
+Anon Public : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16ZmJ4Z3h4dHZ2anVxdmtqY3FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNzkzNjEsImV4cCI6MjA3Njc1NTM2MX0.lbXVNChQ9nvY9e228aQADu8siFtIHc6YzjhZCAgt9es
+Sercer-role : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16ZmJ4Z3h4dHZ2anVxdmtqY3FvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTE3OTM2MSwiZXhwIjoyMDc2NzU1MzYxfQ.M18yUi3XmwNIbXq0Pj-ucsqjhXwtW2dvs95rXK-JO-s
+
+
+
+link supabase
+supabase gen types typescript --project-id mzfbxgxxtvvjuqvkjcqo --schema public > src/types/database.ts
+
+
+run error All
+npx tsc --noEmit
+
+
+
+
+
