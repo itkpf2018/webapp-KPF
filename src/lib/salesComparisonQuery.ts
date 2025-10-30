@@ -51,18 +51,15 @@ export async function fetchSalesRecordsForYear(
   endMonth: number = 12
 ): Promise<SalesRecordRaw[]> {
   // Debug logging
-  console.log('[fetchSalesRecordsForYear] Parameters:', { employeeName, year, storeName, startMonth, endMonth });
 
   // แปลงปีเป็น ค.ศ.
   const normalizedYear = normalizeYear(year);
-  console.log('[fetchSalesRecordsForYear] Normalized year:', normalizedYear);
 
   // สร้าง date range สำหรับช่วงเดือนที่เลือก
   const startDate = `${normalizedYear}-${String(startMonth).padStart(2, '0')}-01`;
   // หาวันสุดท้ายของเดือนสิ้นสุด
   const lastDay = new Date(normalizedYear, endMonth, 0).getDate();
   const endDate = `${normalizedYear}-${String(endMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-  console.log('[fetchSalesRecordsForYear] Date range:', { startDate, endDate });
 
   // Build query
   let query = supabase
@@ -85,13 +82,10 @@ export async function fetchSalesRecordsForYear(
     throw new Error(`Failed to fetch sales records: ${error.message}`);
   }
 
-  console.log('[fetchSalesRecordsForYear] Records found:', data?.length || 0);
 
   // Debug: Log first 3 records to see unit_name values
   if (data && data.length > 0) {
-    console.log('[fetchSalesRecordsForYear] Sample records with unit_name:');
     data.slice(0, 3).forEach((record, idx) => {
-      console.log(`  [${idx}] ${record.product_name} - unit_name: "${record.unit_name}" (quantity: ${record.quantity})`);
     });
   }
 
@@ -162,15 +156,12 @@ export function aggregateSalesByProduct(
   }
 
   // Log unit type mappings for debugging
-  console.log('[aggregateSalesByProduct] Unit type mappings:');
   unitTypeMappings.forEach((products, mapping) => {
-    console.log(`  ${mapping} (used in ${products.length} records)`);
   });
 
   // Log aggregation results for first product
   const firstProduct = Array.from(aggregationMap.values())[0];
   if (firstProduct) {
-    console.log(`[aggregateSalesByProduct] First product "${firstProduct.productName}" byUnitType:`, firstProduct.byUnitType);
   }
 
   return aggregationMap;

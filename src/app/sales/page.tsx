@@ -1324,7 +1324,6 @@ export default function SalesPage() {
                       unitQuantities={line.unitQuantities}
                       onEdit={() => {
                         // TODO: Implement edit functionality to open bottom sheet with existing data
-                        console.log("Edit product:", line.product?.productCode);
                       }}
                       onRemove={() => {
                         resetSubmitState();

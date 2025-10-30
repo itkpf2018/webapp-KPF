@@ -315,13 +315,6 @@ export async function GET(request: Request) {
       storeName: storeNameFilter,
     });
 
-    console.log(`[sales report] ✅ Query Supabase สำเร็จ:`, {
-      totalRows: dataRows.length,
-      dateRange: `${rangeStartIso} ถึง ${rangeEndIso}`,
-      employeeName: employee.name,
-      storeName: storeNameFilter ?? "ทุกร้าน",
-    });
-
     // Process and filter rows
     const salesByDay = new Map<string, DailySaleEntry[]>();
 
@@ -354,17 +347,6 @@ export async function GET(request: Request) {
       // Format time from HH:mm:ss to HH:mm
       const time = sheetRow.time ? sheetRow.time.substring(0, 5) : "";
 
-      // Log first 5 processed rows
-      if (processedCount < 5) {
-        console.log(`[sales report] 📝 Row #${processedCount + 1}:`, {
-          date: sheetRow.date,
-          time: time,
-          product: `${sheetRow.productName} (${sheetRow.productCode})`,
-          unitName: sheetRow.unitName,
-          quantity: sheetRow.quantity,
-          total: sheetRow.total,
-        });
-      }
       processedCount++;
 
       // Add to the day's sales
@@ -387,7 +369,6 @@ export async function GET(request: Request) {
       });
     });
 
-    console.log(`[sales report] 🔄 Processed ${processedCount} rows after filtering`);
 
     // Build final rows with date grouping
     const processedRows: ProcessedSalesRow[] = [];
@@ -597,26 +578,6 @@ export async function GET(request: Request) {
 
         });
       }
-
-      // Log grouped results for debugging
-      if (orderedGroups.length > 0) {
-        console.log(`[sales report] 📊 วันที่ ${iso} มี ${orderedGroups.length} groups:`);
-        orderedGroups.forEach((group, idx) => {
-          const unitsDetail = group.units.map(u => `${u.unitName}:${u.quantity}`).join(', ');
-          const totalPrice = group.units.reduce((sum, u) => sum + u.total, 0);
-          console.log(`  Group #${idx + 1}: ${group.productName} (${group.productCode})`, {
-            time: group.time,
-            unitsCount: group.units.length,
-            units: unitsDetail,
-            calculatedQty: group.units.reduce((sum, u) => sum + u.quantity, 0),
-            groupQty: group.quantity,
-            calculatedTotal: totalPrice.toFixed(2),
-            groupTotal: group.total.toFixed(2),
-          });
-        });
-      }
-
-
 
       if (daySales.length === 0 && showAllDays && !useGlobalGroups) {
         processedRows.push({

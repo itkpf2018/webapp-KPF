@@ -6,7 +6,7 @@
  */
 
 import { getSupabaseServiceClient } from "./supabaseClient";
-import type { Database } from "@/types/supabase";
+import type { Database, Json } from "@/types/supabase";
 
 type AppLogRow = Database["public"]["Tables"]["app_logs"]["Row"];
 type AppLogInsert = Database["public"]["Tables"]["app_logs"]["Insert"];
@@ -34,7 +34,7 @@ export async function addLog(entry: LogEntry): Promise<AppLogRow> {
     actor_name: entry.actorName ?? null,
     actor_id: entry.actorId ?? null,
     details: entry.details ?? null,
-    metadata: entry.metadata ? (entry.metadata as Record<string, unknown>) : null,
+    metadata: entry.metadata ? (entry.metadata as Json) : undefined,
   };
 
   const { data, error } = await supabase

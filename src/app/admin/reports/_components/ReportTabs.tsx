@@ -17,7 +17,7 @@ export function ReportTabs() {
   const pathname = usePathname();
 
   return (
-    <div className="sticky top-[88px] z-40 mb-6 flex flex-wrap gap-3 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-[0_8px_30px_-15px_rgba(37,99,235,0.4)] backdrop-blur-xl print:hidden">
+    <div className="sticky top-[60px] z-40 mb-6 flex flex-wrap gap-3 rounded-2xl border border-white/70 bg-white/90 p-3 shadow-[0_8px_30px_-15px_rgba(37,99,235,0.4)] backdrop-blur-xl print:hidden">
       {TABS.map((tab) => {
         const isActive = pathname === tab.href;
         return (

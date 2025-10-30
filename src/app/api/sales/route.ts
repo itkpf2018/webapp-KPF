@@ -389,7 +389,6 @@ export async function POST(request: Request) {
       }
 
       insertedRecordIds = insertedData.map((record: StockDeductionRecord) => record.id);
-      console.log(`[sales] inserted ${insertedRecordIds.length} sales records successfully`);
 
       // Extract employee_id and store_id from raw payload
       const employeeId = raw.employeeId?.trim();
@@ -460,7 +459,6 @@ export async function POST(request: Request) {
                 return { success: false, recordId: record.id, message: result.message };
               }
 
-              console.log(`[sales] stock deduction successful for record ${record.id}: balance_after=${result.balance_after}`);
               return {
                 success: true,
                 recordId: record.id,
@@ -494,7 +492,6 @@ export async function POST(request: Request) {
             }
           });
         } else {
-          console.log(`[sales] all ${successCount} stock deductions completed successfully`);
         }
       }
 

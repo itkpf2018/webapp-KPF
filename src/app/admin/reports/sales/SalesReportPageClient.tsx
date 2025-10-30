@@ -653,7 +653,6 @@ export default function SalesReportPageClient({ initialEmployees, initialStores 
     const totalPages = state.data.pagination?.totalPages || 1;
     const allRows: ReportRow[] = [];
 
-    console.log(`[Print] Starting to fetch ${totalPages} pages for printing...`);
 
     try {
       for (let page = 1; page <= totalPages; page++) {
@@ -668,17 +667,14 @@ export default function SalesReportPageClient({ initialEmployees, initialStores 
           params.append("range", `${range.start}:${range.end}`);
         });
 
-        console.log(`[Print] Fetching page ${page}/${totalPages}...`);
         const response = await fetch(`/api/admin/reports/sales?${params.toString()}`);
         if (!response.ok) {
           alert("ไม่สามารถโหลดข้อมูลทั้งหมดสำหรับพิมพ์ได้");
           return;
         }
         const payload = await response.json() as { data: ReportData };
-        console.log(`[Print] Page ${page} returned ${payload.data.rows.length} rows`);
         allRows.push(...payload.data.rows);
       }
-      console.log(`[Print] Total rows collected: ${allRows.length}`);
     } catch (error) {
       console.error("Failed to fetch all data for printing:", error);
       alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");

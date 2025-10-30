@@ -31,7 +31,6 @@ export async function createBackup(): Promise<string | null> {
     // Clean old backups
     await cleanOldBackups();
 
-    console.log(`✅ Backup created: ${backupFile}`);
     return backupFile;
   } catch (error) {
     console.error("❌ Backup failed:", error);
@@ -57,7 +56,6 @@ async function cleanOldBackups(): Promise<void> {
     if (backupFiles.length > MAX_BACKUPS) {
       const filesToDelete = backupFiles.slice(MAX_BACKUPS);
       await Promise.all(filesToDelete.map((f) => fs.unlink(f.path)));
-      console.log(`🗑️  Deleted ${filesToDelete.length} old backup(s)`);
     }
   } catch (error) {
     console.error("⚠️  Failed to clean old backups:", error);
@@ -110,7 +108,6 @@ export async function restoreFromBackup(backupFileName: string): Promise<boolean
     // Restore
     await fs.writeFile(DATA_FILE, data, "utf-8");
 
-    console.log(`✅ Restored from backup: ${backupFileName}`);
     return true;
   } catch (error) {
     console.error("❌ Restore failed:", error);

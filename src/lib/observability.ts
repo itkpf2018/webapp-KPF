@@ -117,7 +117,6 @@ function emitToConsole(level: LogLevel, message: string, attributes?: LogAttribu
   } else if (level === "warn") {
     console.warn(`${prefix}${serializedAttributes}`);
   } else {
-    console.log(`${prefix}${serializedAttributes}`);
   }
 }
 

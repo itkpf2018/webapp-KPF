@@ -330,7 +330,6 @@ export default function EmployeesPage() {
 
   const handleCreate = async () => {
     const payload = buildPayload(newEmployee);
-    console.log('🚀 Creating employee with payload:', payload);
     if (!payload.name) {
       setError("กรุณาระบุชื่อพนักงาน");
       return;
@@ -349,7 +348,6 @@ export default function EmployeesPage() {
       }
       const result = (await response.json()) as { ok: boolean; employee?: DraftEmployee };
       const createdEmployee = result.employee;
-      console.log('✅ Created employee response:', createdEmployee);
 
       // Save store assignments if any stores are selected
       if (createdEmployee && newEmployee.selectedStoreIds.length > 0) {
@@ -402,16 +400,6 @@ export default function EmployeesPage() {
     setEditingId(employee.id);
     setIsLoadingAssignments(true);
 
-    // Debug: Log employee data
-    console.log('🔍 Employee data from API:', {
-      name: employee.name,
-      employeeCode: employee.employeeCode,
-      phone: employee.phone,
-      regularDayOff: employee.regularDayOff,
-      province: employee.province,
-      region: employee.region,
-    });
-
     // Load store assignments
     const { storeIds, primaryStoreId } = await loadStoreAssignments(employee.id);
 
@@ -435,7 +423,6 @@ export default function EmployeesPage() {
       targetQuantity: targetQuantity,
     };
 
-    console.log('📝 Draft data being set:', draftData);
 
     setEditingDraft(draftData);
     setIsLoadingAssignments(false);
@@ -444,7 +431,6 @@ export default function EmployeesPage() {
   const handleUpdate = async () => {
     if (!editingId || !editingDraft) return;
     const payload = buildPayload(editingDraft);
-    console.log('🔄 Updating employee with payload:', payload);
     if (!payload.name) {
       setError("กรุณาระบุชื่อพนักงาน");
       return;

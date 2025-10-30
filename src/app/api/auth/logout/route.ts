@@ -12,7 +12,6 @@ export async function POST() {
     cookieStore.delete('auth-session');
     cookieStore.delete('auth-user');
 
-    console.log('[logout] session cleared');
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -172,7 +172,6 @@ export async function POST(request: Request) {
       path: '/',
     });
 
-    console.log('[login] success:', matchedUser.employee_name, matchedUser.role);
 
     return NextResponse.json<LoginResponse>({
       success: true,

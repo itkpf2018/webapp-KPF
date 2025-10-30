@@ -1717,12 +1717,6 @@ export async function getProductSalesReport(
     if (allRecords.length > 0 || ranges.length > 0) {
       salesRecordsFromSupabase = allRecords;
       useSupabase = true;
-      console.log("[getProductSalesReport] ✅ Query Supabase สำเร็จ:", {
-        totalRecords: allRecords.length,
-        dateRanges: ranges.map(r => `${r.startIso} ถึง ${r.endIso}`),
-        employeeFilter: employeeNameFilter.size > 0 ? Array.from(employeeNameFilter) : "ไม่มี filter",
-        storeFilter: storeNameFilter.size > 0 ? Array.from(storeNameFilter) : "ไม่มี filter",
-      });
     }
   } catch (err) {
     console.error("[getProductSalesReport] Error querying Supabase, falling back to logs:", err);
@@ -1809,7 +1803,6 @@ export async function getProductSalesReport(
 
   if (useSupabase) {
     // Process Supabase records
-    console.log(`[getProductSalesReport] 🔄 เริ่ม process ${salesRecordsFromSupabase.length} records...`);
 
     for (const record of salesRecordsFromSupabase) {
       const timestamp = new Date(`${record.recorded_date}T${record.recorded_time}`);
@@ -1817,19 +1810,6 @@ export async function getProductSalesReport(
 
       // Parse unit type
       const unitType = parseUnitType(record.unit_name);
-
-      // Log first few records for debugging
-      if (transactions < 5) {
-        console.log(`[getProductSalesReport] 📝 Record #${transactions + 1}:`, {
-          วันที่: record.recorded_date,
-          สินค้า: `${record.product_name} (${record.product_code})`,
-          หน่วย: record.unit_name,
-          จัดหมวดเป็น: unitType,
-          จำนวน: record.quantity,
-          ราคา: `${record.unit_price}฿`,
-          ยอดรวม: `${record.quantity * (record.unit_price || 0)}฿`,
-        });
-      }
 
       // Calculate revenue from PC price
       const pricePC = record.unit_price || 0;
@@ -1913,26 +1893,6 @@ export async function getProductSalesReport(
       }
     }
 
-    // Log summary after processing
-    console.log(`[getProductSalesReport] ✅ Process เสร็จแล้ว:`, {
-      totalProducts: productMap.size,
-      totalTransactions: transactions,
-      totalRevenue: totalRevenue.toFixed(2),
-      totalQuantity,
-    });
-
-    // Log each product's aggregated data
-    console.log(`[getProductSalesReport] 📊 สรุปรายสินค้า:`);
-    productMap.forEach((entry, key) => {
-      const totalQty = entry.unitData.box.quantity + entry.unitData.pack.quantity + entry.unitData.piece.quantity;
-      const totalRev = entry.unitData.box.revenuePC + entry.unitData.pack.revenuePC + entry.unitData.piece.revenuePC;
-      console.log(`  - ${entry.productName} (${entry.productCode}):`, {
-        ลัง: `${entry.unitData.box.quantity} ชิ้น (${entry.unitData.box.revenuePC.toFixed(2)}฿)`,
-        แพ็ค: `${entry.unitData.pack.quantity} ชิ้น (${entry.unitData.pack.revenuePC.toFixed(2)}฿)`,
-        ชิ้น: `${entry.unitData.piece.quantity} ชิ้น (${entry.unitData.piece.revenuePC.toFixed(2)}฿)`,
-        รวม: `${totalQty} ชิ้น (${totalRev.toFixed(2)}฿)`,
-      });
-    });
   } else {
     // Fallback to logs
     const { salesRecords } = collectDashboardRecords(data.logs, DASHBOARD_TIME_ZONE);
@@ -3402,20 +3362,34 @@ export async function updateCategory(
 }
 
 export async function deleteCategory(id: string) {
-  const data = await readData();
-  const existing = data.categories.find((category) => category.id === id);
+  // Get category name for logging
+  const existing = await supabaseCategories.getCategory(id);
   if (!existing) {
     throw new Error("ไม่พบหมวดหมู่ที่ต้องการลบ");
   }
-  // Remove category reference from products
+
+  // TODO: If products are still in JSON, need to update them here
+  // For now, assuming products will handle category deletion via cascade/set null
+  // If products are still in data/app-data.json, uncomment below:
+  /*
+  const data = await readData();
   data.products = data.products.map((product) => ({
     ...product,
     categoryId: product.categoryId === id ? null : product.categoryId,
     updatedAt: product.categoryId === id ? new Date().toISOString() : product.updatedAt,
   }));
-  data.categories = data.categories.filter((category) => category.id !== id);
   await writeData(data);
-  await appendLog({
+  */
+
+  // Delete from Supabase
+  await supabaseCategories.deleteCategory(id);
+
+  // Log the change
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "delete",
-    message: `ลบหมวดหมู่: ${exi
+    details: `ลบหมวดหมู่: ${existing.name}`,
+    metadata: { categoryId: id },
+  });
+}
