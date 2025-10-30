@@ -1,24 +1,10 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  # No publish directory needed - @netlify/plugin-nextjs handles it
 
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "18.18.0"
   NPM_FLAGS = "--legacy-peer-deps"
-
-# Next.js serverless functions configuration
-[functions]
-  node_bundler = "esbuild"
-  external_node_modules = ["sharp", "lightningcss"]
-  included_files = ["data/**"]
-
-# Redirect rules for Next.js
-[[redirects]]
-  from = "/*"
-  to = "/"
-  status = 200
-  force = false
-  conditions = {Role = ["user"]}
 
 # Headers for security and caching
 [[headers]]
