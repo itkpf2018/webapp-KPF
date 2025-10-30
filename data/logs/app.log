@@ -1749,3 +1749,5 @@
 {"type":"log","timestamp":"2025-10-30T07:34:34.370Z","level":"info","message":"span.success","attributes":{"spanId":"a4bfcb09-dd61-42e4-9aab-843770c80622","spanName":"GET /api/admin/settings","durationMs":274.991}}
 {"type":"log","timestamp":"2025-10-30T08:41:06.300Z","level":"info","message":"span.start","attributes":{"spanId":"e644f14d-8921-4ddb-9e32-523e60c4bb57","spanName":"GET /api/admin/settings"}}
 {"type":"log","timestamp":"2025-10-30T08:41:07.150Z","level":"info","message":"span.success","attributes":{"spanId":"e644f14d-8921-4ddb-9e32-523e60c4bb57","spanName":"GET /api/admin/settings","durationMs":597.298}}
+{"type":"log","timestamp":"2025-10-30T09:28:49.615Z","level":"info","message":"span.start","attributes":{"spanId":"431c8b04-c6ac-4225-ac1a-3838446a60d3","spanName":"GET /api/admin/settings"}}
+{"type":"log","timestamp":"2025-10-30T09:28:50.188Z","level":"info","message":"span.success","attributes":{"spanId":"431c8b04-c6ac-4225-ac1a-3838446a60d3","spanName":"GET /api/admin/settings","durationMs":160.191}}
