@@ -530,11 +530,12 @@ export async function createEmployee(input: EmployeeInput) {
   };
   data.employees.push(employee);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "employee",
     action: "create",
-    message: `เพิ่มพนักงานใหม่: ${employee.name}`,
-    meta: { employeeId: employee.id },
+    details: `เพิ่มพนักงานใหม่: ${employee.name}`,
+    metadata: { employeeId: employee.id },
   });
   await upsertEmployeeRecordToSupabase(employee);
   return employee;
@@ -566,11 +567,12 @@ export async function createStore(input: StoreInput) {
   };
   data.stores.push(store);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "store",
     action: "create",
-    message: `เพิ่มร้าน/หน่วยงาน: ${store.name}`,
-    meta: { storeId: store.id, province: store.province ?? undefined },
+    details: `เพิ่มร้าน/หน่วยงาน: ${store.name}`,
+    metadata: { storeId: store.id, province: store.province ?? undefined },
   });
   await upsertStoreRecordToSupabase(store);
   return store;
@@ -635,11 +637,12 @@ export async function updateEmployee(id: string, input: EmployeeInput) {
     updatedAt,
   };
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "employee",
     action: "update",
-    message: `ปรับปรุงข้อมูลพนักงาน: ${trimmedName}`,
-    meta: { employeeId: id },
+    details: `ปรับปรุงข้อมูลพนักงาน: ${trimmedName}`,
+    metadata: { employeeId: id },
   });
   await upsertEmployeeRecordToSupabase(data.employees[index]);
   return data.employees[index];
@@ -674,11 +677,12 @@ export async function updateStore(id: string, input: StoreInput) {
     updatedAt: new Date().toISOString(),
   };
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "store",
     action: "update",
-    message: `ปรับปรุงร้าน/หน่วยงาน: ${trimmed}`,
-    meta: {
+    details: `ปรับปรุงร้าน/หน่วยงาน: ${trimmed}`,
+    metadata: {
       storeId: id,
       province: data.stores[index].province ?? undefined,
     },
@@ -703,11 +707,12 @@ export async function deleteEmployee(id: string) {
     );
   }
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "employee",
     action: "delete",
-    message: `ลบพนักงาน: ${existing.name}`,
-    meta: { employeeId: id },
+    details: `ลบพนักงาน: ${existing.name}`,
+    metadata: { employeeId: id },
   });
   await deleteEmployeeRecordFromSupabase(id);
 }
@@ -740,11 +745,12 @@ export async function deleteStore(id: string) {
   }
   data.stores = data.stores.filter((store) => store.id !== id);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "store",
     action: "delete",
-    message: `ลบร้าน/หน่วยงาน: ${existing.name}`,
-    meta: {
+    details: `ลบร้าน/หน่วยงาน: ${existing.name}`,
+    metadata: {
       storeId: id,
       affectedEmployees: affectedEmployees.length > 0 ? affectedEmployees : undefined,
     },
@@ -843,11 +849,12 @@ export async function createLeave(input: LeaveInput) {
   };
   data.leaves.push(leave);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "leave",
     action: "create",
-    message: `บันทึกวันลา: ${leave.employeeName} (${leave.type})`,
-    meta: {
+    details: `บันทึกวันลา: ${leave.employeeName} (${leave.type})`,
+    metadata: {
       leaveId: leave.id,
       employeeId: leave.employeeId,
       startDate: leave.startDate,
@@ -896,11 +903,12 @@ export async function updateLeave(id: string, input: Partial<LeaveInput>) {
 
   data.leaves[index] = updated;
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "leave",
     action: "update",
-    message: `ปรับปรุงวันลา: ${updated.employeeName} (${updated.type})`,
-    meta: {
+    details: `ปรับปรุงวันลา: ${updated.employeeName} (${updated.type})`,
+    metadata: {
       leaveId: updated.id,
       employeeId: updated.employeeId,
       startDate: updated.startDate,
@@ -919,11 +927,12 @@ export async function deleteLeave(id: string) {
   }
   data.leaves = data.leaves.filter((leave) => leave.id !== id);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "leave",
     action: "delete",
-    message: `ลบวันลา: ${existing.employeeName} (${existing.type})`,
-    meta: {
+    details: `ลบวันลา: ${existing.employeeName} (${existing.type})`,
+    metadata: {
       leaveId: existing.id,
       employeeId: existing.employeeId,
     },
@@ -1045,11 +1054,12 @@ export async function createProductAssignments({
   }
 
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "assign",
-    message: `ผูกสินค้า ${created.length} รายการกับ ${employee.name}${normalizedStoreId ? ` (สาขา ${data.stores.find((store) => store.id === normalizedStoreId)?.name ?? "ไม่ระบุ"})` : ""}`,
-    meta: {
+    details: `ผูกสินค้า ${created.length} รายการกับ ${employee.name}${normalizedStoreId ? ` (สาขา ${data.stores.find((store) => store.id === normalizedStoreId)?.name ?? "ไม่ระบุ"})` : ""}`,
+    metadata: {
       employeeId: employee.id,
       storeId: normalizedStoreId ?? undefined,
       productIds: created.map((record) => record.productId),
@@ -1071,11 +1081,12 @@ export async function deleteProductAssignment(id: string) {
     ? data.stores.find((store) => store.id === removed.storeId)?.name
     : null;
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "unassign",
-    message: `ยกเลิกการผูกสินค้า ${product?.code ?? removed.productId} กับ ${employeeName ?? removed.employeeId}`,
-    meta: {
+    details: `ยกเลิกการผูกสินค้า ${product?.code ?? removed.productId} กับ ${employeeName ?? removed.employeeId}`,
+    metadata: {
       assignmentId: removed.id,
       employeeId: removed.employeeId,
       storeId: removed.storeId ?? undefined,
@@ -1209,11 +1220,12 @@ export async function createProduct({
   };
   data.products.push(product);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "create",
-    message: `เพิ่มสินค้าใหม่: ${product.code} - ${product.name}`,
-    meta: { productId: product.id },
+    details: `เพิ่มสินค้าใหม่: ${product.code} - ${product.name}`,
+    metadata: { productId: product.id },
   });
   return product;
 }
@@ -1277,11 +1289,12 @@ export async function updateProduct(
     updatedAt: new Date().toISOString(),
   };
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "update",
-    message: `ปรับปรุงสินค้า: ${trimmedCode} - ${trimmedName}`,
-    meta: { productId: id },
+    details: `ปรับปรุงสินค้า: ${trimmedCode} - ${trimmedName}`,
+    metadata: { productId: id },
   });
   return data.products[index];
 }
@@ -1299,11 +1312,12 @@ export async function deleteProduct(id: string) {
     );
   }
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "delete",
-    message: `ลบสินค้า: ${existing.code} - ${existing.name}`,
-    meta: { productId: id },
+    details: `ลบสินค้า: ${existing.code} - ${existing.name}`,
+    metadata: { productId: id },
   });
 }
 
@@ -3315,11 +3329,12 @@ export async function createCategory({
   };
   data.categories.push(category);
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "create",
-    message: `เพิ่มหมวดหมู่ใหม่: ${category.name}`,
-    meta: { categoryId: category.id },
+    details: `เพิ่มหมวดหมู่ใหม่: ${category.name}`,
+    metadata: { categoryId: category.id },
   });
   return category;
 }
@@ -3352,11 +3367,12 @@ export async function updateCategory(
     updatedAt: new Date().toISOString(),
   };
   await writeData(data);
-  await appendLog({
+  await supabaseLogs.addLog({
+    timestamp: new Date().toISOString(),
     scope: "product",
     action: "update",
-    message: `ปรับปรุงหมวดหมู่: ${trimmedName}`,
-    meta: { categoryId: id },
+    details: `ปรับปรุงหมวดหมู่: ${trimmedName}`,
+    metadata: { categoryId: id },
   });
   return data.categories[index];
 }

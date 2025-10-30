@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
-import { appendLog, getStores } from "@/lib/configStore";
+import { getStores } from "@/lib/configStore";
+import { addLog } from "@/lib/supabaseLogs";
 import { assertSupabaseConfig, getSupabaseServiceClient } from "@/lib/supabaseClient";
 import type { Database } from "@/types/supabase";
 
@@ -340,11 +341,13 @@ export async function POST(request: Request) {
       throw new Error("ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
     }
 
-    await appendLog({
+    await addLog({
+      timestamp: submittedAt.toISOString(),
       scope: "attendance",
       action: "create",
-      message: `บันทึกเวลา${sanitized.status === "check-in" ? "เข้า" : "ออก"} - ${sanitized.employeeName}`,
-      meta: {
+      details: `บันทึกเวลา${sanitized.status === "check-in" ? "เข้า" : "ออก"} - ${sanitized.employeeName}`,
+      actorName: sanitized.employeeName,
+      metadata: {
         storeName: sanitized.storeName,
         employeeName: sanitized.employeeName,
         status: sanitized.status,

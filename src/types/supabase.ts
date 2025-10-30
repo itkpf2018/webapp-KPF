@@ -319,6 +319,48 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          baseline: number
+          created_at: string
+          currency: string
+          effective_month: string
+          employee_id: string
+          employee_name: string
+          id: string
+          items: Json
+          last_updated: string
+          role: string
+          store: string
+        }
+        Insert: {
+          baseline?: number
+          created_at?: string
+          currency?: string
+          effective_month: string
+          employee_id: string
+          employee_name: string
+          id: string
+          items?: Json
+          last_updated?: string
+          role: string
+          store: string
+        }
+        Update: {
+          baseline?: number
+          created_at?: string
+          currency?: string
+          effective_month?: string
+          employee_id?: string
+          employee_name?: string
+          id?: string
+          items?: Json
+          last_updated?: string
+          role?: string
+          store?: string
+        }
+        Relationships: []
+      }
       leave_requests: {
         Row: {
           created_at: string

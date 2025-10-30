@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { getBranding, updateBrandingLogo } from "@/lib/configStore";
+import { getSupabaseServiceClient } from "@/lib/supabaseClient";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const UPLOAD_SUBDIR = "uploads";
-const UPLOAD_DIR = path.join(process.cwd(), "public", UPLOAD_SUBDIR);
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
+const BUCKET_NAME = process.env.SUPABASE_ATTENDANCE_BUCKET || "attendance-photos";
 
 const MIME_EXTENSION_MAP: Record<string, string> = {
   "image/png": ".png",
@@ -20,34 +18,34 @@ const MIME_EXTENSION_MAP: Record<string, string> = {
   "image/svg+xml": ".svg",
 };
 
-async function ensureUploadDir() {
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-}
-
 function resolveExtension(file: File) {
-  const nameExt = path.extname(file.name || "").toLowerCase();
-  if (nameExt && Object.values(MIME_EXTENSION_MAP).includes(nameExt)) {
-    return nameExt;
+  const mimeType = file.type || "";
+  const mimeExt = MIME_EXTENSION_MAP[mimeType];
+  if (mimeExt) return mimeExt;
+
+  const nameExt = file.name?.split('.').pop()?.toLowerCase();
+  if (nameExt && Object.values(MIME_EXTENSION_MAP).includes(`.${nameExt}`)) {
+    return `.${nameExt}`;
   }
-  const mimeExt = MIME_EXTENSION_MAP[file.type || ""];
-  return mimeExt ?? ".png";
+
+  return ".png";
 }
 
-function buildRelativePath(filename: string) {
-  return `/${UPLOAD_SUBDIR}/${filename}`;
-}
+async function deleteFromStorage(logoPath: string | null) {
+  if (!logoPath) return;
 
-async function deleteIfManagedAsset(relativePath: string | null) {
-  if (!relativePath || !relativePath.startsWith(`/${UPLOAD_SUBDIR}/`)) {
-    return;
-  }
-  const absolutePath = path.join(process.cwd(), "public", relativePath);
+  // Extract storage path from public URL
+  // Format: https://xxx.supabase.co/storage/v1/object/public/bucket-name/branding/xxx.png
+  const match = logoPath.match(/\/object\/public\/[^/]+\/(.+)$/);
+  if (!match) return;
+
+  const storagePath = match[1];
+  const supabase = getSupabaseServiceClient();
+
   try {
-    await fs.unlink(absolutePath);
+    await supabase.storage.from(BUCKET_NAME).remove([storagePath]);
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      console.warn("[branding] remove asset failed", error);
-    }
+    console.warn("[branding] remove from storage failed", error);
   }
 }
 
@@ -88,18 +86,41 @@ export async function POST(request: Request) {
 
     const extension = resolveExtension(file);
     const filename = `branding-logo-${Date.now()}-${randomUUID()}${extension}`;
-    const relativePath = buildRelativePath(filename);
-    const targetPath = path.join(UPLOAD_DIR, filename);
+    const storagePath = `branding/${filename}`;
 
-    await ensureUploadDir();
+    // Upload to Supabase Storage
     const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(targetPath, buffer);
+    const supabase = getSupabaseServiceClient();
 
+    const uploadResult = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadResult.error) {
+      console.error("[branding] upload error", uploadResult.error);
+      throw new Error("ไม่สามารถอัปโหลดโลโก้ได้");
+    }
+
+    // Get public URL
+    const { data: publicData } = supabase.storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(storagePath);
+
+    const publicUrl = publicData?.publicUrl;
+    if (!publicUrl) {
+      throw new Error("ไม่สามารถสร้างลิงก์โลโก้ได้");
+    }
+
+    // Update branding in database
     const previousBranding = await getBranding();
-    const branding = await updateBrandingLogo(relativePath);
+    const branding = await updateBrandingLogo(publicUrl);
 
-    if (previousBranding.logoPath && previousBranding.logoPath !== relativePath) {
-      await deleteIfManagedAsset(previousBranding.logoPath);
+    // Delete old logo from storage if it exists
+    if (previousBranding.logoPath && previousBranding.logoPath !== publicUrl) {
+      await deleteFromStorage(previousBranding.logoPath);
     }
 
     return NextResponse.json(branding);
@@ -116,7 +137,7 @@ export async function DELETE() {
   try {
     const previousBranding = await getBranding();
     if (previousBranding.logoPath) {
-      await deleteIfManagedAsset(previousBranding.logoPath);
+      await deleteFromStorage(previousBranding.logoPath);
     }
     const branding = await updateBrandingLogo(null);
     return NextResponse.json(branding);

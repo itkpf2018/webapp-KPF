@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { appendLog } from "@/lib/configStore";
+import { addLog } from "@/lib/supabaseLogs";
 import { getSupabaseServiceClient, assertSupabaseConfig } from "@/lib/supabaseClient";
 import type { Database } from "@/types/supabase";
 
@@ -502,11 +502,13 @@ export async function POST(request: Request) {
 
     const overallTotal = insertPayload.reduce((sum, record) => sum + (record.total ?? 0), 0);
 
-    await appendLog({
+    await addLog({
+      timestamp,
       scope: "sales",
       action: "create",
-      message: `บันทึกยอดขาย ${insertPayload.length} รายการ โดย ${employeeName}`,
-      meta: {
+      details: `บันทึกยอดขาย ${insertPayload.length} รายการ โดย ${employeeName}`,
+      actorName: employeeName,
+      metadata: {
         storeName,
         employeeName,
         items: logItems,
