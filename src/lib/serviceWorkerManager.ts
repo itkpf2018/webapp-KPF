@@ -3,7 +3,7 @@
  * Handles PWA service worker registration and update detection
  */
 
-export type UpdateCallback = (version: string, releaseNotes: any) => void;
+export type UpdateCallback = (version: string, releaseNotes: unknown) => void;
 
 class ServiceWorkerManager {
   private updateCallback: UpdateCallback | null = null;
