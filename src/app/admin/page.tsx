@@ -27,6 +27,9 @@ export default async function AdminDashboardPage() {
     id: store.id,
     name: store.name,
     province: store.province ?? null,
+    address: store.address ?? null,
+    latitude: store.latitude ?? null,
+    longitude: store.longitude ?? null,
   }));
 
   return (

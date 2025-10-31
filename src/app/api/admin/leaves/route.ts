@@ -1,14 +1,32 @@
 import { NextResponse } from "next/server";
-import { createLeave, getLeaves } from "@/lib/configStore";
-import type { LeaveRecord } from "@/lib/configStore";
+import {
+  createLeave as createLeaveSupabase,
+  getLeaves as getLeavesSupabase,
+  type LeaveStatus
+} from "@/lib/supabaseLeaves";
+import { getEmployees } from "@/lib/configStore";
 
-const isLeaveStatus = (value: unknown): value is LeaveRecord["status"] =>
+const isLeaveStatus = (value: unknown): value is LeaveStatus =>
   typeof value === "string" &&
   (value === "scheduled" || value === "approved" || value === "rejected" || value === "cancelled");
 
-export async function GET() {
-  const leaves = await getLeaves();
-  return NextResponse.json({ leaves });
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const employeeId = searchParams.get("employeeId") || undefined;
+    const status = searchParams.get("status") || undefined;
+
+    const leaves = await getLeavesSupabase({
+      employeeId,
+      status: status && isLeaveStatus(status) ? status : undefined,
+    });
+
+    return NextResponse.json({ ok: true, leaves });
+  } catch (error) {
+    console.error("[GET /api/admin/leaves] Error:", error);
+    const message = error instanceof Error ? error.message : "ไม่สามารถโหลดข้อมูลการลาได้";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -19,7 +37,6 @@ export async function POST(request: Request) {
       startDate,
       endDate,
       reason,
-      note,
       status,
     } = (await request.json()) as {
       employeeId?: string;
@@ -27,26 +44,50 @@ export async function POST(request: Request) {
       startDate?: string;
       endDate?: string;
       reason?: string;
-      note?: string;
       status?: string;
     };
+
     if (!employeeId || !type || !startDate || !endDate) {
       return NextResponse.json(
         { ok: false, message: "กรุณากรอกข้อมูลวันลาให้ครบถ้วน" },
         { status: 400 },
       );
     }
-    const leave = await createLeave({
+
+    // Get employee name from employees list
+    const employees = await getEmployees();
+    const employee = employees.find((emp) => emp.id === employeeId);
+    if (!employee) {
+      return NextResponse.json(
+        { ok: false, message: "ไม่พบข้อมูลพนักงาน" },
+        { status: 404 },
+      );
+    }
+
+    console.log("[POST /api/admin/leaves] Creating leave:", {
       employeeId,
+      employeeName: employee.name,
       type,
       startDate,
       endDate,
-      reason,
-      note,
-      status: isLeaveStatus(status) ? status : undefined,
+      status: status || "scheduled",
     });
+
+    const leave = await createLeaveSupabase({
+      employeeId,
+      employeeName: employee.name,
+      type,
+      startDate,
+      endDate,
+      reason: reason || null,
+      status: isLeaveStatus(status) ? status : "scheduled",
+    });
+
+    console.log("[POST /api/admin/leaves] Leave created successfully:", leave);
+
     return NextResponse.json({ ok: true, leave });
   } catch (error) {
+    console.error("[POST /api/admin/leaves] Error:", error);
     const message =
       error instanceof Error ? error.message : "ไม่สามารถบันทึกวันลาได้";
     const isClientError =

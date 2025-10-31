@@ -62,17 +62,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
       <div className="w-full max-w-md">
         {/* Card */}
-        <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <div className="rounded-3xl bg-white/95 backdrop-blur-xl p-8 shadow-[0_20px_80px_-15px_rgba(0,0,0,0.15)] border border-white/50">
           {/* Logo/Header */}
-          <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-              <Lock className="h-8 w-8 text-blue-600" />
+          <div className="mb-12 text-center">
+            <div className="mx-auto mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 shadow-[0_10px_40px_-10px_rgba(59,130,246,0.4)]">
+              <Lock className="h-10 w-10 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">เข้าสู่ระบบ</h1>
-            <p className="mt-2 text-sm text-slate-600">กรุณากรอก PIN เพื่อเข้าใช้งาน</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-indigo-900 bg-clip-text text-transparent">เข้าสู่ระบบ</h1>
           </div>
 
           {/* PIN Keypad */}
@@ -84,21 +83,11 @@ export default function LoginPage() {
             error={error}
             onClear={handleClearError}
           />
-
-          {/* Helper Text */}
-          <div className="mt-6 space-y-2 rounded-lg bg-blue-50 p-4">
-            <p className="text-xs font-semibold text-blue-900">วิธีใช้งาน:</p>
-            <ul className="space-y-1 text-xs text-blue-700">
-              <li>• กรอก PIN ที่ Admin ได้สร้างไว้ให้คุณ</li>
-              <li>• PIN ประกอบด้วยตัวเลข 4-6 หลัก</li>
-              <li>• ถ้าลืม PIN กรุณาติดต่อผู้ดูแลระบบ</li>
-            </ul>
-          </div>
         </div>
 
         {/* Footer */}
-        <p className="mt-6 text-center text-xs text-slate-600">
-          © 2025 Attendance Tracker. All rights reserved.
+        <p className="mt-8 text-center text-xs text-slate-500">
+          © 2025 Attendance Tracker
         </p>
       </div>
     </div>

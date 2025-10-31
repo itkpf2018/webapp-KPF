@@ -3,19 +3,32 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ResponsiveContainer,
-  ComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  AreaChart,
-  Area,
-} from "recharts";
+  TrendingUp,
+  Users,
+  DollarSign,
+  ShoppingCart,
+  AlertTriangle,
+  CheckCircle2,
+  Activity,
+  MapPin,
+  Clock,
+  BarChart3,
+  ArrowUp,
+  ArrowDown,
+  Zap
+} from "lucide-react";
 import type { DashboardMetrics } from "@/lib/configStore";
+import dynamic from "next/dynamic";
+
+// Dynamic imports for heavy components
+const ThailandStoreMap = dynamic(() => import("./dashboard/ThailandStoreMap"), {
+  ssr: false,
+  loading: () => <MapSkeleton />,
+});
+
+const RevenueStreamChart = dynamic(() => import("./dashboard/RevenueStreamChart"), {
+  loading: () => <ChartSkeleton />,
+});
 
 type DashboardSnapshot = {
   totals: {
@@ -128,17 +141,9 @@ type SimplifiedStore = {
   id: string;
   name: string;
   province: string | null;
-};
-
-type DashboardFiltersState = {
-  rangeMode: DashboardMetrics["filters"]["rangeMode"];
-  rangeValue: string;
-  store: string;
-  employee: string;
-  attendanceStatus: DashboardMetrics["filters"]["attendanceStatus"];
-  salesStatus: string;
-  timeFrom: string;
-  timeTo: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 type EnterpriseDashboardClientProps = {
@@ -157,854 +162,660 @@ const currencyFormatter = new Intl.NumberFormat("th-TH", {
 
 const numberFormatter = new Intl.NumberFormat("th-TH");
 
-const dateFormatter = new Intl.DateTimeFormat("th-TH", {
-  dateStyle: "medium",
-});
-
-function padNumber(value: number) {
-  return value.toString().padStart(2, "0");
-}
-
-function getZonedParts(date: Date, timeZone: string) {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  const lookup = new Map(formatter.formatToParts(date).map((part) => [part.type, part.value]));
-  return {
-    year: Number.parseInt(lookup.get("year") ?? "0", 10),
-    month: Number.parseInt(lookup.get("month") ?? "0", 10),
-    day: Number.parseInt(lookup.get("day") ?? "0", 10),
-  };
-}
-
-function getCurrentWeekStart(parts: { year: number; month: number; day: number }) {
-  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day));
-  const dayOfWeek = date.getUTCDay();
-  const diff = (dayOfWeek + 6) % 7; // convert Sunday-based index to Monday start
-  date.setUTCDate(date.getUTCDate() - diff);
-  return {
-    year: date.getUTCFullYear(),
-    month: date.getUTCMonth() + 1,
-    day: date.getUTCDate(),
-  };
-}
-
-function getDefaultRangeValue(
-  mode: DashboardFiltersState["rangeMode"],
-  timeZone: string,
-) {
-  const nowParts = getZonedParts(new Date(), timeZone);
-  if (mode === "year") {
-    return `${nowParts.year}`;
-  }
-  if (mode === "month") {
-    return `${nowParts.year}-${padNumber(nowParts.month)}`;
-  }
-  if (mode === "week") {
-    const weekStart = getCurrentWeekStart(nowParts);
-    return `${weekStart.year}-${padNumber(weekStart.month)}-${padNumber(weekStart.day)}`;
-  }
-  return `${nowParts.year}-${padNumber(nowParts.month)}-${padNumber(nowParts.day)}`;
-}
-
-function formatDelta(delta: number) {
-  if (!Number.isFinite(delta) || delta === 0) {
-    return {
-      label: "0%",
-      tone: "neutral" as const,
-    };
-  }
-  const tone = delta > 0 ? "up" : "down";
-  return {
-    label: `${delta > 0 ? "+" : ""}${delta.toFixed(1)}%`,
-    tone,
-  };
-}
-
-function buildTimelineDataset(metrics: DashboardMetrics) {
-  const attendanceMap = new Map(
-    metrics.attendance.timeline.map((entry) => [entry.dateKey, entry]),
-  );
-  const salesMap = new Map(metrics.sales.timeline.map((entry) => [entry.dateKey, entry]));
-  const keys = Array.from(new Set([...attendanceMap.keys(), ...salesMap.keys()]));
-  keys.sort();
-  return keys.map((key) => {
-    const attendanceEntry = attendanceMap.get(key);
-    const salesEntry = salesMap.get(key);
-    return {
-      key,
-      label: salesEntry?.label ?? attendanceEntry?.label ?? key,
-      checkIns: attendanceEntry?.checkIns ?? 0,
-      checkOuts: attendanceEntry?.checkOuts ?? 0,
-      sales: salesEntry?.total ?? 0,
-      transactions: salesEntry?.transactions ?? 0,
-    };
-  });
-}
-
-function describeRange(filters: DashboardMetrics["filters"]) {
-  const start = new Date(filters.rangeStartIso);
-  const end = new Date(filters.rangeEndIso);
-  const startLabel = dateFormatter.format(start);
-  const endLabel = dateFormatter.format(end);
-  if (filters.rangeMode === "day") {
-    return startLabel;
-  }
-  return `${startLabel} – ${endLabel}`;
-}
-
-function normalizeTimeInput(value: string) {
-  return value.replace(/[^0-9:]/g, "");
-}
-
 export default function EnterpriseDashboardClient({
   snapshot,
   initialMetrics,
   employees,
   stores,
 }: EnterpriseDashboardClientProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
   const [metrics, setMetrics] = useState<DashboardMetrics>(initialMetrics);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const skipInitialFetch = useRef(true);
+  const [realtimeRevenue, setRealtimeRevenue] = useState(snapshot.kpis.sales.value);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
 
-  // Initialize filters from URL parameters or use defaults from initialMetrics
-  const [filters, setFilters] = useState<DashboardFiltersState>(() => {
-    const rangeMode = (searchParams.get("rangeMode") as DashboardFiltersState["rangeMode"]) || initialMetrics.filters.rangeMode;
-    const rangeValue = searchParams.get("rangeValue") || initialMetrics.filters.rangeValue;
-    const store = searchParams.get("store") || initialMetrics.filters.store || "";
-    const employee = searchParams.get("employee") || initialMetrics.filters.employee || "";
-    const attendanceStatus = (searchParams.get("attendanceStatus") as DashboardFiltersState["attendanceStatus"]) || initialMetrics.filters.attendanceStatus;
-    const salesStatus = searchParams.get("salesStatus") || initialMetrics.filters.salesStatus || "all";
-    const timeFrom = searchParams.get("timeFrom") || initialMetrics.filters.timeFrom || "";
-    const timeTo = searchParams.get("timeTo") || initialMetrics.filters.timeTo || "";
-
-    return {
-      rangeMode,
-      rangeValue,
-      store,
-      employee,
-      attendanceStatus,
-      salesStatus,
-      timeFrom,
-      timeTo,
-    };
-  });
-
-  // Sync filters to URL parameters
+  // Simulate real-time updates (in production, use SSE or WebSocket)
   useEffect(() => {
-    const params = new URLSearchParams();
-
-    if (filters.rangeMode) params.set("rangeMode", filters.rangeMode);
-    if (filters.rangeValue) params.set("rangeValue", filters.rangeValue);
-    if (filters.store) params.set("store", filters.store);
-    if (filters.employee) params.set("employee", filters.employee);
-    if (filters.attendanceStatus && filters.attendanceStatus !== "all") {
-      params.set("attendanceStatus", filters.attendanceStatus);
-    }
-    if (filters.salesStatus && filters.salesStatus !== "all") {
-      params.set("salesStatus", filters.salesStatus);
-    }
-    if (filters.timeFrom) params.set("timeFrom", filters.timeFrom);
-    if (filters.timeTo) params.set("timeTo", filters.timeTo);
-
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [filters, router]);
-
-  useEffect(() => {
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeout = setTimeout(async () => {
-      setIsLoading(true);
-      setError(null);
+    const interval = setInterval(async () => {
       try {
-        const params = new URLSearchParams();
-        params.set("rangeMode", filters.rangeMode);
-        if (filters.rangeValue) params.set("rangeValue", filters.rangeValue);
-        if (filters.store) params.set("store", filters.store);
-        if (filters.employee) params.set("employee", filters.employee);
-        params.set("variant", "metrics");
-        if (filters.attendanceStatus !== "all") {
-          params.set("attendanceStatus", filters.attendanceStatus);
+        const response = await fetch('/api/admin/dashboard');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.metrics) {
+            // Update full metrics to refresh all dashboard KPIs
+            setMetrics(data.metrics);
+            setLastUpdate(new Date());
+            // Also update realtime revenue for animation
+            if (data.metrics.sales?.totalRevenue !== realtimeRevenue) {
+              setRealtimeRevenue(data.metrics.sales.totalRevenue);
+            }
+          }
         }
-        if (filters.salesStatus && filters.salesStatus !== "all") {
-          params.set("salesStatus", filters.salesStatus);
-        }
-        if (filters.timeFrom) params.set("timeFrom", filters.timeFrom);
-        if (filters.timeTo) params.set("timeTo", filters.timeTo);
-
-        const response = await fetch(`/api/admin/dashboard?${params.toString()}`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          throw new Error("ไม่สามารถโหลดข้อมูลแดชบอร์ดได้");
-        }
-        const payload = (await response.json()) as { metrics?: DashboardMetrics };
-        if (!payload.metrics) {
-          throw new Error("รูปแบบข้อมูลแดชบอร์ดไม่ถูกต้อง");
-        }
-        setMetrics(payload.metrics);
-      } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") {
-          return;
-        }
-        const message =
-          err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการโหลดแดชบอร์ด";
-        setError(message);
-      } finally {
-        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch realtime data:', error);
       }
-    }, 400);
+    }, 10000); // Update every 10 seconds
 
-    return () => {
-      controller.abort();
-      clearTimeout(timeout);
+    return () => clearInterval(interval);
+  }, []); // Empty deps - interval runs once on mount and cleans up on unmount
+
+  // Calculate seconds since last update
+  const secondsSinceUpdate = Math.floor((Date.now() - lastUpdate.getTime()) / 1000);
+
+  // Format delta
+  const formatDelta = (delta: number) => {
+    if (!Number.isFinite(delta) || delta === 0) {
+      return { label: "0%", tone: "neutral" as const };
+    }
+    return {
+      label: `${delta > 0 ? "+" : ""}${delta.toFixed(1)}%`,
+      tone: delta > 0 ? "up" : "down",
     };
-  }, [filters]);
+  };
 
-  const timelineData = useMemo(() => buildTimelineDataset(metrics), [metrics]);
+  // Smart alerts based on actual data
+  const smartAlerts = useMemo(() => {
+    const alerts: Array<{ type: 'critical' | 'warning' | 'info'; message: string }> = [];
 
-  const storeLeaders = useMemo(() => metrics.sales.byStore.slice(0, 5), [metrics]);
-  const employeeLeaders = useMemo(() => metrics.sales.byEmployee.slice(0, 5), [metrics]);
-  const statusBreakdown = useMemo(() => metrics.sales.statuses.slice(0, 5), [metrics]);
-  const topProducts = useMemo(() => snapshot.sales.topProducts.slice(0, 5), [snapshot]);
+    // Check sales performance
+    if (snapshot.kpis.sales.deltaPercent < -10) {
+      alerts.push({
+        type: 'critical',
+        message: `ยอดขายลดลง ${Math.abs(snapshot.kpis.sales.deltaPercent).toFixed(1)}% เทียบกับช่วงก่อน - ต้องตรวจสอบด่วน`
+      });
+    } else if (snapshot.kpis.sales.deltaPercent > 20) {
+      alerts.push({
+        type: 'info',
+        message: `ยอดขายเพิ่มขึ้น ${snapshot.kpis.sales.deltaPercent.toFixed(1)}% - โอกาสเพิ่ม stock`
+      });
+    }
 
-  const totalRevenueLabel = currencyFormatter.format(metrics.sales.totalRevenue ?? 0);
-  const totalQuantityLabel = numberFormatter.format(metrics.sales.totalQuantity ?? 0);
-  const totalTransactionsLabel = numberFormatter.format(metrics.sales.transactions ?? 0);
+    // Check attendance
+    if (snapshot.kpis.attendance.deltaPercent < -15) {
+      alerts.push({
+        type: 'warning',
+        message: `การเช็กอินลดลง ${Math.abs(snapshot.kpis.attendance.deltaPercent).toFixed(1)}% - ติดตามทีม`
+      });
+    }
 
-  const rangeDescription = describeRange(metrics.filters);
-  const timeZone = snapshot.performance.metadata.timeZone;
-  const lookbackDays = snapshot.performance.metadata.lookbackDays;
+    // Check store performance
+    const worstStore = snapshot.performance.segments.store
+      .slice()
+      .sort((a, b) => a.salesTotal - b.salesTotal)[0];
+
+    if (worstStore && worstStore.salesTotal < snapshot.kpis.sales.value * 0.05) {
+      alerts.push({
+        type: 'warning',
+        message: `ร้าน "${worstStore.label}" มียอดขายต่ำ - แนะนำตรวจสอบทีม`
+      });
+    }
+
+    return alerts;
+  }, [snapshot]);
 
   return (
-    <div className="space-y-8 print:bg-white">
-      <header className="flex flex-col gap-4 rounded-3xl border border-blue-100/80 bg-gradient-to-br from-blue-600 via-sky-500 to-indigo-500 p-6 text-white shadow-[0_30px_120px_-80px_rgba(37,99,235,0.9)] print:border-none print:bg-white print:text-slate-900">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Enterprise Operations Dashboard</h1>
-            <p className="text-sm text-white/80 print:text-slate-600">
-              ภาพรวมยอดขายและการลงเวลาประจำช่วง {rangeDescription}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-sky-50/20 pb-12">
+      {/* Top Navigation */}
+      <div className="sticky top-0 z-20 border-b border-blue-100 bg-white/80 backdrop-blur-xl">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">Enterprise Dashboard</h1>
+              <p className="text-xs text-slate-500">Real-time Business Intelligence</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+              >
+                พิมพ์รายงาน
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* HERO: Real-Time Revenue Counter */}
+        <section className="relative overflow-hidden rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/30 p-6 sm:p-8 md:p-12 shadow-[0_40px_120px_-30px_rgba(59,130,246,0.3)] backdrop-blur-xl">
+          {/* Glow Effect */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 h-96 w-96 bg-blue-300/20 blur-[120px] rounded-full animate-pulse" />
+          </div>
+
+          {/* Live Indicator */}
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 sm:px-4 sm:py-2">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+            <span className="text-xs font-semibold text-emerald-700">LIVE</span>
+          </div>
+
+          {/* Main Content */}
+          <div className="relative z-10 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 sm:px-4 sm:py-2 mb-3 sm:mb-4">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+              <span className="text-xs sm:text-sm font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-blue-600">
+                Total Revenue Today
+              </span>
+            </div>
+
+            {/* MASSIVE Number - Responsive */}
+            <div className="my-4 sm:my-6">
+              <AnimatedRevenue value={realtimeRevenue} />
+            </div>
+
+            {/* Growth Indicator */}
+            <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
+              <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 ${
+                snapshot.kpis.sales.deltaPercent > 0
+                  ? 'bg-emerald-100'
+                  : 'bg-rose-100'
+              }`}>
+                {snapshot.kpis.sales.deltaPercent > 0 ? (
+                  <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
+                ) : (
+                  <ArrowDown className="h-3 w-3 sm:h-4 sm:w-4 text-rose-600" />
+                )}
+                <span className={`text-xs sm:text-sm font-bold ${
+                  snapshot.kpis.sales.deltaPercent > 0
+                    ? 'text-emerald-700'
+                    : 'text-rose-700'
+                }`}>
+                  {formatDelta(snapshot.kpis.sales.deltaPercent).label}
+                </span>
+              </div>
+              <span className="text-xs sm:text-sm text-slate-500">vs ช่วงก่อนหน้า</span>
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-400">
+                <Clock className="h-3 w-3" />
+                <span className="hidden sm:inline">อัปเดตล่าสุด {secondsSinceUpdate} วินาทีที่แล้ว</span>
+                <span className="sm:hidden">{secondsSinceUpdate}s ago</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Executive Summary + AI Insights */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Executive Summary */}
+          <ExecutiveSummaryCard snapshot={snapshot} />
+
+          {/* Smart Alerts Panel */}
+          <SmartAlertsPanel alerts={smartAlerts} />
+        </div>
+
+        {/* Quick Stats Cards */}
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <QuickStatCard
+            icon={<ShoppingCart className="h-6 w-6" />}
+            label="ธุรกรรม"
+            value={numberFormatter.format(snapshot.kpis.salesTransactions.value)}
+            delta={snapshot.kpis.salesTransactions.deltaPercent}
+            color="blue"
+          />
+          <QuickStatCard
+            icon={<Users className="h-6 w-6" />}
+            label="เช็กอิน"
+            value={numberFormatter.format(snapshot.kpis.attendance.value)}
+            delta={snapshot.kpis.attendance.deltaPercent}
+            color="emerald"
+          />
+          <QuickStatCard
+            icon={<Activity className="h-6 w-6" />}
+            label="Avg Ticket"
+            value={currencyFormatter.format(snapshot.kpis.averageTicket.value)}
+            delta={snapshot.kpis.averageTicket.deltaPercent}
+            color="indigo"
+          />
+          <QuickStatCard
+            icon={<MapPin className="h-6 w-6" />}
+            label="ร้านค้าทั้งหมด"
+            value={numberFormatter.format(snapshot.totals.stores)}
+            delta={0}
+            color="sky"
+          />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
+          {/* Left: Quick Stats Detail */}
+          <div className="space-y-6">
+            <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">สรุปข้อมูลรวม</h3>
+              <dl className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm text-slate-600">พนักงานทั้งหมด</dt>
+                  <dd className="text-lg font-bold text-slate-900">
+                    {numberFormatter.format(snapshot.totals.employees)} คน
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm text-slate-600">พนักงานที่ active</dt>
+                  <dd className="text-lg font-bold text-emerald-600">
+                    {numberFormatter.format(snapshot.attendance.activeEmployees)} คน
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm text-slate-600">จำนวนสินค้า</dt>
+                  <dd className="text-lg font-bold text-slate-900">
+                    {numberFormatter.format(snapshot.totals.products)} รายการ
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm text-slate-600">ยอดขายรวม</dt>
+                  <dd className="text-lg font-bold text-blue-600">
+                    {currencyFormatter.format(snapshot.sales.totalRevenue)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          {/* Right: Thailand Store Map */}
+          <ThailandStoreMap
+            stores={stores.map(store => ({
+              id: store.id,
+              name: store.name,
+              province: store.province || 'ไม่ระบุจังหวัด',
+              lat: store.latitude || 13.7563,
+              lng: store.longitude || 100.5018,
+              sales: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesTotal || 0,
+              transactions: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesCount || 0,
+            }))}
+          />
+        </div>
+
+        {/* Revenue Stream Chart */}
+        <RevenueStreamChart metrics={metrics} />
+
+        {/* Three Columns: Top Performers, Recent Activities, Top Products */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <TopPerformersCard data={snapshot.performance.segments.employee.slice(0, 5)} />
+          <TopProductsCard products={snapshot.sales.topProducts.slice(0, 5)} />
+          <RecentActivitiesCard activities={snapshot.kpis.alerts} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Animated Revenue Component - Responsive
+function AnimatedRevenue({ value }: { value: number }) {
+  const [displayValue, setDisplayValue] = useState(value);
+  const prevValue = useRef(value);
+
+  useEffect(() => {
+    if (value === prevValue.current) return;
+
+    const start = prevValue.current;
+    const end = value;
+    const duration = 1000;
+    const steps = 60;
+    const increment = (end - start) / steps;
+
+    let current = 0;
+    const timer = setInterval(() => {
+      current++;
+      setDisplayValue(start + (increment * current));
+      if (current >= steps) {
+        clearInterval(timer);
+        prevValue.current = value;
+      }
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return (
+    <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400">
+      {currencyFormatter.format(Math.round(displayValue))}
+    </span>
+  );
+}
+
+// Executive Summary Card
+function ExecutiveSummaryCard({ snapshot }: { snapshot: DashboardSnapshot }) {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-gradient-to-br from-white to-blue-50/30 p-6 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-2xl bg-gradient-to-br from-blue-500 to-sky-400 p-3">
+          <BarChart3 className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Executive Summary</h3>
+          <p className="text-xs text-slate-500">ภาพรวมสำหรับผู้บริหาร</p>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+          <CheckCircle2 className="h-5 w-5 text-emerald-600 flex-shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-emerald-900">Sales Performance</p>
+            <p className="text-emerald-700">
+              {snapshot.kpis.sales.deltaPercent > 0 ? 'เติบโต' : 'ลดลง'} {Math.abs(snapshot.kpis.sales.deltaPercent).toFixed(1)}%
             </p>
-            <p className="mt-1 text-xs uppercase text-white/60 print:text-slate-400">
-              อัปเดตล่าสุด {dateFormatter.format(new Date(snapshot.updatedAt))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3">
+          <Users className="h-5 w-5 text-blue-600 flex-shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-blue-900">พนักงาน Active</p>
+            <p className="text-blue-700">
+              {snapshot.attendance.activeEmployees}/{snapshot.totals.employees} คน
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3 print:hidden">
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="rounded-2xl border border-white/40 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow hover:bg-white/20"
-            >
-              พิมพ์รายงาน
-            </button>
+        </div>
+
+        <div className="flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-3">
+          <MapPin className="h-5 w-5 text-indigo-600 flex-shrink-0" />
+          <div className="text-sm">
+            <p className="font-semibold text-indigo-900">Top Store</p>
+            <p className="text-indigo-700">
+              {snapshot.performance.segments.store[0]?.label || '-'}
+            </p>
           </div>
         </div>
-        <div className="grid gap-4 rounded-2xl bg-white/15 p-4 text-slate-900 shadow-inner print:bg-transparent print:p-0">
-          <div className="grid gap-4 lg:grid-cols-5">
-            <div className="rounded-xl bg-white/90 p-4 shadow-sm print:border print:border-slate-200 print:bg-white">
-              <p className="text-xs font-semibold text-slate-500">ยอดขาย (ช่วง)</p>
-              <p className="mt-2 text-xl font-semibold text-slate-900">
-                {currencyFormatter.format(snapshot.kpis.sales.value)}
-              </p>
+      </div>
+
+      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-600">Overall Status</span>
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+            GOOD ✨
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Smart Alerts Panel
+function SmartAlertsPanel({
+  alerts
+}: {
+  alerts: Array<{ type: 'critical' | 'warning' | 'info'; message: string }>
+}) {
+  return (
+    <div className="rounded-3xl border-2 border-amber-100 bg-gradient-to-br from-white to-amber-50/30 p-6 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-400 p-3">
+          <Zap className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Smart Insights</h3>
+          <p className="text-xs text-slate-500">AI-Powered Business Intelligence</p>
+        </div>
+      </div>
+
+      {alerts.length === 0 ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
+          <p className="text-sm font-semibold text-emerald-900">ทุกอย่างเป็นไปด้วยดี</p>
+          <p className="text-xs text-emerald-700 mt-1">ไม่มีประเด็นที่ต้องเร่งแก้ไข</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {alerts.map((alert, index) => (
+            <div
+              key={index}
+              className={`rounded-xl border p-3 flex items-start gap-3 ${
+                alert.type === 'critical'
+                  ? 'border-rose-200 bg-rose-50'
+                  : alert.type === 'warning'
+                  ? 'border-amber-200 bg-amber-50'
+                  : 'border-blue-200 bg-blue-50'
+              }`}
+            >
+              <AlertTriangle
+                className={`h-5 w-5 flex-shrink-0 ${
+                  alert.type === 'critical'
+                    ? 'text-rose-600'
+                    : alert.type === 'warning'
+                    ? 'text-amber-600'
+                    : 'text-blue-600'
+                }`}
+              />
               <p
-                className={`mt-1 text-xs font-semibold ${
-                  formatDelta(snapshot.kpis.sales.deltaPercent).tone === "down"
-                    ? "text-red-600"
-                    : formatDelta(snapshot.kpis.sales.deltaPercent).tone === "up"
-                      ? "text-emerald-600"
-                      : "text-slate-500"
+                className={`text-sm ${
+                  alert.type === 'critical'
+                    ? 'text-rose-900'
+                    : alert.type === 'warning'
+                    ? 'text-amber-900'
+                    : 'text-blue-900'
                 }`}
               >
-                {formatDelta(snapshot.kpis.sales.deltaPercent).label} เทียบช่วงก่อนหน้า
+                {alert.message}
               </p>
             </div>
-            <div className="rounded-xl bg-white/90 p-4 shadow-sm print:border print:border-slate-200 print:bg-white">
-              <p className="text-xs font-semibold text-slate-500">เช็กอิน</p>
-              <p className="mt-2 text-xl font-semibold text-slate-900">
-                {numberFormatter.format(snapshot.kpis.attendance.value)} ครั้ง
-              </p>
-              <p
-                className={`mt-1 text-xs font-semibold ${
-                  formatDelta(snapshot.kpis.attendance.deltaPercent).tone === "down"
-                    ? "text-red-600"
-                    : formatDelta(snapshot.kpis.attendance.deltaPercent).tone === "up"
-                      ? "text-emerald-600"
-                      : "text-slate-500"
-                }`}
-              >
-                {formatDelta(snapshot.kpis.attendance.deltaPercent).label} เทียบช่วงก่อนหน้า
-              </p>
-            </div>
-            <div className="rounded-xl bg-white/90 p-4 shadow-sm print:border print:border-slate-200 print:bg-white">
-              <p className="text-xs font-semibold text-slate-500">Average Ticket</p>
-              <p className="mt-2 text-xl font-semibold text-slate-900">
-                {currencyFormatter.format(snapshot.kpis.averageTicket.value)}
-              </p>
-              <p
-                className={`mt-1 text-xs font-semibold ${
-                  formatDelta(snapshot.kpis.averageTicket.deltaPercent).tone === "down"
-                    ? "text-red-600"
-                    : formatDelta(snapshot.kpis.averageTicket.deltaPercent).tone === "up"
-                      ? "text-emerald-600"
-                      : "text-slate-500"
-                }`}
-              >
-                {formatDelta(snapshot.kpis.averageTicket.deltaPercent).label} เทียบช่วงก่อนหน้า
-              </p>
-            </div>
-            <div className="rounded-xl bg-white/90 p-4 shadow-sm print:border print:border-slate-200 print:bg-white">
-              <p className="text-xs font-semibold text-slate-500">ธุรกรรม</p>
-              <p className="mt-2 text-xl font-semibold text-slate-900">
-                {numberFormatter.format(snapshot.kpis.salesTransactions.value)} รายการ
-              </p>
-              <p
-                className={`mt-1 text-xs font-semibold ${
-                  formatDelta(snapshot.kpis.salesTransactions.deltaPercent).tone === "down"
-                    ? "text-red-600"
-                    : formatDelta(snapshot.kpis.salesTransactions.deltaPercent).tone === "up"
-                      ? "text-emerald-600"
-                      : "text-slate-500"
-                }`}
-              >
-                {formatDelta(snapshot.kpis.salesTransactions.deltaPercent).label} เทียบช่วงก่อนหน้า
-              </p>
-            </div>
-            <div className="rounded-xl bg-white/90 p-4 shadow-sm print:border print:border-slate-200 print:bg-white">
-              <p className="text-xs font-semibold text-slate-500">กำลังคนที่เช็กอิน</p>
-              <p className="mt-2 text-xl font-semibold text-slate-900">
-                {numberFormatter.format(snapshot.attendance.activeEmployees)} คน
-              </p>
-              <p className="mt-1 text-xs font-semibold text-slate-500">
-                ร้านทั้งหมด {numberFormatter.format(snapshot.totals.stores)} แห่ง
-              </p>
-            </div>
-          </div>
-          {snapshot.kpis.alerts.length > 0 && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4 text-xs text-amber-800 print:border-slate-200 print:bg-white print:text-slate-700">
-              <p className="font-semibold uppercase tracking-wide">Early Alerts</p>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
-                {snapshot.kpis.alerts.map((alert) => (
-                  <li key={alert}>{alert}</li>
-                ))}
-              </ul>
-            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Quick Stat Card
+function QuickStatCard({
+  icon,
+  label,
+  value,
+  delta,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  delta: number;
+  color: string;
+}) {
+  const colorClasses = {
+    blue: 'from-blue-500 to-sky-400',
+    emerald: 'from-emerald-500 to-teal-400',
+    indigo: 'from-indigo-500 to-purple-400',
+    sky: 'from-sky-500 to-cyan-400',
+  };
+
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl hover:shadow-2xl transition-shadow">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`rounded-2xl bg-gradient-to-br ${colorClasses[color as keyof typeof colorClasses]} p-3 text-white`}>
+          {icon}
+        </div>
+      </div>
+      <p className="text-sm font-semibold text-slate-600 mb-1">{label}</p>
+      <p className="text-3xl font-bold text-slate-900 mb-2">{value}</p>
+      {delta !== 0 && (
+        <div className="flex items-center gap-1">
+          {delta > 0 ? (
+            <ArrowUp className="h-4 w-4 text-emerald-600" />
+          ) : (
+            <ArrowDown className="h-4 w-4 text-rose-600" />
           )}
+          <span className={`text-sm font-semibold ${delta > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {Math.abs(delta).toFixed(1)}%
+          </span>
         </div>
-      </header>
+      )}
+    </div>
+  );
+}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm print:border print:border-slate-300">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">ตัวกรองข้อมูล</h2>
-            <p className="text-xs text-slate-500">ปรับช่วงเวลาหรือมุมมองเพื่อเจาะลึกข้อมูล และพิมพ์ได้ทันที</p>
-          </div>
-          {isLoading && (
-            <span className="text-xs font-medium text-blue-600">กำลังโหลดข้อมูล...</span>
-          )}
-        </div>
-        {error && (
-          <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600">
-            {error}
-          </div>
-        )}
-        <div className="mt-4 grid gap-4 lg:grid-cols-4">
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">โหมดช่วงเวลา</label>
-            <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-              value={filters.rangeMode}
-              onChange={(event) => {
-                const nextMode = event.target.value as DashboardFiltersState["rangeMode"];
-                setFilters((prev) => ({
-                  ...prev,
-                  rangeMode: nextMode,
-                  rangeValue: getDefaultRangeValue(nextMode, timeZone),
-                }));
-              }}
-            >
-              <option value="day">รายวัน</option>
-              <option value="week">รายสัปดาห์</option>
-              <option value="month">รายเดือน</option>
-              <option value="year">รายปี</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">ค่าอ้างอิงช่วงเวลา</label>
-            {filters.rangeMode === "month" && (
-              <input
-                type="month"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-                value={filters.rangeValue}
-                onChange={(event) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    rangeValue: event.target.value || prev.rangeValue,
-                  }))
-                }
-              />
-            )}
-            {filters.rangeMode === "year" && (
-              <input
-                type="number"
-                min={2000}
-                max={9999}
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-                value={filters.rangeValue}
-                onChange={(event) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    rangeValue: event.target.value || getDefaultRangeValue("year", timeZone),
-                  }))
-                }
-              />
-            )}
-            {(filters.rangeMode === "day" || filters.rangeMode === "week") && (
-              <input
-                type="date"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-                value={filters.rangeValue}
-                onChange={(event) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    rangeValue:
-                      event.target.value || getDefaultRangeValue(prev.rangeMode, timeZone),
-                  }))
-                }
-              />
-            )}
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">ร้านค้า</label>
-            <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-              value={filters.store}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  store: event.target.value,
-                }))
-              }
-            >
-              <option value="">ทั้งหมด</option>
-              {stores.map((store) => (
-                <option key={store.id} value={store.name}>
-                  {store.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">พนักงาน</label>
-            <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-              value={filters.employee}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  employee: event.target.value,
-                }))
-              }
-            >
-              <option value="">ทั้งหมด</option>
-              {employees.map((employee) => (
-                <option key={employee.id} value={employee.name}>
-                  {employee.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">สถานะลงเวลา</label>
-            <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-              value={filters.attendanceStatus}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  attendanceStatus: event.target.value as DashboardFiltersState["attendanceStatus"],
-                }))
-              }
-            >
-              <option value="all">ทั้งหมด</option>
-              <option value="check-in">เช็กอิน</option>
-              <option value="check-out">เช็กเอาต์</option>
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">สถานะยอดขาย</label>
-            <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-              value={filters.salesStatus}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  salesStatus: event.target.value,
-                }))
-              }
-            >
-              <option value="all">ทั้งหมด</option>
-              {metrics.sales.availableStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">เวลาเริ่ม (HH:MM)</label>
-            <input
-              type="text"
-              placeholder="00:00"
-              value={filters.timeFrom}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  timeFrom: normalizeTimeInput(event.target.value),
-                }))
-              }
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">เวลาสิ้นสุด (HH:MM)</label>
-            <input
-              type="text"
-              placeholder="23:59"
-              value={filters.timeTo}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  timeTo: normalizeTimeInput(event.target.value),
-                }))
-              }
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-            />
-          </div>
-        </div>
-      </section>
+// Skeleton Components
+function MapSkeleton() {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="h-8 w-48 bg-slate-200 rounded-lg mb-4 animate-pulse" />
+      <div className="h-[500px] bg-slate-200 rounded-2xl animate-pulse" />
+    </div>
+  );
+}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm print:border print:border-slate-300">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-slate-900">ภาพรวมยอดขาย & การลงเวลา</h2>
-          <div className="text-xs text-slate-500">
-            ช่วงอ้างอิง: {metrics.filters.rangeLabel}
-          </div>
-        </div>
-        <div className="mt-4 h-80 w-full">
-          <ResponsiveContainer>
-            <ComposedChart data={timelineData} margin={{ top: 16, right: 24, left: 0, bottom: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#64748b" }} />
-              <YAxis
-                yAxisId="left"
-                tick={{ fontSize: 11, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-                width={70}
-              />
-              <YAxis
-                yAxisId="right"
-                orientation="right"
-                tick={{ fontSize: 11, fill: "#64748b" }}
-                axisLine={false}
-                tickLine={false}
-                width={70}
-              />
-              <Tooltip
-                formatter={(value: number, name) => {
-                  if (name === "ยอดขาย (บาท)") {
-                    return [currencyFormatter.format(value), name];
-                  }
-                  return [numberFormatter.format(value), name];
-                }}
-                labelFormatter={(label) => `วันที่ ${label}`}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar
-                yAxisId="left"
-                dataKey="sales"
-                name="ยอดขาย (บาท)"
-                fill="#3b82f6"
-                radius={[6, 6, 0, 0]}
-              />
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="checkIns"
-                name="เช็กอิน"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={false}
-              />
-              <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="transactions"
-                name="ธุรกรรม"
-                stroke="#6366f1"
-                strokeWidth={2}
-                dot={false}
-              />
-            </ComposedChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+function ChartSkeleton() {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="h-8 w-64 bg-slate-200 rounded-lg mb-4 animate-pulse" />
+      <div className="h-80 bg-slate-200 rounded-2xl animate-pulse" />
+    </div>
+  );
+}
 
-      <section className="grid gap-6 lg:grid-cols-3 print:border print:border-slate-300">
-        <div className="space-y-6 lg:col-span-2">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">ผู้นำด้านยอดขายตามสาขา</h2>
-              <span className="text-xs text-slate-500">Top 5</span>
-            </div>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-100">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="px-4 py-3 text-left">ร้านค้า</th>
-                    <th className="px-4 py-3 text-right">ยอดขาย</th>
-                    <th className="px-4 py-3 text-right">ธุรกรรม</th>
-                    <th className="px-4 py-3 text-right">จำนวนสินค้า</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {storeLeaders.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-sm text-slate-400">
-                        ยังไม่มีข้อมูลยอดขายในช่วงที่เลือก
-                      </td>
-                    </tr>
-                  )}
-                  {storeLeaders.map((store) => (
-                    <tr key={store.label}>
-                      <td className="px-4 py-3 font-medium text-slate-700">{store.label}</td>
-                      <td className="px-4 py-3 text-right text-slate-900">
-                        {currencyFormatter.format(store.total)}
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-600">
-                        {numberFormatter.format(store.transactions)}
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-600">
-                        {numberFormatter.format(store.quantity)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">ประสิทธิภาพทีมขาย</h2>
-              <span className="text-xs text-slate-500">Top 5</span>
-            </div>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-100">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="px-4 py-3 text-left">พนักงาน</th>
-                    <th className="px-4 py-3 text-right">ยอดขาย</th>
-                    <th className="px-4 py-3 text-right">ธุรกรรม</th>
-                    <th className="px-4 py-3 text-right">Avg Ticket</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {employeeLeaders.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-sm text-slate-400">
-                        ยังไม่มีข้อมูลพนักงานในช่วงที่เลือก
-                      </td>
-                    </tr>
-                  )}
-                  {employeeLeaders.map((employee) => {
-                    const averageTicket =
-                      employee.transactions > 0
-                        ? employee.total / employee.transactions
-                        : 0;
-                    return (
-                      <tr key={employee.label}>
-                        <td className="px-4 py-3 font-medium text-slate-700">{employee.label}</td>
-                        <td className="px-4 py-3 text-right text-slate-900">
-                          {currencyFormatter.format(employee.total)}
-                        </td>
-                        <td className="px-4 py-3 text-right text-slate-600">
-                          {numberFormatter.format(employee.transactions)}
-                        </td>
-                        <td className="px-4 py-3 text-right text-slate-600">
-                          {currencyFormatter.format(averageTicket)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900">สถานะยอดขายยอดนิยม</h2>
-              <span className="text-xs text-slate-500">Top 5</span>
-            </div>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-slate-100">
-              <table className="min-w-full divide-y divide-slate-200 text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="px-4 py-3 text-left">สถานะ</th>
-                    <th className="px-4 py-3 text-right">ยอดขาย</th>
-                    <th className="px-4 py-3 text-right">ธุรกรรม</th>
-                    <th className="px-4 py-3 text-right">จำนวนสินค้า</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {statusBreakdown.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-4 py-6 text-center text-sm text-slate-400">
-                        ยังไม่มีข้อมูลสถานะยอดขายในช่วงที่เลือก
-                      </td>
-                    </tr>
-                  )}
-                  {statusBreakdown.map((status) => (
-                    <tr key={status.status}>
-                      <td className="px-4 py-3 font-medium text-slate-700">{status.status}</td>
-                      <td className="px-4 py-3 text-right text-slate-900">
-                        {currencyFormatter.format(status.total)}
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-600">
-                        {numberFormatter.format(status.transactions)}
-                      </td>
-                      <td className="px-4 py-3 text-right text-slate-600">
-                        {numberFormatter.format(status.quantity)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+// Top Performers Card
+function TopPerformersCard({ data }: { data: Array<{ id: string; label: string; checkIns: number; checkOuts: number; stores: string[] }> }) {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-400 p-3">
+          <TrendingUp className="h-6 w-6 text-white" />
         </div>
-        <div className="space-y-6">
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">สรุปยอดขายรวม</h2>
-            <dl className="mt-4 space-y-3 text-sm text-slate-600">
-              <div className="flex items-center justify-between">
-                <dt>ยอดขายรวม</dt>
-                <dd className="font-semibold text-slate-900">{totalRevenueLabel}</dd>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Top Performers</h3>
+          <p className="text-xs text-slate-500">พนักงานที่มีผลงานโดดเด่น</p>
+        </div>
+      </div>
+
+      {data.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center">
+          <Users className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+          <p className="text-sm text-slate-600">ยังไม่มีข้อมูลพนักงาน</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {data.map((employee, index) => (
+            <div
+              key={employee.id}
+              className="flex items-center gap-3 rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-3 hover:border-blue-200 hover:shadow-md transition"
+            >
+              <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
+                index === 0
+                  ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white'
+                  : index === 1
+                  ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white'
+                  : index === 2
+                  ? 'bg-gradient-to-br from-orange-300 to-amber-400 text-white'
+                  : 'bg-slate-200 text-slate-600'
+              }`}>
+                {index + 1}
               </div>
-              <div className="flex items-center justify-between">
-                <dt>ธุรกรรมทั้งหมด</dt>
-                <dd className="font-semibold text-slate-900">{totalTransactionsLabel}</dd>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-slate-900 truncate">{employee.label}</p>
+                <p className="text-xs text-slate-500">
+                  {employee.checkIns} เช็กอิน · {employee.stores.length} ร้าน
+                </p>
               </div>
-              <div className="flex items-center justify-between">
-                <dt>จำนวนสินค้ารวม</dt>
-                <dd className="font-semibold text-slate-900">{totalQuantityLabel}</dd>
+              <div className="flex-shrink-0">
+                <div className="text-right">
+                  <p className="text-sm font-bold text-emerald-600">{employee.checkIns + employee.checkOuts}</p>
+                  <p className="text-xs text-slate-500">ครั้ง</p>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <dt>Average Ticket ปัจจุบัน</dt>
-                <dd className="font-semibold text-slate-900">
-                  {currencyFormatter.format(metrics.sales.averageTicket)}
-                </dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt>จำนวนพนักงานที่มียอดขาย</dt>
-                <dd className="font-semibold text-slate-900">
-                  {numberFormatter.format(metrics.sales.byEmployee.length)} คน
-                </dd>
-              </div>
-            </dl>
-          </div>
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">
-              สินค้าขายดี (ย้อนหลัง {lookbackDays} วัน)
-            </h2>
-            <ul className="mt-4 space-y-3 text-sm text-slate-600">
-              {topProducts.length === 0 && (
-                <li className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-center text-slate-400">
-                  ยังไม่มีข้อมูลสินค้าในช่วงที่เลือก
-                </li>
-              )}
-              {topProducts.map((product) => (
-                <li key={product.name} className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-slate-700">{product.name}</span>
-                    <span className="text-sm text-slate-500">
-                      {currencyFormatter.format(product.total)}
-                    </span>
-                  </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Top Products Card
+function TopProductsCard({ products }: { products: Array<{ name: string; total: number; quantity: number }> }) {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-400 p-3">
+          <ShoppingCart className="h-6 w-6 text-white" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">Top Products</h3>
+          <p className="text-xs text-slate-500">สินค้าขายดี</p>
+        </div>
+      </div>
+
+      {products.length === 0 ? (
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-center">
+          <ShoppingCart className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+          <p className="text-sm text-slate-600">ยังไม่มีข้อมูลสินค้า</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {products.map((product, index) => (
+            <div
+              key={product.name}
+              className="rounded-xl border border-slate-200 bg-gradient-to-r from-indigo-50/50 to-white p-3 hover:border-indigo-200 hover:shadow-md transition"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-slate-900 mb-1 truncate">{product.name}</p>
                   <p className="text-xs text-slate-500">
                     ขายได้ {numberFormatter.format(product.quantity)} ชิ้น
                   </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-emerald-800">Insight เชิงปฏิบัติการ</h2>
-            <ul className="mt-4 space-y-3 text-sm text-emerald-700">
-              <li>
-                ทีมขายทั้งหมด {numberFormatter.format(metrics.attendance.uniqueEmployees)} คน มีการเช็กอิน
-                {" "}
-                {numberFormatter.format(metrics.attendance.total)} ครั้งในช่วงที่เลือก
-              </li>
-              <li>
-                สาขาที่มียอดขายสูงสุด: {storeLeaders[0]?.label ?? "-"}
-              </li>
-              <li>
-                พนักงานที่มียอดขายสูงสุด: {employeeLeaders[0]?.label ?? "-"}
-              </li>
-              <li>
-                เวลาที่กรอง: {filters.timeFrom || "ทั้งหมด"} - {filters.timeTo || "ทั้งหมด"}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </section>
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-sm font-bold text-indigo-600">
+                    {currencyFormatter.format(product.total)}
+                  </p>
+                </div>
+              </div>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm print:border print:border-slate-300">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-slate-900">แนวโน้มยอดขายรายวัน (ย้อนหลัง {snapshot.sales.dailyTrend.length} วัน)</h2>
+              {/* Progress Bar */}
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-400"
+                  style={{
+                    width: `${Math.min((product.quantity / (products[0]?.quantity || 1)) * 100, 100)}%`
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="mt-4 h-56 w-full">
-          <ResponsiveContainer>
-            <AreaChart data={snapshot.sales.dailyTrend} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0.05} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="display" tick={{ fontSize: 11, fill: "#64748b" }} />
-              <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} width={70} />
-              <Tooltip
-                formatter={(value: number, name: string) => {
-                  if (name === "total") {
-                    return [currencyFormatter.format(value), "ยอดขาย"];
-                  }
-                  if (name === "quantity") {
-                    return [numberFormatter.format(value), "จำนวนสินค้า"];
-                  }
-                  return value;
-                }}
-              />
-              <Area type="monotone" dataKey="total" name="ยอดขาย" stroke="#2563eb" fill="url(#salesGradient)" />
-              <Line type="monotone" dataKey="quantity" name="จำนวนสินค้า" stroke="#14b8a6" strokeWidth={2} dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+      )}
+    </div>
+  );
+}
+
+// Recent Activities Card
+function RecentActivitiesCard({ activities }: { activities: string[] }) {
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-400 p-3">
+          <Activity className="h-6 w-6 text-white" />
         </div>
-      </section>
+        <div>
+          <h3 className="text-lg font-bold text-slate-900">System Alerts</h3>
+          <p className="text-xs text-slate-500">การแจ้งเตือนระบบ</p>
+        </div>
+      </div>
+
+      {activities.length === 0 ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+          <CheckCircle2 className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
+          <p className="text-sm font-semibold text-emerald-900">ไม่มีการแจ้งเตือน</p>
+          <p className="text-xs text-emerald-700 mt-1">ระบบทำงานปกติ</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {activities.map((activity, index) => (
+            <div
+              key={index}
+              className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3"
+            >
+              <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-900 flex-1">{activity}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Quick Actions */}
+      <div className="mt-4 pt-4 border-t border-slate-200">
+        <button
+          type="button"
+          className="w-full rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 transition"
+        >
+          ดูกิจกรรมทั้งหมด →
+        </button>
+      </div>
     </div>
   );
 }

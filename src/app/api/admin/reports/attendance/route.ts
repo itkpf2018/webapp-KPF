@@ -12,6 +12,7 @@ import {
   formatRangeSummary,
   normalizeRangesFromParams,
 } from "@/lib/reportRangeUtils";
+import { getLeaves } from "@/lib/supabaseLeaves";
 import ExcelJS from "exceljs";
 import { stringify } from "csv-stringify/sync";
 
@@ -283,17 +284,73 @@ export async function GET(request: Request) {
       storeName: storeNameFilter,
     });
 
-    type DayRecord = {
-      storeName: string | null;
-      firstCheckIn: string | null;
-      lastCheckOut: string | null;
-      checkInTimestamp: number | null;
-      checkOutTimestamp: number | null;
+    // Fetch approved/scheduled leave requests for this employee in the date range
+    const leaveRequests = await getLeaves({
+      employeeId: employee.id,
+      startDate: rangeStartIso,
+      endDate: rangeEndIso,
+    });
+
+    console.log(`[Attendance Report] Employee: ${employee.name} (${employee.id})`);
+    console.log(`[Attendance Report] Date range: ${rangeStartIso} to ${rangeEndIso}`);
+    console.log(`[Attendance Report] Found ${leaveRequests.length} leave requests:`, leaveRequests);
+
+    // Create a map of dates to leave types (for approved/scheduled leaves)
+    const leaveDateTypes = new Map<string, string>();
+    for (const leave of leaveRequests) {
+      if (leave.status === "approved" || leave.status === "scheduled") {
+        const start = new Date(leave.startDate + "T00:00:00Z");
+        const end = new Date(leave.endDate + "T00:00:00Z");
+        const current = new Date(start);
+        while (current <= end) {
+          const isoDate = current.toISOString().split("T")[0];
+          leaveDateTypes.set(isoDate, leave.type); // Store leave type
+          current.setUTCDate(current.getUTCDate() + 1);
+        }
+      }
+    }
+
+    console.log(`[Attendance Report] Leave dates with types:`, Array.from(leaveDateTypes.entries()));
+
+    // Parse employee's regular day off (e.g., "Sunday", "Monday", etc.)
+    const regularDayOff = employee.regularDayOff?.trim().toLowerCase() || null;
+    const dayNameMap: { [key: string]: number } = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+      อาทิตย์: 0,
+      จันทร์: 1,
+      อังคาร: 2,
+      พุธ: 3,
+      พฤหัสบดี: 4,
+      ศุกร์: 5,
+      เสาร์: 6,
+    };
+    const regularDayOffIndex = regularDayOff ? dayNameMap[regularDayOff] : null;
+
+    type AttendanceEvent = {
+      timestamp: number;
+      type: "check-in" | "check-out";
+      time: string;
+      storeName: string;
     };
 
-    const dayRecords = new Map<string, DayRecord>();
+    type SessionRecord = {
+      storeName: string;
+      storeProvince: string | null;
+      checkInTime: string;
+      checkOutTime: string;
+      checkInTimestamp: number;
+      checkOutTimestamp: number;
+    };
 
-    // Process all rows from Supabase dataset
+    // Step 1: Collect all check-in/check-out events per day
+    const dayEvents = new Map<string, AttendanceEvent[]>();
+
     for (const row of dataRows) {
       const sheetRow = parseSheetRow(row);
       if (!sheetRow) continue;
@@ -312,60 +369,153 @@ export async function GET(request: Request) {
         continue;
       }
 
-      const key = isoKey;
-      const existing = dayRecords.get(key);
-      const record: DayRecord = existing ?? {
-        storeName: sheetRow.storeName || null,
-        firstCheckIn: null,
-        lastCheckOut: null,
-        checkInTimestamp: null,
-        checkOutTimestamp: null,
-      };
-
       // Create timestamp for comparison
       const timeStr = sheetRow.time || "00:00";
       const [hour, minute] = timeStr.split(":").map(n => parseInt(n) || 0);
       const timestamp = new Date(parts.year, parts.month - 1, parts.day, hour, minute).getTime();
 
       const statusLower = sheetRow.status.toLowerCase();
+      if (statusLower !== "check-in" && statusLower !== "check-out") continue;
 
-      if (statusLower === "check-out") {
-        if (record.checkOutTimestamp === null || timestamp > record.checkOutTimestamp) {
-          record.lastCheckOut = sheetRow.time;
-          record.checkOutTimestamp = timestamp;
-        }
-      } else if (statusLower === "check-in") {
-        if (record.checkInTimestamp === null || timestamp < record.checkInTimestamp) {
-          record.firstCheckIn = sheetRow.time;
-          record.checkInTimestamp = timestamp;
+      const events = dayEvents.get(isoKey) || [];
+      events.push({
+        timestamp,
+        type: statusLower as "check-in" | "check-out",
+        time: sheetRow.time || "00:00",
+        storeName: sheetRow.storeName || "-",
+      });
+      dayEvents.set(isoKey, events);
+    }
+
+    // Step 2: Group events into sessions per day
+    const dayRecords = new Map<string, SessionRecord[]>();
+
+    for (const [date, events] of dayEvents) {
+      // Sort events by timestamp
+      events.sort((a, b) => a.timestamp - b.timestamp);
+
+      const sessions: SessionRecord[] = [];
+      let currentSession: Partial<SessionRecord> | null = null;
+
+      for (const event of events) {
+        if (event.type === "check-in") {
+          // If there's an unclosed session, close it first
+          if (currentSession && currentSession.checkInTime) {
+            currentSession.checkOutTime = currentSession.checkOutTime || "";
+            currentSession.checkOutTimestamp = currentSession.checkOutTimestamp || 0;
+            const matchedStore = storeMapByName.get(currentSession.storeName || "");
+            currentSession.storeProvince = matchedStore?.province ?? null;
+            sessions.push(currentSession as SessionRecord);
+          }
+
+          // Start new session
+          currentSession = {
+            storeName: event.storeName,
+            checkInTime: event.time,
+            checkInTimestamp: event.timestamp,
+            checkOutTime: "",
+            checkOutTimestamp: 0,
+          };
+        } else if (event.type === "check-out" && currentSession) {
+          // Close current session
+          currentSession.checkOutTime = event.time;
+          currentSession.checkOutTimestamp = event.timestamp;
+          const matchedStore = storeMapByName.get(currentSession.storeName || "");
+          currentSession.storeProvince = matchedStore?.province ?? null;
+          sessions.push(currentSession as SessionRecord);
+          currentSession = null;
         }
       }
 
-      if (!record.storeName && sheetRow.storeName) {
-        record.storeName = sheetRow.storeName;
+      // Handle unclosed session (check-in without check-out)
+      if (currentSession && currentSession.checkInTime) {
+        currentSession.checkOutTime = currentSession.checkOutTime || "";
+        currentSession.checkOutTimestamp = currentSession.checkOutTimestamp || 0;
+        const matchedStore = storeMapByName.get(currentSession.storeName || "");
+        currentSession.storeProvince = matchedStore?.province ?? null;
+        sessions.push(currentSession as SessionRecord);
       }
 
-      dayRecords.set(key, record);
+      if (sessions.length > 0) {
+        dayRecords.set(date, sessions);
+      }
     }
 
     // Generate report rows for requested days
     const allRows = isoDates.map((iso) => {
-      const record = dayRecords.get(iso);
+      const sessions = dayRecords.get(iso) || [];
       const [yearStr, monthStr, dayStr] = iso.split("-");
       const yearNum = Number.parseInt(yearStr, 10);
       const monthNum = Number.parseInt(monthStr, 10);
       const dayNum = Number.parseInt(dayStr, 10);
-      const matchedStore =
-        record && record.storeName ? storeMapByName.get(record.storeName) ?? null : null;
-      const storeProvince = matchedStore?.province ?? null;
-      const storeDisplay = record && record.storeName ? record.storeName : null;
-      const hasAttendance =
-        record && (record.firstCheckIn !== null || record.lastCheckOut !== null);
-
-      const checkInTime = record ? formatTime(record.firstCheckIn) : "";
-      const checkOutTime = record ? formatTime(record.lastCheckOut) : "";
       const dayOfWeek = getDayOfWeek(yearNum, monthNum, dayNum);
-      const workingHours = calculateWorkingHours(checkInTime, checkOutTime);
+      const hasAttendance = sessions.length > 0;
+
+      // Determine status based on attendance, leave, and regular day off
+      let status: "present" | "leave" | "day-off" | "absent" = "absent";
+      let leaveType: string | null = null;
+
+      if (hasAttendance) {
+        // Has check-in or check-out record
+        status = "present";
+      } else if (leaveDateTypes.has(iso)) {
+        // Has approved/scheduled leave request
+        status = "leave";
+        leaveType = leaveDateTypes.get(iso) || null;
+      } else if (regularDayOffIndex !== null) {
+        // Check if this date matches employee's regular day off
+        const date = new Date(Date.UTC(yearNum, monthNum - 1, dayNum));
+        const dayIndex = date.getUTCDay();
+        if (dayIndex === regularDayOffIndex) {
+          status = "day-off";
+        }
+      }
+
+      // Calculate summary fields for multi-session days
+      let firstCheckInTime = "";
+      let lastCheckOutTime = "";
+      let totalWorkingMinutes = 0;
+      const storeCount = sessions.length;
+
+      if (sessions.length > 0) {
+        firstCheckInTime = formatTime(sessions[0].checkInTime);
+        lastCheckOutTime = formatTime(sessions[sessions.length - 1].checkOutTime);
+
+        // Calculate total working hours across all sessions
+        for (const session of sessions) {
+          const sessionHours = calculateWorkingHours(
+            formatTime(session.checkInTime),
+            formatTime(session.checkOutTime)
+          );
+          // Parse hours from string like "4 ชม." or "4:30 ชม."
+          const match = sessionHours.match(/(\d+)(?::(\d+))?/);
+          if (match) {
+            const hours = parseInt(match[1]) || 0;
+            const minutes = parseInt(match[2]) || 0;
+            totalWorkingMinutes += hours * 60 + minutes;
+          }
+        }
+      }
+
+      // Format total working hours
+      const totalHours = Math.floor(totalWorkingMinutes / 60);
+      const totalMinutes = totalWorkingMinutes % 60;
+      const totalWorkingHours =
+        totalMinutes === 0
+          ? `${totalHours} ชม.`
+          : `${totalHours}:${totalMinutes.toString().padStart(2, "0")} ชม.`;
+
+      // Format sessions for frontend
+      const formattedSessions = sessions.map((session) => ({
+        storeName: session.storeName,
+        storeProvince: session.storeProvince,
+        checkInTime: formatTime(session.checkInTime),
+        checkOutTime: formatTime(session.checkOutTime),
+        workingHours: calculateWorkingHours(
+          formatTime(session.checkInTime),
+          formatTime(session.checkOutTime)
+        ),
+      }));
 
       return {
         dateIso: iso,
@@ -374,12 +524,19 @@ export async function GET(request: Request) {
         year: yearNum,
         dayLabel: buildDayLabel(yearNum, monthNum, dayNum),
         dayOfWeek,
-        status: hasAttendance ? "present" : "absent",
-        storeName: storeDisplay,
-        storeProvince,
-        checkInTime,
-        checkOutTime,
-        workingHours,
+        status,
+        leaveType,
+        sessions: formattedSessions,
+        storeCount,
+        firstCheckInTime,
+        lastCheckOutTime,
+        totalWorkingHours,
+        // Legacy fields for backward compatibility (single session case)
+        storeName: sessions.length === 1 ? sessions[0].storeName : null,
+        storeProvince: sessions.length === 1 ? sessions[0].storeProvince : null,
+        checkInTime: firstCheckInTime,
+        checkOutTime: lastCheckOutTime,
+        workingHours: totalWorkingHours,
       };
     });
 
@@ -451,9 +608,18 @@ export async function GET(request: Request) {
 
         // Add data rows
         for (const row of allRows) {
+          let statusText = "มาทำงาน";
+          if (row.status === "leave") {
+            statusText = "ลา";
+          } else if (row.status === "day-off") {
+            statusText = "OFF";
+          } else if (row.status === "absent") {
+            statusText = "ขาดงาน";
+          }
+
           worksheet.addRow({
             date: row.dayLabel,
-            status: row.status === "present" ? "มาทำงาน" : "ขาดงาน",
+            status: statusText,
             store: row.storeName || "",
             province: row.storeProvince || "",
             checkInTime: row.checkInTime,
@@ -474,14 +640,25 @@ export async function GET(request: Request) {
         });
       } else {
         // CSV format
-        const csvRows = allRows.map((row) => ({
-          "วันที่": row.dayLabel,
-          "สถานะ": row.status === "present" ? "มาทำงาน" : "ขาดงาน",
-          "ร้าน": row.storeName || "",
-          "จังหวัด": row.storeProvince || "",
-          "เวลาเข้างาน": row.checkInTime,
-          "เวลาออกงาน": row.checkOutTime,
-        }));
+        const csvRows = allRows.map((row) => {
+          let statusText = "มาทำงาน";
+          if (row.status === "leave") {
+            statusText = "ลา";
+          } else if (row.status === "day-off") {
+            statusText = "OFF";
+          } else if (row.status === "absent") {
+            statusText = "ขาดงาน";
+          }
+
+          return {
+            "วันที่": row.dayLabel,
+            "สถานะ": statusText,
+            "ร้าน": row.storeName || "",
+            "จังหวัด": row.storeProvince || "",
+            "เวลาเข้างาน": row.checkInTime,
+            "เวลาออกงาน": row.checkOutTime,
+          };
+        });
 
         const csv = stringify(csvRows, {
           header: true,

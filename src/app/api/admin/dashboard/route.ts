@@ -1,57 +1,103 @@
-import { NextResponse } from "next/server";
-import {
-  getDashboardMetrics,
-  getDashboardSnapshot,
-  type DashboardFilterOptions,
-  type DashboardRangeMode,
-} from "@/lib/configStore";
+import { NextRequest, NextResponse } from "next/server";
+import { getDashboardMetrics } from "@/lib/configStore";
+import type { DashboardFilterOptions } from "@/lib/configStore";
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const variant = (searchParams.get("variant") ?? "snapshot").toLowerCase();
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  if (variant === "metrics") {
-    const filters: DashboardFilterOptions = {};
+/**
+ * GET /api/admin/dashboard
+ *
+ * Query Parameters:
+ * - rangeMode: "today" | "week" | "month" | "quarter" | "year" | "custom"
+ * - rangeValue: Custom date range value (for custom mode)
+ * - store: Store name filter
+ * - employee: Employee name filter
+ * - attendanceStatus: "all" | "check-in" | "check-out"
+ * - salesStatus: Sales status filter
+ * - timeFrom: Start time filter (HH:MM format)
+ * - timeTo: End time filter (HH:MM format)
+ *
+ * Returns:
+ * {
+ *   metrics: DashboardMetrics
+ * }
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+
+    // Build filter options from query parameters
+    const options: DashboardFilterOptions = {};
+
+    // Range filters
     const rangeMode = searchParams.get("rangeMode");
     const rangeValue = searchParams.get("rangeValue");
     if (rangeMode || rangeValue) {
-      filters.range = {};
-      if (rangeMode) {
-        filters.range.mode = rangeMode as DashboardRangeMode;
-      }
-      if (rangeValue) {
-        filters.range.value = rangeValue;
-      }
+      options.range = {
+        mode: rangeMode as "day" | "week" | "month" | "year" | undefined,
+        value: rangeValue,
+      };
     }
+
+    // Store filter
     const store = searchParams.get("store");
     if (store) {
-      filters.store = store;
+      options.store = store;
     }
+
+    // Employee filter
     const employee = searchParams.get("employee");
     if (employee) {
-      filters.employee = employee;
+      options.employee = employee;
     }
+
+    // Attendance status filter
     const attendanceStatus = searchParams.get("attendanceStatus");
     if (attendanceStatus) {
-      filters.attendanceStatus = attendanceStatus as DashboardFilterOptions["attendanceStatus"];
+      options.attendanceStatus = attendanceStatus as "all" | "check-in" | "check-out";
     }
+
+    // Sales status filter
     const salesStatus = searchParams.get("salesStatus");
     if (salesStatus) {
-      filters.salesStatus = salesStatus;
+      options.salesStatus = salesStatus;
     }
+
+    // Time window filters
     const timeFrom = searchParams.get("timeFrom");
     if (timeFrom) {
-      filters.timeFrom = timeFrom;
+      options.timeFrom = timeFrom;
     }
+
     const timeTo = searchParams.get("timeTo");
     if (timeTo) {
-      filters.timeTo = timeTo;
+      options.timeTo = timeTo;
     }
 
-    const metrics = await getDashboardMetrics(filters);
-    return NextResponse.json({ metrics });
-  }
+    // Fetch dashboard metrics
+    const metrics = await getDashboardMetrics(options);
 
-  const snapshot = await getDashboardSnapshot();
-  return NextResponse.json({ snapshot });
+    return NextResponse.json(
+      { metrics },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      }
+    );
+  } catch (error) {
+    console.error("[API] Dashboard error:", error);
+
+    const message =
+      error instanceof Error
+        ? error.message
+        : "ไม่สามารถโหลดข้อมูลแดชบอร์ดได้";
+
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
 }

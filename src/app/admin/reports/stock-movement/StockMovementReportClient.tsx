@@ -952,7 +952,7 @@ export default function StockMovementReportClient({
 
       {/* Summary Cards */}
       {report && (
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 print:hidden">
+        <section className="grid gap-4 grid-cols-2 lg:grid-cols-4 print:hidden">
           {/* รับเข้า */}
           <div className="group rounded-3xl border border-white/70 bg-white/90 p-6 shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between">
@@ -1110,12 +1110,14 @@ export default function StockMovementReportClient({
                         </span>
                       </td>
                       <td className="border-b border-slate-200 px-4 py-3 text-right font-semibold text-slate-900">
-                        {transaction.quantity.toLocaleString("th-TH")}
+                        {transaction.quantity.toLocaleString("th-TH")}{" "}
+                        <span className="text-xs text-slate-500 font-normal">{transaction.unit_name}</span>
                       </td>
                       <td className="border-b border-slate-200 px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <span className="font-semibold text-blue-900">
-                            {transaction.balance_after.toLocaleString("th-TH")}
+                            {transaction.balance_after.toLocaleString("th-TH")}{" "}
+                            <span className="text-xs text-slate-500 font-normal">{transaction.unit_name}</span>
                           </span>
                           <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getStockLevelColor(transaction.balance_after).bgColor} ${getStockLevelColor(transaction.balance_after).textColor}`}>
                             {getStockLevelColor(transaction.balance_after).label}
@@ -1221,14 +1223,16 @@ export default function StockMovementReportClient({
                   <div className="flex justify-between border-t border-slate-100 pt-2 text-sm">
                     <span className="text-slate-600">จำนวน:</span>
                     <span className="text-lg font-bold text-slate-900">
-                      {transaction.quantity.toLocaleString("th-TH")}
+                      {transaction.quantity.toLocaleString("th-TH")}{" "}
+                      <span className="text-sm text-slate-500 font-normal">{transaction.unit_name}</span>
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-600">คงเหลือหลังทำรายการ:</span>
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-blue-900">
-                        {transaction.balance_after.toLocaleString("th-TH")}
+                        {transaction.balance_after.toLocaleString("th-TH")}{" "}
+                        <span className="text-sm text-slate-500 font-normal">{transaction.unit_name}</span>
                       </span>
                       <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${getStockLevelColor(transaction.balance_after).bgColor} ${getStockLevelColor(transaction.balance_after).textColor}`}>
                         {getStockLevelColor(transaction.balance_after).label}

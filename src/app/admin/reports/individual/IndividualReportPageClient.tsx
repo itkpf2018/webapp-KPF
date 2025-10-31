@@ -8,9 +8,23 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
   type ChangeEvent,
   type FormEvent,
 } from "react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Award,
+  Users,
+  Target,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Search,
+  Filter,
+  CheckCircle2,
+} from "lucide-react";
 
 type ExpenseDetail = {
   baselineExpenses: number;
@@ -81,6 +95,10 @@ type RangeItem = {
   end: string;
 };
 
+type SortField = "name" | "sales" | "target" | "achievement" | "netIncome" | "avgDay" | "avgHour";
+type SortDirection = "asc" | "desc";
+type FilterStatus = "all" | "achieved" | "notAchieved" | "noTarget";
+
 function toIsoDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -137,6 +155,8 @@ function buildCsv(report: ReportData) {
     "วันทำงาน",
     "ชั่วโมงทำงาน",
     "ยอดขายรวม",
+    "เป้าหมาย",
+    "% บรรลุเป้า",
     "ค่าใช้จ่ายรายเดือน",
     "ยอดสุทธิ",
     "รายได้เฉลี่ย/วัน",
@@ -148,6 +168,8 @@ function buildCsv(report: ReportData) {
     row.workingDays.toString(),
     row.workingHours.toFixed(1),
     row.totalSales.toFixed(2),
+    row.targetRevenuePC?.toFixed(2) ?? "",
+    row.achievementPercent?.toFixed(1) ?? "",
     row.monthlyExpenses.toFixed(2),
     row.netIncome.toFixed(2),
     row.avgIncomePerDay.toFixed(2),
@@ -176,6 +198,8 @@ function buildExcelXml(report: ReportData) {
       <Cell><Data ss:Type="String">วันทำงาน</Data></Cell>
       <Cell><Data ss:Type="String">ชั่วโมงทำงาน</Data></Cell>
       <Cell><Data ss:Type="String">ยอดขายรวม</Data></Cell>
+      <Cell><Data ss:Type="String">เป้าหมาย</Data></Cell>
+      <Cell><Data ss:Type="String">% บรรลุเป้า</Data></Cell>
       <Cell><Data ss:Type="String">ค่าใช้จ่ายรายเดือน</Data></Cell>
       <Cell><Data ss:Type="String">ยอดสุทธิ</Data></Cell>
       <Cell><Data ss:Type="String">รายได้เฉลี่ย/วัน</Data></Cell>
@@ -192,6 +216,8 @@ function buildExcelXml(report: ReportData) {
           <Cell><Data ss:Type="Number">${row.workingDays}</Data></Cell>
           <Cell><Data ss:Type="Number">${row.workingHours.toFixed(1)}</Data></Cell>
           <Cell><Data ss:Type="Number">${row.totalSales.toFixed(2)}</Data></Cell>
+          <Cell><Data ss:Type="Number">${row.targetRevenuePC?.toFixed(2) ?? ""}</Data></Cell>
+          <Cell><Data ss:Type="Number">${row.achievementPercent?.toFixed(1) ?? ""}</Data></Cell>
           <Cell><Data ss:Type="Number">${row.monthlyExpenses.toFixed(2)}</Data></Cell>
           <Cell><Data ss:Type="Number">${row.netIncome.toFixed(2)}</Data></Cell>
           <Cell><Data ss:Type="Number">${row.avgIncomePerDay.toFixed(2)}</Data></Cell>
@@ -225,6 +251,71 @@ function downloadBlob(content: string, mime: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
+// Performance Badge Component
+function PerformanceBadge({ achievementPercent }: { achievementPercent: number | null }) {
+  if (achievementPercent === null) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+        <Target className="h-3 w-3" />
+        ไม่มีเป้า
+      </span>
+    );
+  }
+
+  if (achievementPercent >= 100) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
+        <CheckCircle2 className="h-3 w-3" />
+        บรรลุ
+      </span>
+    );
+  }
+
+  if (achievementPercent >= 80) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+        <TrendingUp className="h-3 w-3" />
+        ใกล้เป้า
+      </span>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-semibold text-rose-700">
+      <AlertTriangle className="h-3 w-3" />
+      ต่ำกว่าเป้า
+    </span>
+  );
+}
+
+// Achievement Progress Bar
+function AchievementProgress({ achievementPercent }: { achievementPercent: number | null }) {
+  if (achievementPercent === null) return null;
+
+  const percentage = Math.min(achievementPercent, 150); // Cap at 150% for display
+  const color =
+    achievementPercent >= 100
+      ? "from-emerald-500 to-green-400"
+      : achievementPercent >= 80
+      ? "from-amber-500 to-yellow-400"
+      : "from-rose-500 to-red-400";
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between text-xs mb-1">
+        <span className="text-slate-600">บรรลุเป้า</span>
+        <span className="font-semibold text-slate-900">{achievementPercent.toFixed(1)}%</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+        <div
+          className={`h-full rounded-full bg-gradient-to-r ${color} transition-all duration-500`}
+          style={{ width: `${(percentage / 150) * 100}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function IndividualReportPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -232,11 +323,14 @@ export default function IndividualReportPageClient() {
   // Initialize filters from URL or use defaults
   const [filters, setFilters] = useState<FiltersState>(() => {
     const search = searchParams.get("search") || "";
-
-    return {
-      search,
-    };
+    return { search };
   });
+
+  // Sort & Filter state
+  const [sortField, setSortField] = useState<SortField>("achievement");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
+  const [localSearch, setLocalSearch] = useState("");
 
   // Initialize ranges from URL or use defaults
   const [ranges, setRanges] = useState<RangeItem[]>(() => {
@@ -271,14 +365,11 @@ export default function IndividualReportPageClient() {
   // Sync filters and ranges to URL
   useEffect(() => {
     const params = new URLSearchParams();
-
     if (filters.search) params.set("search", filters.search);
-
     if (ranges.length > 0) {
       const rangesData = ranges.map(r => ({ start: r.start, end: r.end }));
       params.set("ranges", JSON.stringify(rangesData));
     }
-
     router.replace(`?${params.toString()}`, { scroll: false });
   }, [filters, ranges, router]);
 
@@ -427,12 +518,14 @@ export default function IndividualReportPageClient() {
   const handlePrint = () => {
     if (state.status !== "success" || !state.data) return;
 
-    // Supervisor signature should always be blank
     const supervisorSignatureName = "";
 
+    // **FIX LOGO CACHE ISSUE**: Add cache busting with timestamp
+    const cacheBuster = new Date().getTime();
     const logoUrl = getBrandingLogoUrl(state.data.branding.logoPath, state.data.branding.updatedAt, {
       origin: window.location.origin,
-    });
+    }) + `?v=${cacheBuster}`;
+
     const printTimestamp = new Intl.DateTimeFormat("th-TH", {
       year: "numeric",
       month: "long",
@@ -447,7 +540,7 @@ export default function IndividualReportPageClient() {
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>รายงานสรุปรายบุคคล</title>
+  <title>รายงานผลงานรายบุคคล</title>
   <style>
     * {
       margin: 0;
@@ -462,7 +555,7 @@ export default function IndividualReportPageClient() {
 
     body {
       font-family: Arial, sans-serif;
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1.4;
       color: #000;
     }
@@ -491,15 +584,11 @@ export default function IndividualReportPageClient() {
     }
 
     .company-logo {
-      width: 64px;
-      height: 64px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
+      width: 96px;
+      height: 96px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #fff;
-      padding: 6px;
     }
 
     .company-logo img {
@@ -522,7 +611,7 @@ export default function IndividualReportPageClient() {
 
     .report-info {
       text-align: right;
-      font-size: 11px;
+      font-size: 10px;
     }
 
     table {
@@ -544,14 +633,14 @@ export default function IndividualReportPageClient() {
       text-align: center;
       font-weight: bold;
       color: #f8fafc;
-      font-size: 10px;
+      font-size: 9px;
     }
 
     td {
       border: 1px solid #333;
       padding: 6px 4px;
       text-align: center;
-      font-size: 10px;
+      font-size: 9px;
     }
 
     .text-right {
@@ -560,6 +649,34 @@ export default function IndividualReportPageClient() {
 
     .text-left {
       text-align: left;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 8px;
+      font-weight: bold;
+    }
+
+    .badge-achieved {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-near {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-low {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-none {
+      background-color: #f1f5f9;
+      color: #475569;
     }
 
     tfoot td {
@@ -641,7 +758,7 @@ export default function IndividualReportPageClient() {
         </div>
         <div class="company-names">
           <h1>บริษัทเคพีฟู้ดส์ จำกัด</h1>
-          <p>รายงานสรุปรายบุคคล</p>
+          <p>รายงานผลงานรายบุคคล (Individual Performance Report)</p>
         </div>
       </div>
       <div class="report-info">
@@ -655,21 +772,41 @@ export default function IndividualReportPageClient() {
         <tr>
           <th>พนักงาน</th>
           <th>ร้านค้า</th>
-          <th>วันทำงาน</th>
-          <th>ชั่วโมงทำงาน</th>
-          <th>ยอดขายรวม</th>
+          <th>วัน</th>
+          <th>ชม.</th>
+          <th>ยอดขาย</th>
           <th>เป้าหมาย</th>
-          <th>บรรลุเป้า</th>
-          <th>ค่าใช้จ่ายรายเดือน</th>
+          <th>% บรรลุ</th>
+          <th>สถานะ</th>
+          <th>ค่าใช้จ่าย</th>
           <th>ยอดสุทธิ</th>
-          <th>รายได้เฉลี่ย/วัน</th>
-          <th>รายได้เฉลี่ย/ชม.</th>
+          <th>รายได้/วัน</th>
+          <th>รายได้/ชม.</th>
         </tr>
       </thead>
       <tbody>
         ${state.data.rows
           .map(
-            (row) => `
+            (row) => {
+              const badgeClass =
+                row.achievementPercent === null
+                  ? "badge-none"
+                  : row.achievementPercent >= 100
+                  ? "badge-achieved"
+                  : row.achievementPercent >= 80
+                  ? "badge-near"
+                  : "badge-low";
+
+              const badgeText =
+                row.achievementPercent === null
+                  ? "ไม่มีเป้า"
+                  : row.achievementPercent >= 100
+                  ? "บรรลุ"
+                  : row.achievementPercent >= 80
+                  ? "ใกล้เป้า"
+                  : "ต่ำกว่าเป้า";
+
+              return `
           <tr>
             <td class="text-left">${row.employeeName}</td>
             <td>${row.storeName ?? "-"}</td>
@@ -678,12 +815,14 @@ export default function IndividualReportPageClient() {
             <td class="text-right">฿ ${row.totalSales.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td class="text-right">${row.targetRevenuePC ? "฿ " + row.targetRevenuePC.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-"}</td>
             <td class="text-right">${row.achievementPercent != null ? row.achievementPercent.toFixed(1) + "%" : "-"}</td>
+            <td><span class="badge ${badgeClass}">${badgeText}</span></td>
             <td class="text-right">฿ ${row.monthlyExpenses.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td class="text-right">฿ ${row.netIncome.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td class="text-right">฿ ${row.avgIncomePerDay.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td class="text-right">฿ ${row.avgIncomePerHour.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
           </tr>
-        `,
+        `;
+            },
           )
           .join("")}
       </tbody>
@@ -693,7 +832,7 @@ export default function IndividualReportPageClient() {
           <td>${state.data.totals.workingDays}</td>
           <td>${state.data.totals.workingHours.toFixed(1)}</td>
           <td class="text-right">${state.data.totals.totalSalesDisplay}</td>
-          <td></td>
+          <td colspan="2"></td>
           <td></td>
           <td class="text-right">${state.data.totals.monthlyExpensesDisplay}</td>
           <td class="text-right">${state.data.totals.netIncomeDisplay}</td>
@@ -705,7 +844,6 @@ export default function IndividualReportPageClient() {
 
     <div class="signatures">
       <div class="signature-row">
-        <!-- 1. พนักงาน -->
         <div class="signature-cell">
           <div class="signature-inline">
             <span>ลงชื่อ</span>
@@ -715,7 +853,6 @@ export default function IndividualReportPageClient() {
           <span class="signature-name">(${state.data.rows.length === 1 ? state.data.rows[0].employeeName : '.....................'})</span>
           <span class="signature-date">วันที่ ___/___/___</span>
         </div>
-        <!-- 2. ผู้ตรวจสอบ -->
         <div class="signature-cell">
           <div class="signature-inline">
             <span>ลงชื่อ</span>
@@ -725,17 +862,15 @@ export default function IndividualReportPageClient() {
           <span class="signature-name">(.....................)</span>
           <span class="signature-date">วันที่ ___/___/___</span>
         </div>
-        <!-- 3. ซูเปอร์ไวเซอร์ -->
         <div class="signature-cell">
           <div class="signature-inline">
             <span>ลงชื่อ</span>
             <span class="signature-line"></span>
             <span>ซูเปอร์ไวเซอร์</span>
           </div>
-          <span class="signature-name">(${supervisorSignatureName})</span>
+          <span class="signature-name">(.....................)</span>
           <span class="signature-date">วันที่ ___/___/___</span>
         </div>
-        <!-- 4. ผู้อนุมัติ -->
         <div class="signature-cell">
           <div class="signature-inline">
             <span>ลงชื่อ</span>
@@ -766,14 +901,135 @@ export default function IndividualReportPageClient() {
     }
   };
 
+  // Computed data with sort and filter
+  const processedRows = useMemo(() => {
+    if (state.status !== "success") return [];
+
+    let filtered = [...state.data.rows];
+
+    // Apply local search filter
+    if (localSearch.trim()) {
+      const search = localSearch.trim().toLowerCase();
+      filtered = filtered.filter(
+        (row) =>
+          row.employeeName.toLowerCase().includes(search) ||
+          (row.storeName && row.storeName.toLowerCase().includes(search))
+      );
+    }
+
+    // Apply achievement status filter
+    if (filterStatus !== "all") {
+      filtered = filtered.filter((row) => {
+        if (filterStatus === "achieved") {
+          return row.achievementPercent !== null && row.achievementPercent >= 100;
+        }
+        if (filterStatus === "notAchieved") {
+          return row.achievementPercent !== null && row.achievementPercent < 100;
+        }
+        if (filterStatus === "noTarget") {
+          return row.achievementPercent === null;
+        }
+        return true;
+      });
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aVal: number | string;
+      let bVal: number | string;
+
+      switch (sortField) {
+        case "name":
+          aVal = a.employeeName;
+          bVal = b.employeeName;
+          break;
+        case "sales":
+          aVal = a.totalSales;
+          bVal = b.totalSales;
+          break;
+        case "target":
+          aVal = a.targetRevenuePC ?? 0;
+          bVal = b.targetRevenuePC ?? 0;
+          break;
+        case "achievement":
+          aVal = a.achievementPercent ?? -1;
+          bVal = b.achievementPercent ?? -1;
+          break;
+        case "netIncome":
+          aVal = a.netIncome;
+          bVal = b.netIncome;
+          break;
+        case "avgDay":
+          aVal = a.avgIncomePerDay;
+          bVal = b.avgIncomePerDay;
+          break;
+        case "avgHour":
+          aVal = a.avgIncomePerHour;
+          bVal = b.avgIncomePerHour;
+          break;
+        default:
+          aVal = 0;
+          bVal = 0;
+      }
+
+      if (typeof aVal === "string" && typeof bVal === "string") {
+        return sortDirection === "asc" ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+
+      return sortDirection === "asc" ? (aVal as number) - (bVal as number) : (bVal as number) - (aVal as number);
+    });
+
+    return filtered;
+  }, [state, localSearch, filterStatus, sortField, sortDirection]);
+
+  // KPI Summary
+  const kpiSummary = useMemo(() => {
+    if (state.status !== "success") return null;
+
+    const totalEmployees = state.data.rows.length;
+    const achieved = state.data.rows.filter(r => r.achievementPercent !== null && r.achievementPercent >= 100).length;
+    const nearTarget = state.data.rows.filter(r => r.achievementPercent !== null && r.achievementPercent >= 80 && r.achievementPercent < 100).length;
+    const belowTarget = state.data.rows.filter(r => r.achievementPercent !== null && r.achievementPercent < 80).length;
+    const noTarget = state.data.rows.filter(r => r.achievementPercent === null).length;
+
+    // Find top performer
+    const topPerformer = [...state.data.rows]
+      .filter(r => r.achievementPercent !== null)
+      .sort((a, b) => (b.achievementPercent ?? 0) - (a.achievementPercent ?? 0))[0];
+
+    return {
+      totalEmployees,
+      achieved,
+      achievedPercent: totalEmployees > 0 ? (achieved / totalEmployees) * 100 : 0,
+      nearTarget,
+      belowTarget,
+      noTarget,
+      topPerformer,
+    };
+  }, [state]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+  };
+
   const toolbarDisabled = state.status === "loading";
   const report = state.status === "success" ? state.data : null;
+
+  // **FIX LOGO CACHE ISSUE**: Add cache busting timestamp
+  const cacheBuster = report ? new Date(report.branding.updatedAt).getTime() : Date.now();
   const displayLogo =
     getBrandingLogoSrc(
       report?.branding.logoPath ?? null,
       report?.branding.updatedAt ?? null,
       FALLBACK_LOGO,
     ) ?? FALLBACK_LOGO;
+  const displayLogoWithCache = `${displayLogo}${displayLogo.startsWith('http') ? `?v=${cacheBuster}` : ''}`;
+
   const rangeSummary =
     report?.filters.rangeSummary ??
     (ranges.length > 0
@@ -787,26 +1043,118 @@ export default function IndividualReportPageClient() {
   return (
     <div className="space-y-6">
       <header className="space-y-3 print:hidden">
-        <h1 className="text-2xl font-semibold text-slate-900 -mt-4 mb-2">รายงานสรุปรายบุคคล</h1>
+        <h1 className="text-2xl font-semibold text-slate-900 -mt-4 mb-2">รายงานผลงานรายบุคคล</h1>
         <p className="text-sm text-slate-500">
-          สรุปข้อมูลการทำงาน ยอดขาย ค่าใช้จ่าย และรายได้เฉลี่ยของพนักงานแต่ละคน
+          Individual Performance Report - สรุปผลการปฏิบัติงาน การเงิน และผลประกอบการของพนักงานแต่ละคน
         </p>
       </header>
 
-      <section className="print:hidden rounded-3xl border border-blue-100 bg-white/90 p-3 sm:p-5 shadow-[0_30px_120px_-110px_rgba(37,99,235,0.8)]">
-        <form className="grid gap-4" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-slate-600">ค้นหาพนักงาน</label>
-            <input
-              type="text"
-              placeholder="ค้นหาชื่อพนักงาน..."
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
-              value={filters.search}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => handleChange("search", event.target.value)}
-              disabled={toolbarDisabled}
-            />
+      {/* KPI Summary Cards */}
+      {kpiSummary && (
+        <div className="print:hidden grid gap-4 grid-cols-2 sm:grid-cols-4">
+          <div className="rounded-2xl border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-sky-50 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-xl bg-blue-500 p-2">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-slate-600">พนักงานทั้งหมด</div>
+            </div>
+            <div className="text-3xl font-bold text-blue-900">{kpiSummary.totalEmployees}</div>
+            <div className="text-xs text-slate-500 mt-1">คน</div>
           </div>
 
+          <div className="rounded-2xl border-2 border-emerald-100 bg-gradient-to-br from-emerald-50 to-green-50 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-xl bg-emerald-500 p-2">
+                <CheckCircle2 className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-slate-600">บรรลุเป้าหมาย</div>
+            </div>
+            <div className="text-3xl font-bold text-emerald-900">{kpiSummary.achieved}</div>
+            <div className="text-xs text-emerald-600 mt-1">
+              {kpiSummary.achievedPercent.toFixed(0)}% ของทั้งหมด
+            </div>
+          </div>
+
+          <div className="rounded-2xl border-2 border-amber-100 bg-gradient-to-br from-amber-50 to-yellow-50 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-xl bg-amber-500 p-2">
+                <TrendingUp className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-slate-600">ใกล้เป้าหมาย</div>
+            </div>
+            <div className="text-3xl font-bold text-amber-900">{kpiSummary.nearTarget}</div>
+            <div className="text-xs text-slate-500 mt-1">80-99% ของเป้า</div>
+          </div>
+
+          <div className="rounded-2xl border-2 border-rose-100 bg-gradient-to-br from-rose-50 to-red-50 p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-xl bg-rose-500 p-2">
+                <AlertTriangle className="h-5 w-5 text-white" />
+              </div>
+              <div className="text-xs font-semibold text-slate-600">ต้องติดตาม</div>
+            </div>
+            <div className="text-3xl font-bold text-rose-900">{kpiSummary.belowTarget}</div>
+            <div className="text-xs text-slate-500 mt-1">ต่ำกว่า 80%</div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Performer Card */}
+      {kpiSummary?.topPerformer && (
+        <div className="print:hidden rounded-2xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 p-4">
+          <div className="flex items-center gap-4">
+            <div className="rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 p-3">
+              <Award className="h-8 w-8 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-slate-600 mb-1">🏆 Top Performer of the Period</div>
+              <div className="text-2xl font-bold text-amber-900">{kpiSummary.topPerformer.employeeName}</div>
+              <div className="text-sm text-slate-600 mt-1">
+                บรรลุเป้า {kpiSummary.topPerformer.achievementPercent?.toFixed(1)}% · ยอดขาย ฿ {kpiSummary.topPerformer.totalSales.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters & Search Section */}
+      <section className="print:hidden rounded-3xl border border-blue-100 bg-white/90 p-3 sm:p-5 shadow-[0_30px_120px_-110px_rgba(37,99,235,0.8)]">
+        <form className="grid gap-4" onSubmit={(event: FormEvent<HTMLFormElement>) => event.preventDefault()}>
+          {/* Search & Filter Bar */}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-600">ค้นหาพนักงาน</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="ค้นหาชื่อพนักงาน หรือ ร้านค้า..."
+                  className="w-full rounded-2xl border border-slate-200 bg-white pl-10 pr-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  disabled={toolbarDisabled}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-slate-600">กรองสถานะ</label>
+              <select
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+                disabled={toolbarDisabled}
+              >
+                <option value="all">ทั้งหมด</option>
+                <option value="achieved">✅ บรรลุเป้าหมาย</option>
+                <option value="notAchieved">⚠️ ไม่บรรลุเป้าหมาย</option>
+                <option value="noTarget">➖ ไม่มีเป้าหมาย</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Date Range Selection */}
           <div className="space-y-3">
             <label className="text-xs font-semibold text-slate-600">ช่วงวันที่</label>
             <div className="flex flex-wrap gap-2">
@@ -959,8 +1307,15 @@ export default function IndividualReportPageClient() {
       </section>
 
       <section className="space-y-4">
-        <div className="print:hidden text-sm text-slate-500">
-          ช่วงรายงาน: <span className="font-medium text-slate-700">{rangeSummary}</span>
+        <div className="print:hidden flex items-center justify-between text-sm text-slate-500">
+          <div>
+            ช่วงรายงาน: <span className="font-medium text-slate-700">{rangeSummary}</span>
+          </div>
+          {report && processedRows.length < report.rows.length && (
+            <div className="text-xs text-slate-500">
+              แสดง {processedRows.length} จาก {report.rows.length} รายการ
+            </div>
+          )}
         </div>
 
         <div
@@ -971,12 +1326,12 @@ export default function IndividualReportPageClient() {
           <div className="mx-auto box-border flex w-full flex-col gap-6 rounded-[22px] bg-white p-4 md:p-6 text-[13px] shadow-[0_0_1px_rgba(15,23,42,0.08)] print:h-auto print:gap-4 print:rounded-none print:p-[10mm] print:text-[11px] print:shadow-none">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 print:h-12 print:w-12">
+                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
                   <Image
-                    src={displayLogo}
+                    src={displayLogoWithCache}
                     alt="โลโก้บริษัท"
                     fill
-                    sizes="64px"
+                    sizes="96px"
                     className="object-contain"
                     priority
                     unoptimized={displayLogo.startsWith("http")}
@@ -986,7 +1341,7 @@ export default function IndividualReportPageClient() {
                   <p className="text-lg font-semibold text-slate-900 whitespace-nowrap">
                     บริษัทเคพีฟู้ดส์ จำกัด
                   </p>
-                  <p className="text-sm text-slate-600">รายงานสรุปรายบุคคล</p>
+                  <p className="text-sm text-slate-600">รายงานผลงานรายบุคคล</p>
                 </div>
               </div>
               <div className="hidden md:block text-right text-sm text-slate-600">
@@ -994,7 +1349,7 @@ export default function IndividualReportPageClient() {
               </div>
             </header>
 
-            {report && (
+            {report && processedRows.length > 0 && (
               <>
               {/* Desktop Table View */}
               <div className="hidden md:block overflow-hidden rounded-xl border border-slate-200">
@@ -1002,25 +1357,84 @@ export default function IndividualReportPageClient() {
                   <table className="min-w-full border-collapse" style={{ tableLayout: 'auto' }}>
                     <thead>
                       <tr className="bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500 text-[11px] font-semibold text-white">
-                        <th className="border border-blue-200/40 px-2 py-2 text-left">พนักงาน</th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-left cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("name")}
+                        >
+                          <div className="flex items-center gap-1">
+                            พนักงาน
+                            {sortField === "name" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
                         <th className="border border-blue-200/40 px-2 py-2 text-center">ร้านค้า</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-center">วันทำงาน</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-center">ชั่วโมงทำงาน</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-right">ยอดขายรวม</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-right">ค่าใช้จ่ายรายเดือน</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-right">ยอดสุทธิ</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-right">รายได้เฉลี่ย/วัน</th>
-                        <th className="border border-blue-200/40 px-2 py-2 text-right">รายได้เฉลี่ย/ชม.</th>
+                        <th className="border border-blue-200/40 px-2 py-2 text-center">วัน</th>
+                        <th className="border border-blue-200/40 px-2 py-2 text-center">ชม.</th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-right cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("sales")}
+                        >
+                          <div className="flex items-center justify-end gap-1">
+                            ยอดขาย
+                            {sortField === "sales" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-right cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("target")}
+                        >
+                          <div className="flex items-center justify-end gap-1">
+                            เป้าหมาย
+                            {sortField === "target" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-center cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("achievement")}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            % บรรลุ
+                            {sortField === "achievement" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
+                        <th className="border border-blue-200/40 px-2 py-2 text-center">สถานะ</th>
+                        <th className="border border-blue-200/40 px-2 py-2 text-right">ค่าใช้จ่าย</th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-right cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("netIncome")}
+                        >
+                          <div className="flex items-center justify-end gap-1">
+                            ยอดสุทธิ
+                            {sortField === "netIncome" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-right cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("avgDay")}
+                        >
+                          <div className="flex items-center justify-end gap-1">
+                            รายได้/วัน
+                            {sortField === "avgDay" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
+                        <th
+                          className="border border-blue-200/40 px-2 py-2 text-right cursor-pointer hover:bg-blue-700 transition"
+                          onClick={() => handleSort("avgHour")}
+                        >
+                          <div className="flex items-center justify-end gap-1">
+                            รายได้/ชม.
+                            {sortField === "avgHour" && (sortDirection === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />)}
+                          </div>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {report.rows.map((row, index) => {
+                      {processedRows.map((row, index) => {
                         const tooltipId = `expense-${row.employeeId}`;
                         const isTooltipActive = activeTooltip === tooltipId;
 
                         return (
-                        <tr key={index} className="text-[11px] text-slate-700">
-                          <td className="border border-slate-200 px-2 py-2 text-left whitespace-nowrap">
+                        <tr key={index} className="text-[11px] text-slate-700 hover:bg-blue-50 transition">
+                          <td className="border border-slate-200 px-2 py-2 text-left whitespace-nowrap font-medium">
                             {row.employeeName}
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-center whitespace-nowrap">
@@ -1032,8 +1446,24 @@ export default function IndividualReportPageClient() {
                           <td className="border border-slate-200 px-2 py-2 text-center">
                             {row.workingHours.toFixed(1)}
                           </td>
-                          <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
+                          <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap font-semibold text-blue-700">
                             ฿ {row.totalSales.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </td>
+                          <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
+                            {row.targetRevenuePC ? `฿ ${row.targetRevenuePC.toLocaleString("th-TH", { minimumFractionDigits: 2 })}` : "-"}
+                          </td>
+                          <td className="border border-slate-200 px-2 py-2 text-center">
+                            {row.achievementPercent !== null ? (
+                              <div className="space-y-1">
+                                <span className="font-semibold">{row.achievementPercent.toFixed(1)}%</span>
+                                <AchievementProgress achievementPercent={row.achievementPercent} />
+                              </div>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                          <td className="border border-slate-200 px-2 py-2 text-center">
+                            <PerformanceBadge achievementPercent={row.achievementPercent} />
                           </td>
                           <td
                             className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap relative group cursor-help"
@@ -1066,7 +1496,6 @@ export default function IndividualReportPageClient() {
                                   </button>
                                 </div>
 
-                                {/* รายการค่าใช้จ่ายฐาน */}
                                 {row.expenseDetail.items.length > 0 && (
                                   <div className="space-y-1">
                                     {row.expenseDetail.items.map((item, idx) => (
@@ -1078,7 +1507,6 @@ export default function IndividualReportPageClient() {
                                   </div>
                                 )}
 
-                                {/* เบี้ยเลี้ยง */}
                                 {row.expenseDetail.dailyAllowance > 0 && (
                                   <div className="flex justify-between text-xs text-blue-600 font-medium pt-1 border-t border-slate-100">
                                     <span className="truncate mr-2">เบี้ยเลี้ยง ({row.expenseDetail.daysWithFullAttendance} วัน × 150)</span>
@@ -1086,7 +1514,6 @@ export default function IndividualReportPageClient() {
                                   </div>
                                 )}
 
-                                {/* รวม */}
                                 <div className="flex justify-between text-xs font-bold text-slate-800 pt-2 border-t border-slate-300">
                                   <span>รวมทั้งหมด</span>
                                   <span>฿ {row.expenseDetail.total.toLocaleString("th-TH", { minimumFractionDigits: 2 })}</span>
@@ -1094,7 +1521,7 @@ export default function IndividualReportPageClient() {
                               </div>
                             </div>
                           </td>
-                          <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
+                          <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap font-semibold text-emerald-700">
                             ฿ {row.netIncome.toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
@@ -1121,6 +1548,9 @@ export default function IndividualReportPageClient() {
                         <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
                           {report.totals.totalSalesDisplay}
                         </td>
+                        <td className="border border-slate-200 px-2 py-2"></td>
+                        <td className="border border-slate-200 px-2 py-2"></td>
+                        <td className="border border-slate-200 px-2 py-2"></td>
                         <td className="border border-slate-200 px-2 py-2 text-right whitespace-nowrap">
                           {report.totals.monthlyExpensesDisplay}
                         </td>
@@ -1141,7 +1571,7 @@ export default function IndividualReportPageClient() {
 
               {/* Mobile Card View */}
               <div className="md:hidden space-y-4">
-                {report.rows.map((row, index) => (
+                {processedRows.map((row, index) => (
                   <div
                     key={index}
                     className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md"
@@ -1155,12 +1585,7 @@ export default function IndividualReportPageClient() {
                             {row.storeName ?? "-"}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs text-slate-500">ยอดสุทธิ</div>
-                          <div className="text-lg font-bold text-emerald-700">
-                            ฿ {row.netIncome.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
-                          </div>
-                        </div>
+                        <PerformanceBadge achievementPercent={row.achievementPercent} />
                       </div>
                     </div>
 
@@ -1178,7 +1603,14 @@ export default function IndividualReportPageClient() {
                       </div>
                     </div>
 
-                    {/* Sales & Expenses */}
+                    {/* Achievement Progress */}
+                    {row.achievementPercent !== null && (
+                      <div className="mb-3 rounded-xl border border-indigo-100 bg-indigo-50/30 p-3">
+                        <AchievementProgress achievementPercent={row.achievementPercent} />
+                      </div>
+                    )}
+
+                    {/* Sales & Target */}
                     <div className="space-y-2">
                       <div className="flex justify-between rounded-lg border border-emerald-100 bg-emerald-50/50 px-3 py-2">
                         <span className="text-sm text-slate-600">ยอดขายรวม</span>
@@ -1186,6 +1618,15 @@ export default function IndividualReportPageClient() {
                           ฿ {row.totalSales.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                         </span>
                       </div>
+
+                      {row.targetRevenuePC && (
+                        <div className="flex justify-between rounded-lg border border-indigo-100 bg-indigo-50/50 px-3 py-2">
+                          <span className="text-sm text-slate-600">เป้าหมาย</span>
+                          <span className="font-semibold text-indigo-700">
+                            ฿ {row.targetRevenuePC.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Expenses with Expandable Details */}
                       <div className="rounded-lg border border-orange-100 bg-orange-50/50">
@@ -1201,16 +1642,11 @@ export default function IndividualReportPageClient() {
                             <span className="font-semibold text-orange-700">
                               ฿ {row.monthlyExpenses.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
                             </span>
-                            <svg
+                            <ChevronDown
                               className={`h-4 w-4 text-slate-400 transition-transform ${
                                 activeTooltip === `expense-mobile-${row.employeeId}` ? 'rotate-180' : ''
                               }`}
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
+                            />
                           </div>
                         </button>
 
@@ -1218,7 +1654,6 @@ export default function IndividualReportPageClient() {
                         {activeTooltip === `expense-mobile-${row.employeeId}` && (
                           <div className="border-t border-orange-100 px-3 py-2">
                             <div className="space-y-2">
-                              {/* รายการค่าใช้จ่ายฐาน */}
                               {row.expenseDetail.items.length > 0 && (
                                 <div className="space-y-1">
                                   {row.expenseDetail.items.map((item, idx) => (
@@ -1232,7 +1667,6 @@ export default function IndividualReportPageClient() {
                                 </div>
                               )}
 
-                              {/* เบี้ยเลี้ยง */}
                               {row.expenseDetail.dailyAllowance > 0 && (
                                 <div className="flex justify-between text-xs text-blue-600 font-medium pt-1 border-t border-orange-100">
                                   <span className="truncate mr-2">
@@ -1244,7 +1678,6 @@ export default function IndividualReportPageClient() {
                                 </div>
                               )}
 
-                              {/* รวม */}
                               <div className="flex justify-between text-xs font-bold text-slate-800 pt-2 border-t border-orange-200">
                                 <span>รวมทั้งหมด</span>
                                 <span>
@@ -1254,6 +1687,14 @@ export default function IndividualReportPageClient() {
                             </div>
                           </div>
                         )}
+                      </div>
+
+                      {/* Net Income */}
+                      <div className="flex justify-between rounded-lg border-2 border-emerald-200 bg-emerald-50 px-3 py-2">
+                        <span className="text-sm font-semibold text-slate-700">ยอดสุทธิ</span>
+                        <span className="font-bold text-lg text-emerald-700">
+                          ฿ {row.netIncome.toLocaleString("th-TH", { minimumFractionDigits: 2 })}
+                        </span>
                       </div>
                     </div>
 
@@ -1311,6 +1752,17 @@ export default function IndividualReportPageClient() {
                 </div>
               </div>
               </>
+            )}
+
+            {/* No Results */}
+            {report && processedRows.length === 0 && (
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                  <Search className="h-8 w-8 text-slate-400" />
+                </div>
+                <p className="text-slate-600 font-medium">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                <p className="text-sm text-slate-500 mt-1">ลองปรับเปลี่ยนคำค้นหาหรือตัวกรอง</p>
+              </div>
             )}
           </div>
         </div>

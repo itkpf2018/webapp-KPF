@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "./providers";
+import { UpdatePopup } from "@/components/UpdatePopup";
 import "./globals.css";
 import { getBranding } from "@/lib/configStore";
 import { getBrandingLogoSrc } from "@/lib/branding";
@@ -65,6 +66,7 @@ export default async function RootLayout({
         data-branding-updated-at={branding.updatedAt}
       >
         <Providers>{children}</Providers>
+        <UpdatePopup />
       </body>
     </html>
   );

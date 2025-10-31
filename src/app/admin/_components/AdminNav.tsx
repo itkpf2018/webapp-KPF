@@ -46,6 +46,14 @@ const SETTINGS_DROPDOWN: DropdownItem[] = [
   { label: "ปรับสต็อกสินค้า", href: "/admin/settings?section=stock-adjustment", icon: <Settings className="h-4 w-4" /> },
 ];
 
+// Mobile-only attendance report menu item (no dropdown, direct link)
+const MOBILE_ATTENDANCE_ITEM: MenuItem = {
+  label: "รายงานลงเวลา",
+  caption: "Attendance",
+  href: "/admin/reports",
+  icon: BarChart3,
+};
+
 const MENU_ITEMS: MenuItem[] = [
   {
     label: "Dashboard",
@@ -119,13 +127,16 @@ export default function AdminNav() {
         )}
 
         <nav className="flex flex-wrap gap-2">
-          {MENU_ITEMS.map((item) => {
+          {/* Desktop: Show Dashboard with dropdown */}
+          {/* Mobile: Show Dashboard with dropdown + separate attendance link */}
+          {MENU_ITEMS.map((item, index) => {
             const isActive = getIsActive(item);
             const Icon = item.icon;
             const isOpen = openDropdown === item.label;
             const hasDropdown = item.dropdown && item.dropdown.length > 0;
 
             return (
+              <>
               <div
                 key={item.label}
                 className="relative"
@@ -221,6 +232,39 @@ export default function AdminNav() {
                   </div>
                 )}
               </div>
+
+              {/* Mobile-only: Show attendance report link after Dashboard, hide on desktop */}
+              {index === 0 && (
+                <Link
+                  href={MOBILE_ATTENDANCE_ITEM.href}
+                  className={`md:hidden flex min-w-[180px] items-center gap-3 rounded-2xl px-4 py-3 text-sm transition-all duration-150 ${
+                    pathname.startsWith('/admin/reports')
+                      ? "bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500 font-semibold text-white shadow-[0_20px_50px_-35px_rgba(37,99,235,0.8)]"
+                      : "border border-transparent bg-white/70 text-slate-600 hover:border-blue-200 hover:text-blue-600"
+                  }`}
+                >
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl border ${
+                      pathname.startsWith('/admin/reports')
+                        ? "border-white/30 bg-white/20"
+                        : "border-blue-100 bg-blue-50"
+                    }`}
+                  >
+                    <BarChart3 className={`h-5 w-5 ${pathname.startsWith('/admin/reports') ? "text-white" : "text-blue-600"}`} />
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span>{MOBILE_ATTENDANCE_ITEM.label}</span>
+                    <span
+                      className={`text-[11px] uppercase tracking-wide ${
+                        pathname.startsWith('/admin/reports') ? "text-white/80" : "text-slate-400"
+                      }`}
+                    >
+                      {MOBILE_ATTENDANCE_ITEM.caption}
+                    </span>
+                  </div>
+                </Link>
+              )}
+              </>
             );
           })}
         </nav>

@@ -114,14 +114,9 @@ npm run gen:types    # generate TypeScript types from Supabase schema (overwrite
 - Server-side access via `getSupabaseServiceClient()` (service role key)
 
 **Schema Evolution:**
-- Migrations tracked in `migrations/*.sql` files (numbered sequentially: 001, 002, 003, etc.)
-- Current migrations:
-  - `001_create_user_pins.sql`: PIN authentication system with bcrypt hashing
-  - `002_create_auth_security.sql`: Audit logs and rate limiting for security
-  - `003_add_super_admin_role.sql`: Super admin role for enhanced permissions
-  - `004_create_app_logs_table.sql`: System logging table (Netlify deployment preparation)
-  - `005_create_categories_branding_tables.sql`: Categories and branding settings (Netlify deployment preparation)
-  - `006_create_leave_requests_table.sql`: Leave management table (Netlify deployment preparation)
+- Migrations tracked in `migrations/*.sql` files (numbered sequentially)
+- Run all migrations in order via Supabase SQL Editor
+- Check `migrations/` directory for current migration files
 - **Important:** `npm run gen:types` outputs to `src/types/supabase.ts` (overwrites existing file)
 - Keep a backup of custom types before regenerating
 - After running migrations, restart dev server to ensure types are loaded: `npm run dev`
@@ -488,6 +483,11 @@ The app supports bulk operations for products and assignments:
 - PWA assets generated in `public/` directory during production build
 - To test PWA features: `npm run build && npm run start` (service worker won't work in dev mode)
 
+### Next.js Image Configuration
+- Remote patterns configured in `next.config.ts` for Supabase images
+- Allows Next.js Image component to optimize images from `*.supabase.co` domains
+- Pattern: `https://*.supabase.co/storage/v1/object/public/**`
+
 ## Employee-Store Relationships
 
 Employees can be assigned to multiple stores with one designated as primary:
@@ -577,6 +577,21 @@ Employees can be assigned to multiple stores with one designated as primary:
    - All authentication attempts are logged to `auth_audit_logs` for security auditing
    - Admin UI available at `/admin/user-pins` for PIN management
 
+## Testing
+
+The project uses Vitest with React Testing Library for component and integration testing:
+
+- **Test Location**: Tests should mirror the source structure under `src/__tests__/` (e.g., `src/__tests__/app/sales` for sales features)
+- **Running Tests**:
+  - `npx vitest` - Enter watch mode for development
+  - `npx vitest run` - Run all tests once
+  - `npx vitest run --coverage` - Generate coverage report (required before PR merge, target >=80% coverage)
+- **Testing Guidelines**:
+  - Mock browser APIs (e.g., `navigator.geolocation`) for deterministic attendance flows
+  - Name test suites after the route or hook being tested
+  - Resolve snapshot failures immediately before requesting review
+  - Use React Testing Library for component testing
+
 ## Debugging & Common Issues
 
 ### Build Errors
@@ -599,6 +614,31 @@ Employees can be assigned to multiple stores with one designated as primary:
 - Dashboard metrics use timezone-aware date functions: `getZonedDateParts()`, `makeZonedDate()`
 - For date range filtering, see `src/lib/reportRangeUtils.ts`
 - Client-side data fetching uses TanStack Query - check React Query DevTools
+
+## Code Style & Conventions
+
+- **TypeScript**: Use 2-space indentation, trailing semicolons, and explicit return types on exported APIs
+- **Naming**:
+  - PascalCase for components, hooks, and providers
+  - camelCase for utilities and functions
+  - SCREAMING_SNAKE_CASE for constants
+- **Styling**: Prefer Tailwind classes; add custom styles only in `src/app/globals.css`
+- **Comments**: Keep brief and focused on non-obvious logic or domain context
+- **File Organization**:
+  - User-facing routes in `src/app`
+  - Shared UI primitives in `src/components`
+  - Cross-cutting helpers in `src/lib`
+  - API routes co-located with features or in `src/app/api/<feature>`
+
+## Pull Request Guidelines
+
+- Write imperative commit subjects (e.g., "add sales check-in flow")
+- Squash fixup commits before pushing
+- PR descriptions should summarize behavior changes, link related issues, and list manual checks
+- Attach screenshots for UI updates
+- Apply area labels like `ui`, `api`, or `infrastructure`
+- Ensure all checks pass: `npm run lint` and `npx vitest run --coverage` before requesting review
+- Confirm CI is green before merging
 
 ## Migration Notes
 

@@ -51,12 +51,17 @@ export async function getLeaves(options?: {
     query = query.eq("status", options.status);
   }
 
-  if (options?.startDate) {
-    query = query.gte("start_date", options.startDate);
-  }
-
-  if (options?.endDate) {
-    query = query.lte("end_date", options.endDate);
+  // Check for overlapping date ranges
+  // A leave overlaps with the report range if:
+  // leave.start_date <= report.endDate AND leave.end_date >= report.startDate
+  if (options?.startDate && options?.endDate) {
+    query = query
+      .lte("start_date", options.endDate)
+      .gte("end_date", options.startDate);
+  } else if (options?.startDate) {
+    query = query.gte("end_date", options.startDate);
+  } else if (options?.endDate) {
+    query = query.lte("start_date", options.endDate);
   }
 
   const { data, error } = await query;
@@ -177,6 +182,8 @@ export async function createLeave(input: {
 export async function updateLeave(
   id: string,
   input: Partial<{
+    employeeId: string;
+    employeeName: string;
     type: string;
     startDate: string;
     endDate: string;
@@ -197,6 +204,8 @@ export async function updateLeave(
   }
 
   const updateData: LeaveUpdate = {
+    ...(input.employeeId && { employee_id: input.employeeId }),
+    ...(input.employeeName && { employee_name: input.employeeName }),
     ...(input.type && { type: input.type }),
     ...(input.startDate && { start_date: input.startDate }),
     ...(input.endDate && { end_date: input.endDate }),

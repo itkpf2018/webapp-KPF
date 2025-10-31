@@ -1158,7 +1158,7 @@ export default function StockManagementClient() {
 
       <SiteNav />
 
-      <main className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-12 pt-[106px] sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto flex w-full max-w-none sm:max-w-7xl flex-col gap-6 pt-[130px] pb-4 sm:px-4 sm:pb-12 sm:px-6 lg:px-8">
 
         {/* Header */}
         <header className="space-y-6 rounded-3xl border border-blue-100 bg-white/90 p-6 shadow-[0_20px_60px_-45px_rgba(37,99,235,0.5)] backdrop-blur-xl sm:p-10">

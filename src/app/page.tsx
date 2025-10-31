@@ -124,12 +124,13 @@ export default function Home() {
     return employees.find((employee) => employee.id === selectedEmployeeId) ?? null;
   }, [selectedEmployeeId, employees]);
 
-  const lockedStoreId = selectedEmployee?.defaultStoreId ?? null;
+  // Lock store only if employee has exactly 1 assigned store
+  const isStoreLocked = assignedStores.length === 1;
 
   const lockedStore = useMemo(() => {
-    if (!lockedStoreId) return null;
-    return stores.find((store) => store.id === lockedStoreId) ?? null;
-  }, [lockedStoreId, stores]);
+    if (!isStoreLocked || assignedStores.length !== 1) return null;
+    return assignedStores[0] ?? null;
+  }, [isStoreLocked, assignedStores]);
 
   const selectedStore = useMemo(() => {
     if (!selectedStoreId) return null;
@@ -144,8 +145,6 @@ export default function Home() {
     }
     return null;
   }, [lockedStore, selectedStore, formState.storeName, stores]);
-
-  const isStoreLocked = Boolean(lockedStoreId && lockedStore);
 
   const locationSummary = useMemo(() => {
     if (locationState.status !== "resolved") return "";
@@ -303,9 +302,9 @@ export default function Home() {
     }
   }, [ensureLocation, gpsRequired]);
 
-  // Fetch assigned stores for manual mode (when GPS is not required)
+  // Fetch assigned stores (always fetch, regardless of GPS mode)
   useEffect(() => {
-    if (!selectedEmployeeId || gpsRequired) {
+    if (!selectedEmployeeId) {
       setAssignedStores([]);
       return;
     }
@@ -322,11 +321,16 @@ export default function Home() {
           assignments?: Array<{
             storeId: string;
             storeName?: string;
+            is_primary?: boolean;
           }>;
         };
         if (!active) return;
         const storeMap = new Map(stores.map((store) => [store.id, store]));
         const list = Array.isArray(data.assignments) ? data.assignments : [];
+
+        // Find primary store
+        const primaryAssignment = list.find((a) => a.is_primary);
+
         const mappedStores = list
           .map((assignment) => {
             const store = storeMap.get(assignment.storeId);
@@ -341,7 +345,27 @@ export default function Home() {
           .filter((storeOption, index, array) =>
             array.findIndex((item) => item.id === storeOption.id) === index,
           );
-        setAssignedStores(mappedStores);
+
+        // Sort: primary store first
+        const sortedStores = primaryAssignment
+          ? [
+              ...mappedStores.filter((s) => s.id === primaryAssignment.storeId),
+              ...mappedStores.filter((s) => s.id !== primaryAssignment.storeId),
+            ]
+          : mappedStores;
+
+        setAssignedStores(sortedStores);
+
+        // Auto-select first store (primary store for 2+, only store for 1)
+        if (sortedStores.length > 0) {
+          const autoSelectStore = sortedStores[0];
+          setSelectedStoreId(autoSelectStore.id);
+          updateField("storeName", autoSelectStore.name);
+        } else {
+          // Clear selection if no stores assigned
+          setSelectedStoreId("");
+          updateField("storeName", "");
+        }
       } catch (error) {
         if (!active) return;
         console.error("Failed to fetch assigned stores:", error);
@@ -355,7 +379,7 @@ export default function Home() {
     return () => {
       active = false;
     };
-  }, [selectedEmployeeId, gpsRequired, stores]);
+  }, [selectedEmployeeId, stores]);
 
   const handleSubmit = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -580,10 +604,12 @@ export default function Home() {
             employeeName: selectedEmployee.name,
           },
     );
-    if (lockedStoreId) {
-      setSelectedStoreId((prev) => (prev === lockedStoreId ? prev : lockedStoreId));
+
+    // Auto-select store if employee has exactly 1 assigned store
+    if (isStoreLocked && lockedStore) {
+      setSelectedStoreId(lockedStore.id);
     }
-  }, [selectedEmployee, lockedStoreId]);
+  }, [selectedEmployee, isStoreLocked, lockedStore]);
 
   useEffect(() => {
     const effectiveStore = lockedStore ?? selectedStore;
@@ -596,7 +622,7 @@ export default function Home() {
               storeName: "",
             },
       );
-      if (!lockedStoreId) {
+      if (!isStoreLocked) {
         setSelectedStoreId((prev) => prev);
       }
       return;
@@ -609,10 +635,10 @@ export default function Home() {
             storeName: effectiveStore.name,
           },
     );
-    if (!lockedStoreId && selectedStoreId !== effectiveStore.id) {
+    if (!isStoreLocked && selectedStoreId !== effectiveStore.id) {
       setSelectedStoreId(effectiveStore.id);
     }
-  }, [lockedStore, selectedStore, lockedStoreId, selectedStoreId]);
+  }, [lockedStore, selectedStore, isStoreLocked, selectedStoreId]);
 
   useEffect(() => () => {
     if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -635,13 +661,13 @@ export default function Home() {
 
         <SiteNav />
 
-        <div className="relative z-10 px-4 pb-10 pt-[100px] sm:px-6 lg:px-8">
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <div className="relative z-10 pt-[130px] sm:px-4 sm:pb-10 sm:px-6 lg:px-8">
+          <div className="mx-auto flex w-full max-w-none sm:max-w-5xl flex-col gap-0 sm:gap-6">
 
-        <section className="relative overflow-hidden rounded-[36px] border border-white/70 bg-white/85 shadow-[0_60px_200px_-110px_rgba(37,99,235,0.85)] backdrop-blur-2xl">
+        <section className="relative overflow-hidden bg-white/85 sm:rounded-[36px] sm:border sm:border-white/70 backdrop-blur-2xl">
           <CardGlow />
 
-          <form onSubmit={handleSubmit} className="relative z-10 space-y-10 p-8 sm:p-10">
+          <form onSubmit={handleSubmit} className="relative z-10 space-y-10 p-4 sm:p-8 sm:p-10">
             <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-blue-500">ATTENDANCE</p>
@@ -1013,8 +1039,8 @@ function StoreField({
   const hasStores = stores.length > 0;
   const hasAssignedStores = assignedStores.length > 0;
 
-  // Manual mode: use assigned stores
-  const storeOptions = !gpsRequired && hasAssignedStores ? assignedStores : stores;
+  // Always use assigned stores if available (regardless of GPS mode)
+  const storeOptions = hasAssignedStores ? assignedStores : stores;
   const isManualMode = !gpsRequired;
 
   return (

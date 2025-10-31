@@ -879,15 +879,11 @@ export default function SalesReportPageClient({ initialEmployees, initialStores 
     }
 
     .company-logo {
-      width: 64px;
-      height: 64px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
+      width: 96px;
+      height: 96px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #fff;
-      padding: 6px;
     }
 
     .company-logo img {
@@ -1850,12 +1846,12 @@ export default function SalesReportPageClient({ initialEmployees, initialStores 
           <div className="box-border flex w-full flex-col gap-4 rounded-[22px] bg-white p-6 shadow-[0_0_1px_rgba(15,23,42,0.08)] print:rounded-none print:p-[10mm] print:shadow-none">
             <header className="flex flex-col md:flex-row md:items-start md:justify-between border-b-2 border-slate-300 pb-3 mb-4">
               <div className="flex items-start gap-4">
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
                   <Image
                     src={displayLogo}
                     alt="โลโก้บริษัท"
                     fill
-                    sizes="56px"
+                    sizes="96px"
                     className="object-contain"
                     priority
                     unoptimized={displayLogo.startsWith("http")}

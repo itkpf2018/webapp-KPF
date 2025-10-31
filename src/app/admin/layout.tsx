@@ -14,9 +14,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
       <SiteNav />
 
-      <div className="relative z-10 px-4 pb-10 pt-[100px] sm:px-6 lg:px-10 print:p-0 print:pt-0">
-        <div className="mx-auto w-full max-w-[1600px] print:max-w-none">
-          <main className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/85 p-6 shadow-[0_50px_180px_-120px_rgba(37,99,235,0.9)] backdrop-blur-xl sm:p-8 print:overflow-visible print:rounded-none print:border-none print:shadow-none print:bg-white print:backdrop-blur-none print:p-0 print:m-0">
+      <div className="relative z-10 pt-[130px] sm:px-4 sm:pb-10 sm:px-6 lg:px-10 print:p-0 print:pt-0">
+        <div className="mx-auto w-full max-w-none sm:max-w-[1600px] print:max-w-none">
+          <main className="relative overflow-hidden bg-white/85 sm:rounded-3xl sm:border sm:border-white/70 sm:p-6 sm:shadow-[0_50px_180px_-120px_rgba(37,99,235,0.9)] sm:p-8 backdrop-blur-xl print:overflow-visible print:border-none print:shadow-none print:bg-white print:backdrop-blur-none print:p-0 print:m-0">
             {children}
           </main>
         </div>

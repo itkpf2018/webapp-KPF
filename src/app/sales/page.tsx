@@ -981,7 +981,7 @@ export default function SalesPage() {
 
       <SiteNav />
 
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 pb-32 pt-[106px] sm:px-6 md:pb-12 lg:px-8">
+      <main className="relative z-10 mx-auto flex w-full max-w-none sm:max-w-6xl flex-col gap-10 pt-[130px] pb-4 sm:px-4 sm:pb-32 sm:px-6 md:pb-12 lg:px-8">
 
         <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
           <form

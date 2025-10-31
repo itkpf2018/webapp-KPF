@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -28,12 +29,28 @@ type StoreOption = {
   province: string | null;
 };
 
+type SessionData = {
+  storeName: string | null;
+  storeProvince: string | null;
+  checkInTime: string;
+  checkOutTime: string;
+  workingHours: string;
+};
+
 type ReportRow = {
   dateIso: string;
   day: number;
   dayLabel: string;
   dayOfWeek: string;
-  status: "present" | "absent";
+  status: "present" | "leave" | "day-off" | "absent";
+  leaveType: string | null;
+  // Multi-session support
+  sessions: SessionData[];
+  storeCount: number;
+  firstCheckInTime: string;
+  lastCheckOutTime: string;
+  totalWorkingHours: string;
+  // Legacy fields (for backward compatibility with single session)
   storeName: string | null;
   storeProvince: string | null;
   checkInTime: string;
@@ -157,16 +174,81 @@ type FetchState =
   | { status: "error"; message: string };
 
 function buildCsv(report: ReportData) {
-  const headers = ["วันที่", "ร้านค้า", "จังหวัด", "เวลาเข้า", "เวลาออก", "ชั่วโมง", "โทรศัพท์"];
-  const rows = report.rows.map((row) => [
-    `${row.dayLabel} (${row.dayOfWeek})`,
-    row.status === "present" && row.storeName ? row.storeName : "หยุด",
-    row.status === "present" && row.storeProvince ? row.storeProvince : "",
-    row.status === "present" ? row.checkInTime : "",
-    row.status === "present" ? row.checkOutTime : "",
-    row.status === "present" ? row.workingHours : "",
-    "",
-  ]);
+  const headers = ["วันที่", "ร้านค้า", "จังหวัด", "เวลาเข้า", "เวลาออก", "ชั่วโมง", "หมายเหตุ"];
+  const rows: string[][] = [];
+
+  report.rows.forEach((row) => {
+    const isMultiStore = row.sessions.length > 1 && row.status === "present";
+
+    if (row.status === "leave" && row.leaveType) {
+      // Leave row
+      rows.push([
+        `${row.dayLabel} (${row.dayOfWeek})`,
+        "ลา",
+        "",
+        "",
+        "",
+        "",
+        row.leaveType,
+      ]);
+    } else if (row.status === "day-off") {
+      // Day off row
+      rows.push([
+        `${row.dayLabel} (${row.dayOfWeek})`,
+        "OFF",
+        "",
+        "",
+        "",
+        "",
+        "วันหยุดประจำ",
+      ]);
+    } else if (row.status === "absent") {
+      // Absent row
+      rows.push([
+        `${row.dayLabel} (${row.dayOfWeek})`,
+        "หยุด",
+        "",
+        "",
+        "",
+        "",
+        "ขาดงาน",
+      ]);
+    } else if (isMultiStore) {
+      // Multi-store: parent row + sub-rows
+      rows.push([
+        `${row.dayLabel} (${row.dayOfWeek})`,
+        `${row.storeCount} ร้าน`,
+        "",
+        row.firstCheckInTime,
+        row.lastCheckOutTime,
+        row.totalWorkingHours,
+        "",
+      ]);
+      row.sessions.forEach((session, idx) => {
+        const prefix = idx === row.sessions.length - 1 ? "└─" : "├─";
+        rows.push([
+          "",
+          `${prefix} ${session.storeName}`,
+          session.storeProvince || "",
+          session.checkInTime,
+          session.checkOutTime,
+          session.workingHours,
+          "",
+        ]);
+      });
+    } else {
+      // Single store row
+      rows.push([
+        `${row.dayLabel} (${row.dayOfWeek})`,
+        row.storeName || "-",
+        row.storeProvince || "",
+        row.checkInTime,
+        row.checkOutTime,
+        row.workingHours,
+        "",
+      ]);
+    }
+  });
   const all = [headers, ...rows];
   return all.map((cols) =>
     cols
@@ -189,28 +271,98 @@ function buildExcelXml(report: ReportData) {
       <Cell><Data ss:Type="String">เวลาเข้า</Data></Cell>
       <Cell><Data ss:Type="String">เวลาออก</Data></Cell>
       <Cell><Data ss:Type="String">ชั่วโมง</Data></Cell>
-      <Cell><Data ss:Type="String">โทรศัพท์</Data></Cell>
+      <Cell><Data ss:Type="String">หมายเหตุ</Data></Cell>
     </Row>
   `;
 
   const dataRows = report.rows
-    .map(
-      (row) => `
+    .map((row) => {
+      const isMultiStore = row.sessions.length > 1 && row.status === "present";
+
+      if (row.status === "leave" && row.leaveType) {
+        // Leave row
+        return `
         <Row>
           <Cell><Data ss:Type="String">${row.dayLabel} (${row.dayOfWeek})</Data></Cell>
-          <Cell><Data ss:Type="String">${
-            row.status === "present" && row.storeName ? row.storeName : "หยุด"
-          }</Data></Cell>
-          <Cell><Data ss:Type="String">${
-            row.status === "present" && row.storeProvince ? row.storeProvince : ""
-          }</Data></Cell>
-          <Cell><Data ss:Type="String">${row.status === "present" ? row.checkInTime : ""}</Data></Cell>
-          <Cell><Data ss:Type="String">${row.status === "present" ? row.checkOutTime : ""}</Data></Cell>
-          <Cell><Data ss:Type="String">${row.status === "present" ? row.workingHours : ""}</Data></Cell>
+          <Cell><Data ss:Type="String">ลา</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String">${row.leaveType}</Data></Cell>
+        </Row>
+      `;
+      } else if (row.status === "day-off") {
+        // Day off row
+        return `
+        <Row>
+          <Cell><Data ss:Type="String">${row.dayLabel} (${row.dayOfWeek})</Data></Cell>
+          <Cell><Data ss:Type="String">OFF</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String">วันหยุดประจำ</Data></Cell>
+        </Row>
+      `;
+      } else if (row.status === "absent") {
+        // Absent row
+        return `
+        <Row>
+          <Cell><Data ss:Type="String">${row.dayLabel} (${row.dayOfWeek})</Data></Cell>
+          <Cell><Data ss:Type="String">หยุด</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String">ขาดงาน</Data></Cell>
+        </Row>
+      `;
+      } else if (isMultiStore) {
+        // Multi-store: parent row + sub-rows
+        const parentRow = `
+        <Row>
+          <Cell><Data ss:Type="String">${row.dayLabel} (${row.dayOfWeek})</Data></Cell>
+          <Cell><Data ss:Type="String">${row.storeCount} ร้าน</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String">${row.firstCheckInTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.lastCheckOutTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.totalWorkingHours}</Data></Cell>
           <Cell><Data ss:Type="String"></Data></Cell>
         </Row>
-      `,
-    )
+      `;
+        const subRows = row.sessions
+          .map((session, idx) => {
+            const prefix = idx === row.sessions.length - 1 ? "└─" : "├─";
+            return `
+        <Row>
+          <Cell><Data ss:Type="String"></Data></Cell>
+          <Cell><Data ss:Type="String">${prefix} ${session.storeName}</Data></Cell>
+          <Cell><Data ss:Type="String">${session.storeProvince || ""}</Data></Cell>
+          <Cell><Data ss:Type="String">${session.checkInTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${session.checkOutTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${session.workingHours}</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+        </Row>
+      `;
+          })
+          .join("");
+        return parentRow + subRows;
+      } else {
+        // Single store row
+        return `
+        <Row>
+          <Cell><Data ss:Type="String">${row.dayLabel} (${row.dayOfWeek})</Data></Cell>
+          <Cell><Data ss:Type="String">${row.storeName || "-"}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.storeProvince || ""}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.checkInTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.checkOutTime}</Data></Cell>
+          <Cell><Data ss:Type="String">${row.workingHours}</Data></Cell>
+          <Cell><Data ss:Type="String"></Data></Cell>
+        </Row>
+      `;
+      }
+    })
     .join("");
 
   return `<?xml version="1.0"?>
@@ -291,7 +443,8 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
   const [state, setState] = useState<FetchState>({ status: "idle" });
   const abortRef = useRef<AbortController | null>(null);
   const reportContainerRef = useRef<HTMLDivElement | null>(null);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set()); // For mobile
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set()); // For desktop table
 
   const selectedEmployee = useMemo(
     () => initialEmployees.find((employee) => employee.id === filters.employeeId) ?? null,
@@ -591,15 +744,11 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
     }
 
     .company-logo {
-      width: 45px;
-      height: 45px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
+      width: 96px;
+      height: 96px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #fff;
     }
 
     .company-logo img {
@@ -814,23 +963,99 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
           <th>เวลาเข้า</th>
           <th>เวลาออก</th>
           <th>ชั่วโมง</th>
-          <th>โทรศัพท์</th>
+          <th>หมายเหตุ</th>
         </tr>
       </thead>
       <tbody>
         ${monthData.rows
           .map(
-            (row) => `
+            (row) => {
+              const isMultiStore = row.sessions.length > 1 && row.status === "present";
+
+              if (row.status === "leave" && row.leaveType) {
+                // Leave row
+                return `
           <tr>
             <td>${row.day} (${row.dayOfWeek})</td>
-            <td>${row.status === "absent" ? '<span class="absent">หยุด</span>' : row.storeName ?? "-"}</td>
-            <td>${row.status === "absent" ? "" : row.storeProvince ?? ""}</td>
-            <td>${row.status === "absent" ? "" : row.checkInTime || ""}</td>
-            <td>${row.status === "absent" ? "" : row.checkOutTime || ""}</td>
-            <td>${row.status === "absent" ? "" : row.workingHours || ""}</td>
+            <td><span style="color: #16a34a; font-weight: bold;">ลา</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>${row.leaveType}</td>
+          </tr>
+        `;
+              } else if (row.status === "day-off") {
+                // Day off row
+                return `
+          <tr>
+            <td>${row.day} (${row.dayOfWeek})</td>
+            <td><span style="color: #3b82f6; font-weight: bold;">OFF</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>วันหยุดประจำ</td>
+          </tr>
+        `;
+              } else if (row.status === "absent") {
+                // Absent row
+                return `
+          <tr>
+            <td>${row.day} (${row.dayOfWeek})</td>
+            <td><span class="absent">หยุด</span></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>ขาดงาน</td>
+          </tr>
+        `;
+              } else if (isMultiStore) {
+                // Multi-store: parent row + sub-rows (always expanded in print)
+                const parentRow = `
+          <tr>
+            <td>${row.day} (${row.dayOfWeek})</td>
+            <td>${row.storeCount} ร้าน</td>
+            <td></td>
+            <td>${row.firstCheckInTime}</td>
+            <td>${row.lastCheckOutTime}</td>
+            <td>${row.totalWorkingHours}</td>
             <td></td>
           </tr>
-        `,
+        `;
+                const subRows = row.sessions
+                  .map((session, idx) => {
+                    const prefix = idx === row.sessions.length - 1 ? '└─' : '├─';
+                    return `
+          <tr style="background: #f8fafc;">
+            <td></td>
+            <td style="text-align: left; padding-left: 20px;">${prefix} ${session.storeName}</td>
+            <td>${session.storeProvince || ""}</td>
+            <td>${session.checkInTime}</td>
+            <td>${session.checkOutTime}</td>
+            <td>${session.workingHours}</td>
+            <td></td>
+          </tr>
+        `;
+                  })
+                  .join("");
+                return parentRow + subRows;
+              } else {
+                // Single store row
+                return `
+          <tr>
+            <td>${row.day} (${row.dayOfWeek})</td>
+            <td>${row.storeName ?? "-"}</td>
+            <td>${row.storeProvince ?? ""}</td>
+            <td>${row.checkInTime || ""}</td>
+            <td>${row.checkOutTime || ""}</td>
+            <td>${row.workingHours || ""}</td>
+            <td></td>
+          </tr>
+        `;
+              }
+            }
           )
           .join("")}
       </tbody>
@@ -874,7 +1099,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
             <span class="signature-line"></span>
             <span>ซูเปอร์ไวเซอร์</span>
           </div>
-          <span class="signature-name">(${supervisorSignatureName})</span>
+          <span class="signature-name">(.....................)</span>
           <span class="signature-date">วันที่ ___/___/___</span>
         </div>
         <!-- 4. ผู้อนุมัติ -->
@@ -963,13 +1188,17 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       header: "ร้านค้า",
       sortable: true,
       align: "center",
-      render: (value, row) => {
-        const isAbsent = row.status === "absent";
-        return isAbsent ? (
-          <span className="font-semibold text-red-600">หยุด</span>
-        ) : (
-          value || "-"
-        );
+      render: (value: unknown, row: ReportRow) => {
+        if (row.status === "leave") {
+          return <span className="font-semibold text-green-600">ลา</span>;
+        }
+        if (row.status === "day-off") {
+          return <span className="font-semibold text-blue-500">OFF</span>;
+        }
+        if (row.status === "absent") {
+          return <span className="font-semibold text-red-600">หยุด</span>;
+        }
+        return typeof value === "string" ? value || "-" : "-";
       },
     },
     {
@@ -977,9 +1206,9 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       header: "จังหวัด",
       sortable: true,
       align: "center",
-      render: (value, row) => {
-        const isAbsent = row.status === "absent";
-        return isAbsent ? "" : value || "";
+      render: (value: unknown, row: ReportRow) => {
+        const notWorking = row.status !== "present";
+        return notWorking ? "" : (typeof value === "string" ? value || "" : "");
       },
     },
     {
@@ -987,9 +1216,9 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       header: "เวลาเข้า",
       sortable: true,
       align: "center",
-      render: (value, row) => {
-        const isAbsent = row.status === "absent";
-        return isAbsent ? "" : value || "";
+      render: (value: unknown, row: ReportRow) => {
+        const notWorking = row.status !== "present";
+        return notWorking ? "" : (typeof value === "string" ? value || "" : "");
       },
     },
     {
@@ -997,9 +1226,9 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       header: "เวลาออก",
       sortable: true,
       align: "center",
-      render: (value, row) => {
-        const isAbsent = row.status === "absent";
-        return isAbsent ? "" : value || "";
+      render: (value: unknown, row: ReportRow) => {
+        const notWorking = row.status !== "present";
+        return notWorking ? "" : (typeof value === "string" ? value || "" : "");
       },
     },
     {
@@ -1007,17 +1236,28 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       header: "ชั่วโมง",
       sortable: true,
       align: "center",
-      render: (value, row) => {
-        const isAbsent = row.status === "absent";
-        return isAbsent ? "" : value || "";
+      render: (value: unknown, row: ReportRow) => {
+        const notWorking = row.status !== "present";
+        return notWorking ? "" : (typeof value === "string" ? value || "" : "");
       },
     },
     {
-      key: "phone" as keyof ReportRow,
-      header: "โทรศัพท์",
+      key: "leaveType" as keyof ReportRow,
+      header: "หมายเหตุ",
       sortable: false,
       align: "center",
-      render: () => "",
+      render: (_value, row) => {
+        if (row.status === "leave" && row.leaveType) {
+          return <span className="text-green-700">{row.leaveType}</span>;
+        }
+        if (row.status === "day-off") {
+          return <span className="text-blue-600">วันหยุดประจำ</span>;
+        }
+        if (row.status === "absent") {
+          return <span className="text-red-600">ขาดงาน</span>;
+        }
+        return "";
+      },
     },
   ];
 
@@ -1025,6 +1265,20 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const toggleRow = useCallback((dateIso: string) => {
     setExpandedRows((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(dateIso)) {
+        newSet.delete(dateIso);
+      } else {
+        newSet.add(dateIso);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Toggle expand/collapse date for desktop table
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const toggleDate = useCallback((dateIso: string) => {
+    setExpandedDates((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(dateIso)) {
         newSet.delete(dateIso);
@@ -1274,12 +1528,12 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
             <>
               <header className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
                     <Image
                       src={displayLogo}
                       alt="โลโก้บริษัท"
                       fill
-                      sizes="64px"
+                      sizes="96px"
                       className="object-contain"
                       priority
                       unoptimized={displayLogo.startsWith("http")}
@@ -1355,34 +1609,50 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                       <th className="border border-slate-200 px-2 py-2 text-center text-sm">จังหวัด</th>
                       <th className="border border-slate-200 px-2 py-2 text-center text-sm">เวลาเข้า</th>
                       <th className="border border-slate-200 px-2 py-2 text-center text-sm">เวลาออก</th>
-                      <th className="border border-slate-200 px-2 py-2 text-center text-sm">โทรศัพท์</th>
+                      <th className="border border-slate-200 px-2 py-2 text-center text-sm">หมายเหตุ</th>
                     </tr>
                   </thead>
                   <tbody>
                     {report.rows.map((row) => {
-                      const isAbsent = row.status === "absent";
+                      const notWorking = row.status !== "present";
+                      let statusLabel = row.storeName ?? "-";
+                      let statusClass = "";
+                      let noteText = "";
+
+                      if (row.status === "leave" && row.leaveType) {
+                        statusLabel = "ลา";
+                        statusClass = "font-semibold text-green-600";
+                        noteText = row.leaveType;
+                      } else if (row.status === "day-off") {
+                        statusLabel = "OFF";
+                        statusClass = "font-semibold text-blue-500";
+                        noteText = "วันหยุดประจำ";
+                      } else if (row.status === "absent") {
+                        statusLabel = "หยุด";
+                        statusClass = "font-semibold text-red-600";
+                        noteText = "ขาดงาน";
+                      }
+
                       return (
                         <tr key={row.dateIso}>
                           <td className="border border-slate-200 px-2 py-2 text-center text-sm">
                             {row.day}
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-center text-sm">
-                            {isAbsent ? (
-                              <span className="font-semibold text-red-600">หยุด</span>
-                            ) : (
-                              row.storeName ?? "-"
-                            )}
+                            <span className={statusClass}>{statusLabel}</span>
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-center text-sm">
-                            {isAbsent ? "" : row.storeProvince ?? ""}
+                            {notWorking ? "" : row.storeProvince ?? ""}
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-center text-sm">
-                            {isAbsent ? "" : row.checkInTime || ""}
+                            {notWorking ? "" : row.checkInTime || ""}
                           </td>
                           <td className="border border-slate-200 px-2 py-2 text-center text-sm">
-                            {isAbsent ? "" : row.checkOutTime || ""}
+                            {notWorking ? "" : row.checkOutTime || ""}
                           </td>
-                          <td className="border border-slate-200 px-2 py-2 text-center text-sm" />
+                          <td className="border border-slate-200 px-2 py-2 text-center text-sm text-slate-600">
+                            {noteText}
+                          </td>
                         </tr>
                       );
                     })}
@@ -1393,16 +1663,30 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
               {/* Mobile Card Layout */}
               <div className="mobile-cards mb-4 space-y-3">
                 {report.rows.map((row) => {
-                  const isAbsent = row.status === "absent";
+                  const notWorking = row.status !== "present";
+                  let statusBadge = null;
+
+                  if (row.status === "leave") {
+                    statusBadge = (
+                      <span className="px-2 py-1 text-xs font-semibold text-green-600 bg-green-50 rounded">ลา</span>
+                    );
+                  } else if (row.status === "day-off") {
+                    statusBadge = (
+                      <span className="px-2 py-1 text-xs font-semibold text-blue-500 bg-blue-50 rounded">OFF</span>
+                    );
+                  } else if (row.status === "absent") {
+                    statusBadge = (
+                      <span className="px-2 py-1 text-xs font-semibold text-red-600 bg-red-50 rounded">หยุด</span>
+                    );
+                  }
+
                   return (
                     <div key={row.dateIso} className="border border-slate-200 rounded-lg p-3 bg-white shadow-sm">
                       <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-200">
                         <span className="text-lg font-semibold text-slate-900">วันที่ {row.day}</span>
-                        {isAbsent && (
-                          <span className="px-2 py-1 text-xs font-semibold text-red-600 bg-red-50 rounded">หยุด</span>
-                        )}
+                        {statusBadge}
                       </div>
-                      {!isAbsent && (
+                      {!notWorking && (
                         <div className="space-y-1.5 text-sm">
                           <div className="flex justify-between">
                             <span className="text-slate-600">ร้านค้า:</span>
@@ -1587,11 +1871,111 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
             {/* Desktop Table - Hidden on mobile */}
             {report && (
               <div className="hidden md:block">
-                <SortableTable
-                  columns={attendanceColumns}
-                  data={report.rows}
-                  className="print:rounded-lg"
-                />
+                <div className="overflow-x-auto rounded-lg border border-slate-200 shadow-sm print:rounded-lg">
+                  <table className="min-w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-blue-600 via-sky-500 to-indigo-500">
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">วันที่</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">ร้านค้า</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">จังหวัด</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">เวลาเข้า</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">เวลาออก</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">ชั่วโมง</th>
+                        <th className="border border-slate-300 px-4 py-3 text-center text-sm font-semibold text-white">หมายเหตุ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.rows.map((row) => {
+                        const isExpanded = expandedDates.has(row.dateIso);
+                        const isMultiStore = row.sessions.length > 1 && row.status === "present";
+
+                        // Determine status display
+                        let storeDisplay = row.storeName || "-";
+                        let storeColor = "";
+                        let noteText = "";
+                        let noteColor = "";
+
+                        if (row.status === "leave") {
+                          storeDisplay = "ลา";
+                          storeColor = "font-semibold text-green-600";
+                          noteText = row.leaveType || "";
+                          noteColor = "text-green-700";
+                        } else if (row.status === "day-off") {
+                          storeDisplay = "OFF";
+                          storeColor = "font-semibold text-blue-500";
+                          noteText = "วันหยุดประจำ";
+                          noteColor = "text-blue-600";
+                        } else if (row.status === "absent") {
+                          storeDisplay = "หยุด";
+                          storeColor = "font-semibold text-red-600";
+                          noteText = "ขาดงาน";
+                          noteColor = "text-red-600";
+                        } else if (isMultiStore) {
+                          storeDisplay = `${row.storeCount} ร้าน`;
+                        }
+
+                        return (
+                          <React.Fragment key={row.dateIso}>
+                            {/* Parent Row */}
+                            <tr
+                              className={`${isMultiStore ? "cursor-pointer hover:bg-slate-50" : ""} ${row.status !== "present" ? "bg-slate-50/50" : ""}`}
+                              onClick={isMultiStore ? () => toggleDate(row.dateIso) : undefined}
+                            >
+                              <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                {row.dayLabel} ({row.dayOfWeek})
+                              </td>
+                              <td className={`border border-slate-200 px-4 py-2 text-center text-sm ${storeColor}`}>
+                                {storeDisplay} {isMultiStore && (
+                                  <span className="ml-1 text-slate-400">
+                                    {isExpanded ? "▲" : "▼"}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                {row.status === "present" && !isMultiStore ? row.storeProvince || "" : ""}
+                              </td>
+                              <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                {row.status === "present" ? row.firstCheckInTime || row.checkInTime : ""}
+                              </td>
+                              <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                {row.status === "present" ? row.lastCheckOutTime || row.checkOutTime : ""}
+                              </td>
+                              <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                {row.status === "present" ? row.totalWorkingHours || row.workingHours : ""}
+                              </td>
+                              <td className={`border border-slate-200 px-4 py-2 text-center text-sm ${noteColor}`}>
+                                {noteText}
+                              </td>
+                            </tr>
+
+                            {/* Sub-rows for multi-store sessions (expanded) */}
+                            {isMultiStore && isExpanded && row.sessions.map((session, idx) => (
+                              <tr key={`${row.dateIso}-${idx}`} className="bg-slate-50/70">
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm"></td>
+                                <td className="border border-slate-200 px-4 py-2 text-left text-sm pl-8">
+                                  {idx === row.sessions.length - 1 ? "└─" : "├─"} {session.storeName}
+                                </td>
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                  {session.storeProvince || ""}
+                                </td>
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                  {session.checkInTime}
+                                </td>
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                  {session.checkOutTime}
+                                </td>
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm">
+                                  {session.workingHours}
+                                </td>
+                                <td className="border border-slate-200 px-4 py-2 text-center text-sm"></td>
+                              </tr>
+                            ))}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
@@ -1600,7 +1984,40 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
               <div className="md:hidden space-y-2">
                 {report.rows.map((row) => {
                   const isExpanded = expandedRows.has(row.dateIso);
-                  const isAbsent = row.status === "absent";
+                  const notWorking = row.status !== "present";
+
+                  // Icon and colors based on status
+                  let iconBg = "bg-blue-100";
+                  let icon = "🏪";
+
+                  if (row.status === "leave") {
+                    iconBg = "bg-green-100";
+                    icon = "🌴";
+                  } else if (row.status === "day-off") {
+                    iconBg = "bg-blue-100";
+                    icon = "📅";
+                  } else if (row.status === "absent") {
+                    iconBg = "bg-red-100";
+                    icon = "❌";
+                  }
+
+                  // Status label and color
+                  const isMultiStore = row.sessions.length > 1 && row.status === "present";
+                  let statusLabel = row.storeName || "-";
+                  let statusColor = "text-slate-700";
+
+                  if (row.status === "leave") {
+                    statusLabel = "ลา";
+                    statusColor = "text-green-600";
+                  } else if (row.status === "day-off") {
+                    statusLabel = "OFF";
+                    statusColor = "text-blue-500";
+                  } else if (row.status === "absent") {
+                    statusLabel = "หยุด";
+                    statusColor = "text-red-600";
+                  } else if (isMultiStore) {
+                    statusLabel = `${row.storeCount} ร้าน`;
+                  }
 
                   return (
                     <div
@@ -1615,15 +2032,9 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           {/* Icon */}
                           <div className="flex-shrink-0">
-                            {isAbsent ? (
-                              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                                <span className="text-xl">🏖️</span>
-                              </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <span className="text-xl">🏪</span>
-                              </div>
-                            )}
+                            <div className={`w-10 h-10 rounded-full ${iconBg} flex items-center justify-center`}>
+                              <span className="text-xl">{icon}</span>
+                            </div>
                           </div>
 
                           {/* Date */}
@@ -1636,21 +2047,15 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                             </div>
                           </div>
 
-                          {/* Store Name */}
+                          {/* Store Name / Status */}
                           <div className="flex-1 min-w-0 hidden sm:block">
-                            {isAbsent ? (
-                              <span className="text-sm font-semibold text-red-600">
-                                หยุด
-                              </span>
-                            ) : (
-                              <div className="text-sm font-medium text-slate-700 truncate">
-                                {row.storeName || "-"}
-                              </div>
-                            )}
+                            <div className={`text-sm font-semibold ${statusColor} truncate`}>
+                              {statusLabel}
+                            </div>
                           </div>
 
                           {/* Time */}
-                          {!isAbsent && (
+                          {!notWorking && (
                             <div className="flex items-center gap-2 text-xs text-slate-600 flex-shrink-0">
                               <span>⏰</span>
                               <span>
@@ -1680,8 +2085,45 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                         </div>
                       </button>
 
-                      {/* Expanded View - Details */}
-                      {isExpanded && !isAbsent && (
+                      {/* Expanded View - Multi-Store Sessions */}
+                      {isExpanded && !notWorking && isMultiStore && (
+                        <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/30">
+                          <div className="mb-2 text-xs text-slate-600 font-medium">
+                            รวม {row.storeCount} ร้าน • {row.totalWorkingHours}
+                          </div>
+                          <div className="space-y-2">
+                            {row.sessions.map((session, idx) => (
+                              <div key={idx} className="bg-white rounded-lg border border-slate-200 p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-xs text-slate-500">📍</span>
+                                  <div className="font-semibold text-sm text-slate-900">
+                                    Session {idx + 1}: {session.storeName}
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  <div>
+                                    <div className="text-slate-600">จังหวัด</div>
+                                    <div className="text-slate-900 font-medium">{session.storeProvince || "-"}</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-slate-600">ชั่วโมง</div>
+                                    <div className="text-blue-600 font-semibold">{session.workingHours}</div>
+                                  </div>
+                                  <div className="col-span-2">
+                                    <div className="text-slate-600">เวลา</div>
+                                    <div className="text-slate-900 font-medium">
+                                      ⏰ {session.checkInTime} → {session.checkOutTime}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Expanded View - Single Store Details */}
+                      {isExpanded && !notWorking && !isMultiStore && (
                         <div className="px-4 pb-4 pt-2 border-t border-slate-100 bg-slate-50/50">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                             <div className="flex items-start gap-2">
@@ -1747,11 +2189,29 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                         </div>
                       )}
 
+                      {/* Expanded View - Leave Day */}
+                      {isExpanded && row.status === "leave" && (
+                        <div className="px-4 pb-4 pt-2 border-t border-green-100 bg-green-50/30">
+                          <div className="text-sm text-green-700 text-center">
+                            วันนี้พนักงานลา
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Expanded View - Day Off */}
+                      {isExpanded && row.status === "day-off" && (
+                        <div className="px-4 pb-4 pt-2 border-t border-blue-100 bg-blue-50/30">
+                          <div className="text-sm text-blue-600 text-center">
+                            วันหยุดประจำของพนักงาน
+                          </div>
+                        </div>
+                      )}
+
                       {/* Expanded View - Absent Day */}
-                      {isExpanded && isAbsent && (
+                      {isExpanded && row.status === "absent" && (
                         <div className="px-4 pb-4 pt-2 border-t border-red-100 bg-red-50/30">
                           <div className="text-sm text-red-600 text-center">
-                            วันนี้พนักงานหยุดงาน
+                            วันนี้พนักงานหยุดงาน / ขาดงาน
                           </div>
                         </div>
                       )}

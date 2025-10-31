@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "buildDate": "2025-01-31T15:30:00+07:00",
+  "releaseNotes": {
+    "th": {
+      "title": "อัปเดตใหม่ล่าสุด",
+      "highlights": [
+        {
+          "icon": "🎨",
+          "title": "ปรับปรุงหน้า Login",
+          "description": "ปุ่ม PIN แบบกลมพร้อมเงาสามมิติที่สวยงาม"
+        },
+        {
+          "icon": "📊",
+          "title": "Dashboard ที่ดีขึ้น",
+          "description": "โหลดข้อมูลเร็วขึ้นและแสดงผลที่แม่นยำกว่าเดิม"
+        },
+        {
+          "icon": "📝",
+          "title": "รายงานมาตรฐาน",
+          "description": "รูปแบบลายเซ็นที่เป็นมาตรฐานเดียวกันทุกรายงาน"
+        },
+        {
+          "icon": "🔧",
+          "title": "แก้ไขบั๊กต่าง ๆ",
+          "description": "ปรับปรุงเสถียรภาพและประสิทธิภาพโดยรวม"
+        }
+      ],
+      "technicalChanges": [
+        "TypeScript type safety improvements",
+        "Performance optimizations for data fetching",
+        "Enhanced error handling across all components",
+        "Standardized signature sections in all reports",
+        "Improved mobile responsiveness"
+      ]
+    },
+    "en": {
+      "title": "Latest Update",
+      "highlights": [
+        {
+          "icon": "🎨",
+          "title": "Login Page Redesign",
+          "description": "Beautiful circular PIN buttons with 3D shadows"
+        },
+        {
+          "icon": "📊",
+          "title": "Enhanced Dashboard",
+          "description": "Faster data loading and more accurate display"
+        },
+        {
+          "icon": "📝",
+          "title": "Standardized Reports",
+          "description": "Consistent signature format across all reports"
+        },
+        {
+          "icon": "🔧",
+          "title": "Bug Fixes",
+          "description": "Improved stability and overall performance"
+        }
+      ],
+      "technicalChanges": [
+        "TypeScript type safety improvements",
+        "Performance optimizations for data fetching",
+        "Enhanced error handling across all components",
+        "Standardized signature sections in all reports",
+        "Improved mobile responsiveness"
+      ]
+    }
+  },
+  "compatibility": {
+    "minVersion": "1.0.0",
+    "breakingChanges": false
+  }
+}

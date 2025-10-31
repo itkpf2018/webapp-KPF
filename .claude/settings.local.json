@@ -35,7 +35,10 @@
       "Bash(if [ -f \"$file\" ])",
       "Bash(then)",
       "Bash(fi)",
-      "Bash(perl:*)"
+      "Bash(perl:*)",
+      "Bash(curl:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")"
     ],
     "deny": [],
     "ask": []

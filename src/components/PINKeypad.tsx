@@ -128,12 +128,12 @@ export default function PINKeypad({
     variant?: 'default' | 'backspace' | 'submit';
   }) => {
     const baseClass =
-      'flex h-16 w-full items-center justify-center rounded-2xl text-2xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
+      'flex aspect-square w-full items-center justify-center rounded-full text-2xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantClass = {
-      default: 'bg-white border-2 border-slate-200 text-slate-900 hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100',
-      backspace: 'bg-red-50 border-2 border-red-200 text-red-600 hover:bg-red-100 active:bg-red-200',
-      submit: 'bg-gradient-to-br from-blue-600 to-indigo-600 border-2 border-blue-700 text-white hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800',
+      default: 'bg-white border border-slate-200 text-slate-900 hover:border-blue-400 hover:bg-blue-50 active:bg-blue-100 shadow-[0_4px_14px_0_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_0_rgba(0,0,0,0.15)] active:shadow-[0_2px_8px_0_rgba(0,0,0,0.15)]',
+      backspace: 'bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 active:bg-red-200 shadow-[0_4px_14px_0_rgba(239,68,68,0.2)] hover:shadow-[0_6px_20px_0_rgba(239,68,68,0.25)] active:shadow-[0_2px_8px_0_rgba(239,68,68,0.25)]',
+      submit: 'bg-gradient-to-br from-blue-600 to-indigo-600 border border-blue-700 text-white hover:from-blue-700 hover:to-indigo-700 active:from-blue-800 active:to-indigo-800 shadow-[0_6px_20px_0_rgba(59,130,246,0.35)] hover:shadow-[0_8px_28px_0_rgba(59,130,246,0.45)] active:shadow-[0_3px_12px_0_rgba(59,130,246,0.4)]',
     }[variant];
 
     return (
@@ -218,11 +218,6 @@ export default function PINKeypad({
           disabled={pin.length < minLength || isLoading}
         />
       </div>
-
-      {/* Helper Text */}
-      <p className="mt-4 text-center text-xs text-slate-500">
-        กรอก PIN {minLength}-{maxLength} หลัก
-      </p>
     </div>
   );
 }

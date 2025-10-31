@@ -3,7 +3,38 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { FileDown, FileSpreadsheet, Printer, Eye, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Archive,
+  Box,
+  TrendingUp,
+  Award,
+  BarChart3,
+  PieChart,
+  Target,
+  DollarSign,
+  Download,
+  FileSpreadsheet,
+  Printer,
+  ChevronDown,
+  ChevronRight,
+  Package,
+  TrendingDown,
+  Minus,
+  ArrowUp,
+  ArrowDown,
+  Zap,
+  Crown,
+  Star,
+  Shield,
+  Building2,
+  Briefcase,
+  LineChart,
+  BarChart4,
+  Calculator,
+  Banknote,
+  Wallet,
+  FileBarChart
+} from "lucide-react";
 import { getBrandingLogoSrc, getBrandingLogoUrl } from "@/lib/branding";
 import type { BrandingSettings, EmployeeRecord, ProductSalesReport } from "@/lib/configStore";
 
@@ -224,6 +255,39 @@ function buildExcelXml(report: ProductSalesReport) {
 </Workbook>`;
 }
 
+// Performance Badge Component
+function PerformanceBadge({ rank }: { rank: number }) {
+  if (rank === 1) {
+    return (
+      <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 px-3 py-1 text-xs font-bold text-white shadow-lg">
+        <Crown className="h-3.5 w-3.5" />
+        TOP
+      </div>
+    );
+  }
+  if (rank <= 3) {
+    return (
+      <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 px-3 py-1 text-xs font-bold text-white">
+        <Star className="h-3.5 w-3.5" />
+        STRONG
+      </div>
+    );
+  }
+  if (rank <= 5) {
+    return (
+      <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-500 to-sky-400 px-3 py-1 text-xs font-semibold text-white">
+        <Shield className="h-3.5 w-3.5" />
+        AVERAGE
+      </div>
+    );
+  }
+  return (
+    <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-slate-400 to-slate-500 px-3 py-1 text-xs font-medium text-white">
+      LOW
+    </div>
+  );
+}
+
 export default function ProductSalesReportPageClient({
   initialReport,
   employees,
@@ -438,6 +502,40 @@ export default function ProductSalesReportPageClient({
     downloadBlob(xml, "application/vnd.ms-excel", filename);
   };
 
+  // Logo with cache busting
+  const FALLBACK_LOGO = "/icons/icon-192x192.png";
+  const cacheBuster = branding.updatedAt ? new Date(branding.updatedAt).getTime() : Date.now();
+  const displayLogo = getBrandingLogoSrc(
+    branding.logoPath ?? null,
+    branding.updatedAt ?? null,
+    FALLBACK_LOGO
+  ) ?? FALLBACK_LOGO;
+  const displayLogoWithCache = `${displayLogo}${displayLogo.startsWith('http') ? `?v=${cacheBuster}` : ''}`;
+
+  // Calculate top 5 products
+  const top5Products = [...report.products]
+    .sort((a, b) => b.totalRevenuePC - a.totalRevenuePC)
+    .slice(0, 5);
+
+  // Calculate KPI metrics
+  const totalProducts = report.summary.uniqueProducts;
+  const totalRevenue = report.summary.totalRevenuePC;
+  const topPerformer = top5Products[0];
+  const avgPricePerUnit = report.summary.totalQuantity > 0
+    ? totalRevenue / report.summary.totalQuantity
+    : 0;
+  const totalUnits = report.summary.totalQuantity;
+
+  // Calculate unit distribution for pie chart
+  const boxRevenue = report.summary.unitBreakdown.box.revenuePC;
+  const packRevenue = report.summary.unitBreakdown.pack.revenuePC;
+  const pieceRevenue = report.summary.unitBreakdown.piece.revenuePC;
+  const totalUnitRevenue = boxRevenue + packRevenue + pieceRevenue;
+
+  const boxPercent = totalUnitRevenue > 0 ? (boxRevenue / totalUnitRevenue) * 100 : 0;
+  const packPercent = totalUnitRevenue > 0 ? (packRevenue / totalUnitRevenue) * 100 : 0;
+  const piecePercent = totalUnitRevenue > 0 ? (pieceRevenue / totalUnitRevenue) * 100 : 0;
+
   const handlePrint = () => {
     // Auto-expand all products before printing
     expandAll();
@@ -556,15 +654,13 @@ export default function ProductSalesReportPageClient({
     }
 
     .company-logo {
-      width: 64px;
-      height: 64px;
-      border: 1px solid #d1d5db;
-      border-radius: 12px;
+      width: 96px;
+      height: 96px;
       display: flex;
       align-items: center;
       justify-content: center;
       background-color: #fff;
-      padding: 6px;
+      padding: 8px;
     }
 
     .company-logo img {
@@ -871,36 +967,288 @@ export default function ProductSalesReportPageClient({
 
   return (
     <div id="report-print-root" className="space-y-6">
-      <header className="space-y-3 print:hidden">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-slate-900 -mt-4 mb-2">รายงานยอดขายรายสินค้า</h1>
-            <p className="text-sm text-slate-500">
-              สรุปยอดขายแบบเรียลไทม์ จำแนกตามสินค้า พร้อมกรองได้หลายช่วงเวลาและหลายพนักงาน
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={expandAll}
-              disabled={report.products.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <ChevronDown className="h-4 w-4" />
-              ขยายทั้งหมด
-            </button>
-            <button
-              type="button"
-              onClick={collapseAll}
-              disabled={report.products.length === 0}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <ChevronRight className="h-4 w-4" />
-              ย่อทั้งหมด
-            </button>
+      {/* Enterprise Header with Logo */}
+      <header className="print:hidden">
+        <div className="rounded-3xl border-2 border-blue-200 bg-gradient-to-br from-white via-blue-50/30 to-sky-50/20 p-6 shadow-[0_40px_120px_-30px_rgba(59,130,246,0.3)]">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              {/* Logo - Clear and Prominent (no border) - Increased size for better visibility */}
+              <div className="flex-shrink-0">
+                <Image
+                  src={displayLogoWithCache}
+                  alt="Company Logo"
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold text-slate-900">รายงานยอดขายรายสินค้า</h1>
+                <p className="text-sm text-slate-600">
+                  สรุปยอดขายแบบเรียลไทม์ จำแนกตามสินค้า พร้อมกรองได้หลายช่วงเวลาและหลายพนักงาน
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={expandAll}
+                disabled={report.products.length === 0}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ChevronDown className="h-4 w-4" />
+                ขยายทั้งหมด
+              </button>
+              <button
+                type="button"
+                onClick={collapseAll}
+                disabled={report.products.length === 0}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <ChevronRight className="h-4 w-4" />
+                ย่อทั้งหมด
+              </button>
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Executive KPI Summary - 2x3 Grid (Compact) */}
+      <section className="print:hidden grid gap-3 grid-cols-2 lg:grid-cols-3">
+        <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-white to-blue-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-blue-500 to-sky-400 p-2 print:p-3">
+              <Building2 className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Total Products</p>
+              <p className="text-xl font-bold text-slate-900">{totalProducts}</p>
+              <p className="text-[10px] text-slate-500">รายการสินค้า</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 p-2 print:p-3">
+              <Banknote className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Total Revenue</p>
+              <p className="text-xl font-bold text-emerald-700">{formatShort(totalRevenue)}</p>
+              <p className="text-[10px] text-slate-500">ยอดขายรวม</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-amber-100 bg-gradient-to-br from-white to-amber-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-amber-500 to-yellow-400 p-2 print:p-3">
+              <Award className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Top Performer</p>
+              <p className="text-xs font-bold text-slate-900 truncate max-w-[140px]">{topPerformer?.productName || "-"}</p>
+              <p className="text-[10px] text-slate-500">{topPerformer ? formatShort(topPerformer.totalRevenuePC) : "-"}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-white to-indigo-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-indigo-500 to-purple-400 p-2 print:p-3">
+              <Calculator className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Avg Price/Unit</p>
+              <p className="text-xl font-bold text-indigo-700">{formatShort(avgPricePerUnit)}</p>
+              <p className="text-[10px] text-slate-500">ราคาเฉลี่ย</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-sky-100 bg-gradient-to-br from-white to-sky-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-sky-500 to-cyan-400 p-2 print:p-3">
+              <Package className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Units Sold</p>
+              <p className="text-xl font-bold text-sky-700">{formatShort(totalUnits)}</p>
+              <p className="text-[10px] text-slate-500">จำนวนชิ้น</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-violet-100 bg-gradient-to-br from-white to-violet-50/30 p-3 shadow-md">
+          <div className="flex items-center gap-2.5">
+            <div className="rounded-lg bg-gradient-to-br from-violet-500 to-purple-400 p-2 print:p-3">
+              <FileBarChart className="h-8 w-8 text-white print:h-10 print:w-10" />
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold text-slate-600">Market Share</p>
+              <p className="text-xl font-bold text-violet-700">100%</p>
+              <p className="text-[10px] text-slate-500">ส่วนแบ่ง</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Charts Section: Top 5 Products & Unit Distribution Side-by-Side */}
+      {hasProducts && (
+        <section className="print:hidden grid gap-4 grid-cols-1 lg:grid-cols-2">
+          {/* Top 5 Products Ranking (Compact) */}
+          {top5Products.length > 0 && (
+            <div className="rounded-xl border border-amber-100 bg-gradient-to-br from-white via-amber-50/20 to-yellow-50/10 p-4 shadow-md">
+              <div className="flex items-center gap-2.5 mb-3">
+                <div className="rounded-lg bg-gradient-to-br from-amber-500 to-yellow-400 p-2 print:p-3">
+                  <BarChart4 className="h-7 w-7 text-white print:h-10 print:w-10" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Top 5 Best Sellers</h2>
+                  <p className="text-[10px] text-slate-600">สินค้าขายดีอันดับต้น</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {top5Products.map((product, index) => {
+                  const maxRevenue = top5Products[0].totalRevenuePC;
+                  const percentOfMax = (product.totalRevenuePC / maxRevenue) * 100;
+
+                  return (
+                    <div
+                      key={product.productKey}
+                      className="relative overflow-hidden rounded-lg border border-slate-200 bg-white p-2.5 hover:border-blue-300 hover:shadow-md transition-all"
+                    >
+                      {/* Background Progress Bar */}
+                      <div
+                        className="absolute inset-0 bg-gradient-to-r from-blue-100/50 via-sky-100/50 to-cyan-100/50 opacity-40"
+                        style={{ width: `${percentOfMax}%` }}
+                      />
+
+                      <div className="relative flex items-center gap-2.5">
+                        {/* Rank Badge */}
+                        <div className={`flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full font-bold text-sm ${
+                          index === 0
+                            ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-md'
+                            : index === 1
+                            ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white'
+                            : index === 2
+                            ? 'bg-gradient-to-br from-orange-300 to-amber-400 text-white'
+                            : 'bg-slate-200 text-slate-600'
+                        }`}>
+                          {index + 1}
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <p className="font-bold text-sm text-slate-900 truncate">{product.productName}</p>
+                          </div>
+                          <p className="text-[10px] text-slate-500">SKU: {product.productCode || "-"}</p>
+                        </div>
+
+                        {/* Revenue */}
+                        <div className="flex-shrink-0 text-right">
+                          <p className="text-base font-bold text-emerald-600">{formatShort(product.totalRevenuePC)}</p>
+                          <p className="text-[10px] text-slate-500">{formatShort(product.totalQuantity)} ชิ้น</p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-blue-500 via-sky-400 to-cyan-400"
+                          style={{ width: `${percentOfMax}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Unit Distribution Pie Chart (Compact) */}
+          <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-white to-indigo-50/20 p-4 shadow-md">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className="rounded-lg bg-gradient-to-br from-indigo-500 to-purple-400 p-2 print:p-3">
+                <PieChart className="h-7 w-7 text-white print:h-10 print:w-10" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Unit Distribution</h2>
+                <p className="text-[10px] text-slate-600">การกระจายยอดขายตามหน่วย</p>
+              </div>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              {/* Visual Pie Chart Representation */}
+              <div className="flex items-center justify-center">
+                <div className="relative w-32 h-32 md:w-36 md:h-36">
+                  {/* Simple CSS Pie Chart */}
+                  <div
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: `conic-gradient(
+                        from 0deg,
+                        #10b981 0deg ${boxPercent * 3.6}deg,
+                        #3b82f6 ${boxPercent * 3.6}deg ${(boxPercent + packPercent) * 3.6}deg,
+                        #f59e0b ${(boxPercent + packPercent) * 3.6}deg 360deg
+                      )`
+                    }}
+                  />
+                  <div className="absolute inset-3 rounded-full bg-white flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="text-base font-bold text-slate-900">{formatShort(totalUnitRevenue)}</p>
+                      <p className="text-[10px] text-slate-500">Total</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Legend and Breakdown */}
+              <div className="space-y-2">
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded bg-emerald-500" />
+                      <span className="text-xs font-semibold text-slate-900">กล่อง</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-700">{boxPercent.toFixed(1)}%</span>
+                  </div>
+                  <p className="text-sm font-bold text-emerald-700">{formatShort(boxRevenue)}</p>
+                  <p className="text-[10px] text-slate-600">{formatNumber(report.summary.unitBreakdown.box.quantity)} ชิ้น</p>
+                </div>
+
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded bg-blue-500" />
+                      <span className="text-xs font-semibold text-slate-900">แพ็ค</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-blue-700">{packPercent.toFixed(1)}%</span>
+                  </div>
+                  <p className="text-sm font-bold text-blue-700">{formatShort(packRevenue)}</p>
+                  <p className="text-[10px] text-slate-600">{formatNumber(report.summary.unitBreakdown.pack.quantity)} ชิ้น</p>
+                </div>
+
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded bg-amber-500" />
+                      <span className="text-xs font-semibold text-slate-900">ปี๊บ/ซอง</span>
+                    </div>
+                    <span className="text-[10px] font-bold text-amber-700">{piecePercent.toFixed(1)}%</span>
+                  </div>
+                  <p className="text-sm font-bold text-amber-700">{formatShort(pieceRevenue)}</p>
+                  <p className="text-[10px] text-slate-600">{formatNumber(report.summary.unitBreakdown.piece.quantity)} ชิ้น</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Filters Section */}
       <section className="print:hidden rounded-3xl border border-blue-100 bg-white/90 p-4 shadow-[0_30px_120px_-110px_rgba(37,99,235,0.8)]">
@@ -1060,7 +1408,7 @@ export default function ProductSalesReportPageClient({
         </div>
       </section>
 
-      {/* Export Buttons */}
+      {/* Export Buttons - Updated Icons */}
       <section className="print:hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
           <button
@@ -1069,7 +1417,7 @@ export default function ProductSalesReportPageClient({
             disabled={isLoading || !hasProducts}
             className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <FileDown className="h-4 w-4" />
+            <Download className="h-4 w-4" />
             ดาวน์โหลด CSV
           </button>
           <button
@@ -1115,7 +1463,7 @@ export default function ProductSalesReportPageClient({
               <th colSpan={2} className="border border-blue-700 px-2 py-1 text-center bg-blue-700/20">แพ็ค</th>
               <th colSpan={2} className="border border-blue-700 px-2 py-1 text-center bg-blue-700/20">ปี๊บ/ซอง</th>
               <th rowSpan={2} className="border border-blue-700 px-2 py-2 text-right">รวม PC</th>
-              <th rowSpan={2} className="border border-blue-700 px-2 py-2"></th>
+              <th rowSpan={2} className="border border-blue-700 px-2 py-2">Rank</th>
             </tr>
             <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px]">
               {/* Box */}
@@ -1137,9 +1485,10 @@ export default function ProductSalesReportPageClient({
                 </td>
               </tr>
             ) : (
-              report.products.map((product) => {
+              report.products.map((product, productIndex) => {
                 const isExpanded = expandedProducts.has(product.productKey);
                 const hasStores = product.storeBreakdown && product.storeBreakdown.length > 0;
+                const rank = productIndex + 1;
 
                 return (
                   <React.Fragment key={product.productKey}>
@@ -1174,13 +1523,7 @@ export default function ProductSalesReportPageClient({
                       {/* Totals */}
                       <td className="border border-slate-200 px-2 py-2 text-right font-bold text-emerald-700">{formatCurrency(product.totalRevenuePC)}</td>
                       <td className="border border-slate-200 px-2 py-2 text-center">
-                        <button
-                          onClick={() => openModal(product)}
-                          className="inline-flex items-center justify-center rounded-lg p-1.5 text-blue-600 transition hover:bg-blue-50 hover:text-blue-800"
-                          title="ดูรายละเอียด"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </button>
+                        <PerformanceBadge rank={rank} />
                       </td>
                     </tr>
 
@@ -1241,9 +1584,10 @@ export default function ProductSalesReportPageClient({
           </div>
         ) : (
           <>
-            {report.products.map((product) => {
+            {report.products.map((product, productIndex) => {
               const isExpanded = expandedProducts.has(product.productKey);
               const hasStores = product.storeBreakdown && product.storeBreakdown.length > 0;
+              const rank = productIndex + 1;
 
               return (
                 <div key={product.productKey} className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -1254,13 +1598,7 @@ export default function ProductSalesReportPageClient({
                         <h3 className="font-semibold text-sm truncate">{product.productName}</h3>
                         <p className="text-xs text-blue-100 mt-0.5">SKU: {product.productCode || "-"}</p>
                       </div>
-                      <button
-                        onClick={() => openModal(product)}
-                        className="flex-shrink-0 p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition"
-                        title="ดูรายละเอียด"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
+                      <PerformanceBadge rank={rank} />
                     </div>
                   </div>
 
@@ -1373,99 +1711,6 @@ export default function ProductSalesReportPageClient({
           </>
         )}
       </section>
-
-      {/* Drill-Down Modal */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={closeModal}>
-          <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={closeModal}
-              className="absolute right-4 top-4 text-2xl text-slate-400 hover:text-slate-600"
-            >
-              ×
-            </button>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-                <Eye className="h-5 w-5" />
-              </div>
-              <h2 className="text-xl font-bold text-slate-900">
-                {selectedProduct.productName}
-              </h2>
-            </div>
-
-            {/* Product Summary */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                <p className="text-xs text-emerald-600">รวม PC</p>
-                <p className="text-lg font-bold text-emerald-700">{formatCurrency(selectedProduct.totalRevenuePC)}</p>
-              </div>
-              <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                <p className="text-xs text-slate-600">จำนวนชิ้น</p>
-                <p className="text-lg font-bold text-slate-700">{formatNumber(selectedProduct.totalQuantity)} ชิ้น</p>
-              </div>
-            </div>
-
-            {/* Store Breakdown Table */}
-            <h3 className="text-lg font-semibold text-slate-800 mb-3">แยกตามร้าน</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-100 text-slate-600">
-                    <th className="border border-slate-200 px-3 py-2 text-left">ร้าน</th>
-                    <th className="border border-slate-200 px-3 py-2 text-center">Box</th>
-                    <th className="border border-slate-200 px-3 py-2 text-center">Pack</th>
-                    <th className="border border-slate-200 px-3 py-2 text-center">Piece</th>
-                    <th className="border border-slate-200 px-3 py-2 text-right">รวม</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedProduct.storeBreakdown.map((store) => (
-                    <tr key={store.storeName} className="hover:bg-slate-50">
-                      <td className="border border-slate-200 px-3 py-2 font-medium">{store.storeName}</td>
-                      <td className="border border-slate-200 px-3 py-2 text-center text-xs">
-                        {store.unitData.box.quantity > 0 ? (
-                          <>
-                            {store.unitData.box.quantity}
-                            <br />
-                            <span className="text-emerald-600">{formatShort(store.unitData.box.revenuePC)}</span>
-                          </>
-                        ) : "-"}
-                      </td>
-                      <td className="border border-slate-200 px-3 py-2 text-center text-xs">
-                        {store.unitData.pack.quantity > 0 ? (
-                          <>
-                            {store.unitData.pack.quantity}
-                            <br />
-                            <span className="text-emerald-600">{formatShort(store.unitData.pack.revenuePC)}</span>
-                          </>
-                        ) : "-"}
-                      </td>
-                      <td className="border border-slate-200 px-3 py-2 text-center text-xs">
-                        {store.unitData.piece.quantity > 0 ? (
-                          <>
-                            {store.unitData.piece.quantity}
-                            <br />
-                            <span className="text-emerald-600">{formatShort(store.unitData.piece.revenuePC)}</span>
-                          </>
-                        ) : "-"}
-                      </td>
-                      <td className="border border-slate-200 px-3 py-2 text-right font-bold">{formatCurrency(store.totalRevenuePC)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <button
-              onClick={closeModal}
-              className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
-            >
-              ปิด
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

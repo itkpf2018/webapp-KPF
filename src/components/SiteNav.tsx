@@ -45,6 +45,12 @@ type NavLink = {
 
 const ATTENDANCE_DROPDOWN: DropdownItem[] = [
   {
+    label: "ลงเวลา",
+    href: "/",
+    icon: Clock,
+    requiredRole: ['employee', 'sales', 'admin', 'super_admin']
+  },
+  {
     label: "จัดการการลา",
     href: "/admin/settings?section=leaves",
     icon: CalendarCheck2,
@@ -332,19 +338,19 @@ export default function SiteNav() {
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl text-base font-semibold shadow-lg ${
+            className={`inline-flex h-16 w-16 items-center justify-center rounded-xl text-lg font-semibold ${
               hasCustomLogo
-                ? "border border-blue-100 bg-white text-blue-600"
-                : "bg-gradient-to-br from-blue-600 via-indigo-500 to-sky-500 text-white"
+                ? "bg-transparent text-blue-600"
+                : "bg-gradient-to-br from-blue-600 via-indigo-500 to-sky-500 text-white shadow-lg"
             }`}
           >
             {hasCustomLogo && logoSrc ? (
               <Image
                 src={logoSrc}
                 alt="KPFoods logo"
-                width={44}
-                height={44}
-                className="h-11 w-11 rounded-2xl object-cover"
+                width={64}
+                height={64}
+                className="h-16 w-16 object-contain"
                 priority
               />
             ) : (
