@@ -250,7 +250,7 @@ function buildCsv(report: ReportData) {
     }
   });
   const all = [headers, ...rows];
-  return all.map((cols) =>
+  const csvContent = all.map((cols) =>
     cols
       .map((value) => {
         if (value === null || value === undefined) return "";
@@ -260,6 +260,9 @@ function buildCsv(report: ReportData) {
       })
       .join(","),
   ).join("\r\n");
+
+  // เพิ่ม BOM (Byte Order Mark) เพื่อให้ Excel รู้ว่าเป็น UTF-8
+  return "\uFEFF" + csvContent;
 }
 
 function buildExcelXml(report: ReportData) {
@@ -638,7 +641,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
     if (state.status !== "success" || !state.data) return;
 
     // Supervisor signature should always be blank
-    const supervisorSignatureName = "";
+    const _supervisorSignatureName = "";
 
     // Fetch all months data for printing
     const allMonthsData: Array<{ month: MonthInfo; rows: ReportRow[] }> = [];
@@ -749,12 +752,21 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: #e2e8f0;
+      border-radius: 8px;
+      padding: 8px;
     }
 
     .company-logo img {
       width: 100%;
       height: 100%;
       object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .company-logo img[data-loaded="true"] {
+      opacity: 1;
     }
 
     .company-info h1 {
@@ -928,7 +940,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
     <header>
       <div class="company-info">
         <div class="company-logo">
-          <img src="${logoUrl}" alt="โลโก้บริษัท" />
+          <img src="${logoUrl}" alt="โลโก้บริษัท" onload="this.setAttribute('data-loaded', 'true')" />
         </div>
         <div>
           <h1>บริษัทเคพีฟู้ดส์ จำกัด</h1>
@@ -1304,7 +1316,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-600">พนักงาน *</label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.employeeId}
               onChange={(event) => handleChange("employeeId", event.target.value)}
               disabled={toolbarDisabled}
@@ -1320,7 +1332,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-600">ร้านค้า</label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.storeId}
               onChange={(event) => handleChange("storeId", event.target.value)}
               disabled={toolbarDisabled}
@@ -1528,7 +1540,7 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
             <>
               <header className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
+                  <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-2">
                     <Image
                       src={displayLogo}
                       alt="โลโก้บริษัท"
@@ -1537,6 +1549,8 @@ export default function ReportPageClient({ initialEmployees, initialStores }: Pr
                       className="object-contain"
                       priority
                       unoptimized={displayLogo.startsWith("http")}
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E"
                     />
                   </div>
                   <div className="space-y-1">

@@ -80,7 +80,7 @@ export function ReportFilters({
       <div className="space-y-2">
         <label className="text-xs font-semibold text-slate-600">พนักงาน *</label>
         <select
-          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
           value={filters.employeeId}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             onFilterChange("employeeId", event.target.value)
@@ -98,7 +98,7 @@ export function ReportFilters({
       <div className="space-y-2">
         <label className="text-xs font-semibold text-slate-600">ร้านค้า / หน่วยงาน</label>
         <select
-          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
           value={filters.storeId}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             onFilterChange("storeId", event.target.value)
@@ -117,7 +117,7 @@ export function ReportFilters({
       <div className="space-y-2">
         <label className="text-xs font-semibold text-slate-600">เดือน</label>
         <select
-          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
           value={filters.month}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             onFilterChange("month", event.target.value)
@@ -135,7 +135,7 @@ export function ReportFilters({
       <div className="space-y-2">
         <label className="text-xs font-semibold text-slate-600">ปี (ค.ศ.)</label>
         <select
-          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
           value={filters.year}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
             onFilterChange("year", event.target.value)
@@ -156,7 +156,7 @@ export function ReportFilters({
         <label className="text-xs font-semibold text-slate-600">วันที่</label>
         <div className="flex gap-2">
           <select
-            className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
             value={filters.day}
             onChange={(event: ChangeEvent<HTMLSelectElement>) =>
               onFilterChange("day", event.target.value)

@@ -419,7 +419,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
     const metadata = reportData.metadata;
 
     // Sales comparison report is always for 1 employee, so supervisor signature should be blank
-    const supervisorSignatureName = "";
+    const _supervisorSignatureName = "";
 
     const logoUrl = getBrandingLogoUrl(
       reportData.branding?.logoPath ?? null,
@@ -446,7 +446,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
     const endMonthName = monthOptions[filters.endMonth - 1]?.label || "";
 
     // คำนวณยอดขายช่วงเดือนที่เลือก
-    const rangeTotal = products.reduce((sum, product) => {
+    const _rangeTotal = products.reduce((sum, product) => {
       return (
         sum +
         product.monthlySales
@@ -456,10 +456,10 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
     }, 0);
 
     // คำนวณผลต่างจากเดือนสุดท้ายที่เลือก
-    const lastMonthDiffAmount = products.reduce((sum, p) => sum + (p.monthlySales[filters.endMonth - 1]?.diffAmount || 0), 0);
+    const _lastMonthDiffAmount = products.reduce((sum, p) => sum + (p.monthlySales[filters.endMonth - 1]?.diffAmount || 0), 0);
     const lastMonthCurrentTotal = products.reduce((sum, p) => sum + (p.monthlySales[filters.endMonth - 1]?.totalSales || 0), 0);
     const lastMonthPrevTotal = products.reduce((sum, p) => sum + (p.monthlySales[filters.endMonth - 2]?.totalSales || 0), 0);
-    const lastMonthDiffPercent = lastMonthPrevTotal !== 0 ? ((lastMonthCurrentTotal - lastMonthPrevTotal) / lastMonthPrevTotal) * 100 : 0;
+    const _lastMonthDiffPercent = lastMonthPrevTotal !== 0 ? ((lastMonthCurrentTotal - lastMonthPrevTotal) / lastMonthPrevTotal) * 100 : 0;
 
     // สร้าง HTML สำหรับแถวข้อมูล
     const rowsHtml = products
@@ -552,12 +552,21 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: #e2e8f0;
+      border-radius: 8px;
+      padding: 8px;
     }
 
     .company-logo img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .company-logo img[data-loaded="true"] {
+      opacity: 1;
     }
 
     .company-names {
@@ -787,7 +796,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
     <header>
       <div class="header-left">
         <div class="company-logo">
-          <img src="${logoUrl}" alt="Company Logo" />
+          <img src="${logoUrl}" alt="Company Logo" onload="this.setAttribute('data-loaded', 'true')" />
         </div>
         <div class="company-names">
           <h1>บริษัทเคพีฟู้ดส์ จำกัด</h1>
@@ -1068,7 +1077,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
               พนักงาน *
             </label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.employeeId}
               onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("employeeId", event.target.value)
@@ -1088,7 +1097,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
               ร้านค้า
             </label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.storeId}
               onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("storeId", event.target.value)
@@ -1109,7 +1118,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
               ปี (พ.ศ.) *
             </label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.year}
               onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("year", parseInt(event.target.value, 10))
@@ -1129,7 +1138,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
               ตั้งแต่เดือน *
             </label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.startMonth}
               onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("startMonth", parseInt(event.target.value, 10))
@@ -1149,7 +1158,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
               ถึงเดือน *
             </label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.endMonth}
               onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                 handleChange("endMonth", parseInt(event.target.value, 10))
@@ -1204,7 +1213,7 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
           <div className="box-border flex w-full flex-col gap-4 rounded-[22px] bg-white p-6 shadow-[0_0_1px_rgba(15,23,42,0.08)] print:rounded-none print:p-[10mm] print:shadow-none">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
+                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-2">
                   <Image
                     src={displayLogo}
                     alt="โลโก้บริษัท"
@@ -1213,6 +1222,8 @@ export default function SalesComparisonPageClient({ initialEmployees, initialSto
                     className="object-contain"
                     priority
                     unoptimized={displayLogo.startsWith("http")}
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E"
                   />
                 </div>
                 <div className="space-y-1">

@@ -326,7 +326,7 @@ export async function GET(request: Request) {
 
     // Process sheet data
     let processedCount = 0;
-    dataRows.forEach((row, rowIndex) => {
+    dataRows.forEach((row,_rowIndex) => {
       const sheetRow = parseSalesSheetRow(row);
       if (!sheetRow) return;
 
@@ -549,7 +549,7 @@ export async function GET(request: Request) {
       // For detail and daily modes, push rows immediately
       // For monthly, quarterly, and yearly modes, we'll push after all days are processed
       if (!useGlobalGroups) {
-        orderedGroups.forEach((group, groupIndex) => {
+        orderedGroups.forEach((group,groupIndex) => {
 
           processedRows.push({
 
@@ -606,7 +606,7 @@ export async function GET(request: Request) {
     if (useGlobalGroups) {
       let previousPeriod = "";
 
-      globalOrderedGroups.forEach((group, groupIndex) => {
+      globalOrderedGroups.forEach((group,groupIndex) => {
         // Get the first dateIso from the group (or use the stored dateIso)
         const groupDateIso = group.dateIso || sortedDays[0] || "";
         const [yearStr, monthStr] = groupDateIso.split("-");

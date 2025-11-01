@@ -176,7 +176,7 @@ function buildCsv(report: ReportData) {
     row.avgIncomePerHour.toFixed(2),
   ]);
   const all = [headers, ...rows];
-  return all
+  const csvContent = all
     .map((cols) =>
       cols
         .map((value) => {
@@ -188,6 +188,9 @@ function buildCsv(report: ReportData) {
         .join(","),
     )
     .join("\r\n");
+
+  // เพิ่ม BOM (Byte Order Mark) เพื่อให้ Excel รู้ว่าเป็น UTF-8
+  return "\uFEFF" + csvContent;
 }
 
 function buildExcelXml(report: ReportData) {
@@ -431,7 +434,7 @@ export default function IndividualReportPageClient() {
     };
   }, [filters, ranges]);
 
-  const handleChange = (key: keyof FiltersState, value: string) => {
+  const _handleChange = (key: keyof FiltersState, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -518,7 +521,7 @@ export default function IndividualReportPageClient() {
   const handlePrint = () => {
     if (state.status !== "success" || !state.data) return;
 
-    const supervisorSignatureName = "";
+    const _supervisorSignatureName = "";
 
     // **FIX LOGO CACHE ISSUE**: Add cache busting with timestamp
     const cacheBuster = new Date().getTime();
@@ -589,12 +592,21 @@ export default function IndividualReportPageClient() {
       display: flex;
       align-items: center;
       justify-content: center;
+      background-color: #e2e8f0;
+      border-radius: 8px;
+      padding: 8px;
     }
 
     .company-logo img {
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .company-logo img[data-loaded="true"] {
+      opacity: 1;
     }
 
     .company-names h1 {
@@ -754,7 +766,7 @@ export default function IndividualReportPageClient() {
     <header>
       <div class="header-left">
         <div class="company-logo">
-          <img src="${logoUrl}" alt="โลโก้บริษัท" />
+          <img src="${logoUrl}" alt="โลโก้บริษัท" onload="this.setAttribute('data-loaded', 'true')" />
         </div>
         <div class="company-names">
           <h1>บริษัทเคพีฟู้ดส์ จำกัด</h1>
@@ -1141,7 +1153,7 @@ export default function IndividualReportPageClient() {
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">กรองสถานะ</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
                 disabled={toolbarDisabled}
@@ -1326,7 +1338,7 @@ export default function IndividualReportPageClient() {
           <div className="mx-auto box-border flex w-full flex-col gap-6 rounded-[22px] bg-white p-4 md:p-6 text-[13px] shadow-[0_0_1px_rgba(15,23,42,0.08)] print:h-auto print:gap-4 print:rounded-none print:p-[10mm] print:text-[11px] print:shadow-none">
             <header className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white p-2">
+                <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-2">
                   <Image
                     src={displayLogoWithCache}
                     alt="โลโก้บริษัท"
@@ -1335,6 +1347,8 @@ export default function IndividualReportPageClient() {
                     className="object-contain"
                     priority
                     unoptimized={displayLogo.startsWith("http")}
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E"
                   />
                 </div>
                 <div className="space-y-1">

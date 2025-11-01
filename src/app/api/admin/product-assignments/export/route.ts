@@ -4,7 +4,9 @@ import { listProductAssignments } from "@/lib/supabaseProducts";
 import {
   exportAssignmentsCsv,
   exportAssignmentsExcel,
+  exportAssignmentsExcelSimple,
   type AssignmentExportRow,
+  type MasterDataForExport,
 } from "@/lib/assignmentImportExport";
 
 export const runtime = "nodejs";
@@ -12,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 type ExportFormat = "csv" | "excel";
 type EmployeeRow = { id: string; name: string; employee_code: string | null };
-type StoreRow = { id: string; name: string };
+type StoreRow = { id: string; name: string; province: string | null };
 
 /**
  * GET /api/admin/product-assignments/export
@@ -48,15 +50,31 @@ export async function GET(request: Request): Promise<Response> {
     }
 
     // Fetch assignments based on filters
-    const assignments = await listProductAssignments({
+    const allAssignments = await listProductAssignments({
       employeeId,
       storeId: storeId === "" ? null : storeId,
       onlyActiveUnits: false, // Export all units including inactive ones
     });
 
+    // Filter out assignments with no units (incomplete data)
+    const assignments = allAssignments.filter(assignment => assignment.units.length > 0);
+
+    if (allAssignments.length > assignments.length) {
+      const skippedCount = allAssignments.length - assignments.length;
+      console.warn(
+        `[export-assignments] Skipped ${skippedCount} assignments with no units. ` +
+        `These assignments need to be edited to add unit prices.`
+      );
+    }
+
     if (assignments.length === 0) {
       return NextResponse.json(
-        { ok: false, message: "ไม่มีข้อมูลการผูกสินค้าที่ต้องการส่งออก" },
+        {
+          ok: false,
+          message: allAssignments.length > 0
+            ? "การผูกสินค้าทั้งหมดยังไม่มีข้อมูลหน่วยและราคา กรุณาแก้ไขการผูกสินค้าเพื่อเพิ่มข้อมูลก่อน export"
+            : "ไม่มีข้อมูลการผูกสินค้าที่ต้องการส่งออก"
+        },
         { status: 404 }
       );
     }
@@ -78,10 +96,15 @@ export async function GET(request: Request): Promise<Response> {
       )
     );
 
-    const [employeesResult, storesResult, unitsResult] = await Promise.all([
+    // Fetch employees, stores, units to build export rows
+    const [
+      employeesResult,
+      storesResult,
+      unitsResult,
+    ] = await Promise.all([
       supabase.from("employees").select("id, name, employee_code").in("id", employeeIds),
       storeIds.length > 0
-        ? supabase.from("stores").select("id, name").in("id", storeIds)
+        ? supabase.from("stores").select("id, name, province").in("id", storeIds)
         : Promise.resolve({ data: [], error: null }),
       unitIds.length > 0
         ? supabase.from("product_units").select("id, sku").in("id", unitIds)
@@ -126,6 +149,18 @@ export async function GET(request: Request): Promise<Response> {
     const storeById = new Map(stores.map((store) => [store.id, store.name]));
     const unitSkuById = new Map(units.map((unit) => [unit.id, unit.sku || ""]));
 
+    // Debug logging
+    console.log("[export-assignments] Debug info:");
+    console.log("- Total assignments:", assignments.length);
+    console.log("- Employees map size:", employeeById.size);
+    console.log("- Stores map size:", storeById.size);
+    console.log("- Units map size:", unitSkuById.size);
+    if (assignments.length > 0) {
+      console.log("- First assignment sample:", JSON.stringify(assignments[0], null, 2));
+    }
+    console.log("- Employee IDs in map:", Array.from(employeeById.keys()));
+    console.log("- Store IDs in map:", Array.from(storeById.keys()));
+
     // Transform assignments to export rows (one row per unit)
     const exportRows: AssignmentExportRow[] = [];
 
@@ -133,6 +168,7 @@ export async function GET(request: Request): Promise<Response> {
       const employee = employeeById.get(assignment.employeeId);
       if (!employee) {
         console.warn(`[export-assignments] Employee not found: ${assignment.employeeId}`);
+        console.warn(`[export-assignments] Available employee IDs:`, Array.from(employeeById.keys()));
         continue;
       }
 
@@ -176,7 +212,8 @@ export async function GET(request: Request): Promise<Response> {
 
     // Export based on format
     if (format === "excel") {
-      const buffer = await exportAssignmentsExcel(exportRows);
+      // Use simple Excel export (no dropdowns, no formulas, no master data)
+      const buffer = await exportAssignmentsExcelSimple(exportRows);
       const filename = `${fileBaseName}.xlsx`;
 
       return new Response(buffer, {

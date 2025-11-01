@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getBrandingLogoSrc } from "@/lib/branding";
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { CartesianGrid, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, ReferenceLine, TooltipProps } from "recharts";
-import { TrendingUp, DollarSign, TrendingDown, Clock, Award, Package, Users, BarChart3, Target, CreditCard } from "lucide-react";
-import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
+import { CartesianGrid, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { TrendingUp, DollarSign, TrendingDown, Award, BarChart3, Target, CreditCard } from "lucide-react";
+import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 type EmployeeOption = {
   id: string;
@@ -658,7 +658,7 @@ export default function RoiReportPageClient({ initialEmployees }: Props) {
             {/* Header Section */}
             <header className="flex items-start justify-between border-b border-slate-200 pb-6 print:pb-3 print:mb-3 print:border-b print:border-slate-300 print-card">
               <div className="flex items-center gap-4">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 rounded-xl bg-slate-100 p-2">
                   <Image
                     src={displayLogoWithCache}
                     alt="Logo"
@@ -667,6 +667,8 @@ export default function RoiReportPageClient({ initialEmployees }: Props) {
                     className="object-contain"
                     priority
                     unoptimized={displayLogo.startsWith("http")}
+                    placeholder="blur"
+                    blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E"
                   />
                 </div>
                 <div>

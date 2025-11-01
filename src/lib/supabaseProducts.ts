@@ -309,6 +309,16 @@ export async function listProductAssignments({
       .in("assignment_id", assignmentIds),
   ]);
 
+  // Debug logging
+  console.log("[listProductAssignments] Debug:");
+  console.log("- Assignment IDs count:", assignmentIds.length);
+  console.log("- Product rows count:", productRows?.length ?? 0);
+  console.log("- Unit rows count:", unitRows?.length ?? 0);
+  console.log("- Assignment unit rows count:", assignmentUnitRows?.length ?? 0);
+  if (assignmentUnitRows && assignmentUnitRows.length > 0) {
+    console.log("- First assignment unit sample:", assignmentUnitRows[0]);
+  }
+
   const productsById = new Map<string, ProductRow>(
     (productRows ?? []).map((row: ProductRow) => [row.id, row])
   );
@@ -320,9 +330,15 @@ export async function listProductAssignments({
   const assignmentUnits: ProductAssignmentUnitRow[] = assignmentUnitRows ?? [];
 
   for (const entry of assignmentUnits) {
-    if (onlyActiveUnits && !entry.is_active) continue;
+    if (onlyActiveUnits && !entry.is_active) {
+      console.log(`[listProductAssignments] Skipping inactive unit: ${entry.id}`);
+      continue;
+    }
     const unitRow = unitsById.get(entry.unit_id);
-    if (!unitRow) continue;
+    if (!unitRow) {
+      console.warn(`[listProductAssignments] Unit not found in unitsById: ${entry.unit_id}`);
+      continue;
+    }
     const list = assignmentUnitsByAssignment.get(entry.assignment_id) ?? [];
     list.push({
       assignmentUnitId: entry.id,
@@ -334,6 +350,8 @@ export async function listProductAssignments({
     });
     assignmentUnitsByAssignment.set(entry.assignment_id, list);
   }
+
+  console.log("[listProductAssignments] Assignment units map size:", assignmentUnitsByAssignment.size);
 
   return assignmentRows.map((assignment: { id: string; product_id: string; employee_id: string; store_id: string | null }) => {
     const product = productsById.get(assignment.product_id);

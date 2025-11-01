@@ -209,7 +209,7 @@ export default function RoiReportPageClient({ initialEmployees }: Props) {
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-600">พนักงาน *</label>
             <select
-              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
               value={filters.employeeId}
               onChange={(event: ChangeEvent<HTMLSelectElement>) => handleChange("employeeId", event.target.value)}
               disabled={toolbarDisabled}

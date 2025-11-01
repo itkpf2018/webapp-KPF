@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { getBrandingLogoSrc } from "@/lib/branding";
 import { useAuth } from "@/contexts/AuthContext";
+import { useModal } from "@/contexts/ModalContext";
 import type { UserRole } from "@/types/auth";
 import {
   Clock,
@@ -173,6 +174,7 @@ const NAV_LINKS: NavLink[] = [
 export default function SiteNav() {
   const pathname = usePathname();
   const { user, logout, hasRole } = useAuth();
+  const { isModalOpen } = useModal();
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [logoSrc, setLogoSrc] = useState<string | null>(null);
@@ -333,7 +335,7 @@ export default function SiteNav() {
   }, []);
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-[100] bg-gradient-to-br from-[#eef5ff]/95 via-[#e9f1ff]/95 to-[#f8fbff]/95 px-4 pb-4 pt-4 backdrop-blur-md sm:px-6 lg:px-8">
+    <header className={`${isModalOpen ? 'relative z-10' : 'fixed z-[100]'} left-0 right-0 top-0 bg-gradient-to-br from-[#eef5ff]/95 via-[#e9f1ff]/95 to-[#f8fbff]/95 px-4 pb-4 pt-4 backdrop-blur-md sm:px-6 lg:px-8`}>
       <nav className="mx-auto flex max-w-[1600px] items-center justify-between rounded-[28px] border border-white/70 bg-white/90 px-4 py-3 shadow-[0_30px_110px_-90px_rgba(37,99,235,0.9)] backdrop-blur-xl transition-all duration-300">
         <div className="flex items-center gap-3">
           <Link

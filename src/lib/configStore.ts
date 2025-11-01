@@ -258,6 +258,15 @@ export type LogEntry = {
   message: string;
   timestamp: string;
   meta?: Record<string, unknown>;
+  // Enhanced tracking fields
+  userId?: string;
+  userName?: string;
+  userRole?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  device?: string;
+  browser?: string;
+  location?: string;
 };
 
 type AppData = {
@@ -2644,15 +2653,85 @@ function resolveDashboardFilters(
 export async function getDashboardSnapshot() {
   const data = await readData();
   const now = new Date();
-  const { attendanceRecords, salesRecords } = collectDashboardRecords(
-    data.logs,
-    DASHBOARD_TIME_ZONE,
-  );
 
+  // Define time periods
   const currentPeriodEnd = now;
   const currentPeriodStart = new Date(currentPeriodEnd.getTime() - DASHBOARD_LOOKBACK_DAYS * DAY_IN_MS);
   const previousPeriodEnd = currentPeriodStart;
   const previousPeriodStart = new Date(previousPeriodEnd.getTime() - DASHBOARD_LOOKBACK_DAYS * DAY_IN_MS);
+
+  // Try to fetch from Supabase first
+  let attendanceRecords: DashboardAttendanceRecord[] = [];
+  let salesRecords: DashboardSalesRecord[] = [];
+  let useSupabase = false;
+
+  try {
+    const supabase = getSupabaseServiceClient();
+
+    // Fetch attendance records from Supabase
+    const startDateIso = formatIsoDay(previousPeriodStart, DASHBOARD_TIME_ZONE);
+    const endDateIso = formatIsoDay(currentPeriodEnd, DASHBOARD_TIME_ZONE);
+
+    const [attendanceResponse, salesResponse] = await Promise.all([
+      supabase
+        .from("attendance_records")
+        .select("recorded_date, recorded_time, status, employee_name, store_name")
+        .gte("recorded_date", startDateIso)
+        .lte("recorded_date", endDateIso)
+        .order("recorded_date", { ascending: true }),
+      supabase
+        .from("sales_records")
+        .select("recorded_date, recorded_time, employee_name, store_name, product_name, product_code, quantity, total")
+        .gte("recorded_date", startDateIso)
+        .lte("recorded_date", endDateIso)
+        .order("recorded_date", { ascending: true })
+    ]);
+
+    if (!attendanceResponse.error && !salesResponse.error) {
+      useSupabase = true;
+
+      // Convert Supabase attendance records to dashboard format
+      attendanceRecords = (attendanceResponse.data ?? []).map(record => {
+        const timestamp = new Date(`${record.recorded_date}T${record.recorded_time}`);
+        const parts = getZonedDateParts(timestamp, DASHBOARD_TIME_ZONE);
+        return {
+          timestamp,
+          dayKey: getDayKey(parts),
+          storeName: record.store_name ?? "ไม่ระบุ",
+          employeeName: record.employee_name ?? "ไม่ระบุ",
+          status: (record.status?.toLowerCase() === "check-out" ? "check-out" : "check-in") as "check-in" | "check-out",
+          parts,
+        };
+      });
+
+      // Convert Supabase sales records to dashboard format
+      salesRecords = (salesResponse.data ?? []).map(record => {
+        const timestamp = new Date(`${record.recorded_date}T${record.recorded_time}`);
+        const parts = getZonedDateParts(timestamp, DASHBOARD_TIME_ZONE);
+        return {
+          timestamp,
+          dayKey: getDayKey(parts),
+          storeName: record.store_name ?? "ไม่ระบุ",
+          employeeName: record.employee_name ?? "ไม่ระบุ",
+          productName: record.product_name ?? "ไม่ระบุ",
+          productCode: record.product_code ?? "",
+          total: record.total ?? 0,
+          quantity: record.quantity ?? 0,
+          status: "completed",
+          parts,
+        };
+      });
+    }
+  } catch (error) {
+    console.error("[getDashboardSnapshot] Error fetching from Supabase, falling back to logs:", error);
+  }
+
+  // Fallback to logs if Supabase failed
+  if (!useSupabase) {
+    const logsData = collectDashboardRecords(data.logs, DASHBOARD_TIME_ZONE);
+    attendanceRecords = logsData.attendanceRecords;
+    salesRecords = logsData.salesRecords;
+  }
 
   const currentAttendance = attendanceRecords.filter(
     (record) => record.timestamp >= currentPeriodStart && record.timestamp < currentPeriodEnd,
@@ -2999,11 +3078,80 @@ export async function getDashboardMetrics(
 ): Promise<DashboardMetrics> {
   const data = await readData();
   const now = new Date();
-  const { attendanceRecords, salesRecords } = collectDashboardRecords(
-    data.logs,
-    DASHBOARD_TIME_ZONE,
-  );
   const resolved = resolveDashboardFilters(options, now, DASHBOARD_TIME_ZONE);
+
+  // Try to fetch from Supabase first
+  let attendanceRecords: DashboardAttendanceRecord[] = [];
+  let salesRecords: DashboardSalesRecord[] = [];
+  let useSupabase = false;
+
+  try {
+    const supabase = getSupabaseServiceClient();
+
+    // Fetch from Supabase within the resolved date range
+    const startDateIso = formatIsoDay(resolved.rangeStart, DASHBOARD_TIME_ZONE);
+    const endDateIso = formatIsoDay(resolved.rangeEnd, DASHBOARD_TIME_ZONE);
+
+    const [attendanceResponse, salesResponse] = await Promise.all([
+      supabase
+        .from("attendance_records")
+        .select("recorded_date, recorded_time, status, employee_name, store_name")
+        .gte("recorded_date", startDateIso)
+        .lte("recorded_date", endDateIso)
+        .order("recorded_date", { ascending: true }),
+      supabase
+        .from("sales_records")
+        .select("recorded_date, recorded_time, employee_name, store_name, product_name, product_code, quantity, total")
+        .gte("recorded_date", startDateIso)
+        .lte("recorded_date", endDateIso)
+        .order("recorded_date", { ascending: true })
+    ]);
+
+    if (!attendanceResponse.error && !salesResponse.error) {
+      useSupabase = true;
+
+      // Convert Supabase attendance records to dashboard format
+      attendanceRecords = (attendanceResponse.data ?? []).map(record => {
+        const timestamp = new Date(`${record.recorded_date}T${record.recorded_time}`);
+        const parts = getZonedDateParts(timestamp, DASHBOARD_TIME_ZONE);
+        return {
+          timestamp,
+          dayKey: getDayKey(parts),
+          storeName: record.store_name ?? "ไม่ระบุ",
+          employeeName: record.employee_name ?? "ไม่ระบุ",
+          status: (record.status?.toLowerCase() === "check-out" ? "check-out" : "check-in") as "check-in" | "check-out",
+          parts,
+        };
+      });
+
+      // Convert Supabase sales records to dashboard format
+      salesRecords = (salesResponse.data ?? []).map(record => {
+        const timestamp = new Date(`${record.recorded_date}T${record.recorded_time}`);
+        const parts = getZonedDateParts(timestamp, DASHBOARD_TIME_ZONE);
+        return {
+          timestamp,
+          dayKey: getDayKey(parts),
+          storeName: record.store_name ?? "ไม่ระบุ",
+          employeeName: record.employee_name ?? "ไม่ระบุ",
+          productName: record.product_name ?? "ไม่ระบุ",
+          productCode: record.product_code ?? "",
+          total: record.total ?? 0,
+          quantity: record.quantity ?? 0,
+          status: "completed",
+          parts,
+        };
+      });
+    }
+  } catch (error) {
+    console.error("[getDashboardMetrics] Error fetching from Supabase, falling back to logs:", error);
+  }
+
+  // Fallback to logs if Supabase failed
+  if (!useSupabase) {
+    const logsData = collectDashboardRecords(data.logs, DASHBOARD_TIME_ZONE);
+    attendanceRecords = logsData.attendanceRecords;
+    salesRecords = logsData.salesRecords;
+  }
 
   const storeFilter = resolved.applied.store
     ? resolved.applied.store.toLocaleLowerCase("th")

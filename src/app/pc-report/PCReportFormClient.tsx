@@ -13,7 +13,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import SiteNav from "@/components/SiteNav";
 import ShelfPhotosSection, {
   type ShelfPhoto,
@@ -538,7 +538,7 @@ export default function PCReportFormClient({
     }
   };
 
-  const selectedEmployee = employees.find((e) => e.id === formState.employeeId);
+  const _selectedEmployee = employees.find((e) => e.id === formState.employeeId);
   const availableStores = formState.employeeId
     ? employeeStoresQuery.data || []
     : stores;

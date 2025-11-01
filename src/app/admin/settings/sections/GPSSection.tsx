@@ -71,7 +71,7 @@ export default function GPSSection() {
     setErrorMessage(null);
     try {
       await saveMutation.mutateAsync(isEnabled);
-    } catch (err) {
+    } catch (_err) {
       // Error handled by mutation
     } finally {
       setIsSaving(false);

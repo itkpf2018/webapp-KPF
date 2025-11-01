@@ -118,7 +118,7 @@ export default function Home() {
   const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false);
   const [assignedStores, setAssignedStores] = useState<StoreOption[]>([]);
   const [isLoadingAssignedStores, setIsLoadingAssignedStores] = useState(false);
-  const { gpsRequired, isLoading: isLoadingGPSSettings } = useGPSRequired();
+  const { gpsRequired, isLoading: _isLoadingGPSSettings } = useGPSRequired();
   const selectedEmployee = useMemo(() => {
     if (!selectedEmployeeId) return null;
     return employees.find((employee) => employee.id === selectedEmployeeId) ?? null;
@@ -379,6 +379,7 @@ export default function Home() {
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEmployeeId, stores]);
 
   const handleSubmit = useCallback(

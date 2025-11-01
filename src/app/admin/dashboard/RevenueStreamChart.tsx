@@ -34,7 +34,7 @@ export default function RevenueStreamChart({ metrics }: RevenueStreamChartProps)
 
   // SSR-safe responsive state
   const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
+  const [_isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     // Only run on client-side after hydration

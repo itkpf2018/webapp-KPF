@@ -255,7 +255,7 @@ export async function DELETE(
     await removeEmployeeStoreAssignment(employeeId, storeId);
 
     // Update legacy default_store_id if the removed store was the primary one
-    const remainingAssignments = await getEmployeeStoreAssignments(employeeId);
+    const _remainingAssignments = await getEmployeeStoreAssignments(employeeId);
     // DISABLED: employees table is not in type definitions, causing build errors
     // TODO: Re-enable once employees table is added to Supabase types
     /*

@@ -1119,6 +1119,60 @@ export type Database = {
         }
         Relationships: []
       }
+      support_messages: {
+        Row: {
+          admin_notes: string | null
+          context_url: string | null
+          context_user_agent: string | null
+          created_at: string
+          id: string
+          message: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+          submitted_at: string
+          type: string
+          updated_at: string
+          user_id: string | null
+          user_name: string
+          user_role: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          context_url?: string | null
+          context_user_agent?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          submitted_at: string
+          type: string
+          updated_at?: string
+          user_id?: string | null
+          user_name: string
+          user_role?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          context_url?: string | null
+          context_user_agent?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+          submitted_at?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+          user_name?: string
+          user_role?: string | null
+        }
+        Relationships: []
+      }
       user_pins: {
         Row: {
           created_at: string

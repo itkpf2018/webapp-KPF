@@ -729,7 +729,7 @@ export default function StockMovementReportClient({
               <label className="text-xs font-semibold text-slate-600">วันที่เริ่มต้น</label>
               <input
                 type="date"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.start_date}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handleChange("start_date", event.target.value)
@@ -742,7 +742,7 @@ export default function StockMovementReportClient({
               <label className="text-xs font-semibold text-slate-600">วันที่สิ้นสุด</label>
               <input
                 type="date"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.end_date}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handleChange("end_date", event.target.value)
@@ -755,7 +755,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">พนักงาน</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.employee_id}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("employee_id", event.target.value)
@@ -775,7 +775,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">ร้านค้า</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.store_id}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("store_id", event.target.value)
@@ -795,7 +795,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">สินค้า</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.product_id}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("product_id", event.target.value)
@@ -815,7 +815,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">หน่วย</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 value={filters.unit_id}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("unit_id", event.target.value)
@@ -835,7 +835,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">ประเภท</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.transaction_type}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("transaction_type", event.target.value)
@@ -854,7 +854,7 @@ export default function StockMovementReportClient({
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-600">จำนวนรายการต่อหน้า</label>
               <select
-                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-400 focus:outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-400 focus:outline-none"
                 value={filters.limit}
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
                   handleChange("limit", event.target.value)

@@ -4,35 +4,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import {
-  Archive,
-  Box,
-  TrendingUp,
   Award,
-  BarChart3,
   PieChart,
-  Target,
-  DollarSign,
   Download,
   FileSpreadsheet,
   Printer,
   ChevronDown,
   ChevronRight,
   Package,
-  TrendingDown,
-  Minus,
-  ArrowUp,
-  ArrowDown,
-  Zap,
   Crown,
   Star,
   Shield,
   Building2,
-  Briefcase,
-  LineChart,
   BarChart4,
   Calculator,
   Banknote,
-  Wallet,
   FileBarChart
 } from "lucide-react";
 import { getBrandingLogoSrc, getBrandingLogoUrl } from "@/lib/branding";
@@ -177,7 +163,7 @@ function buildCsv(report: ProductSalesReport) {
   ]);
 
   const all = [headers, ...rows];
-  return all
+  const csvContent = all
     .map((cols) =>
       cols
         .map((value) => {
@@ -189,6 +175,9 @@ function buildCsv(report: ProductSalesReport) {
         .join(","),
     )
     .join("\r\n");
+
+  // เพิ่ม BOM (Byte Order Mark) เพื่อให้ Excel รู้ว่าเป็น UTF-8
+  return "\uFEFF" + csvContent;
 }
 
 function buildExcelXml(report: ProductSalesReport) {
@@ -297,7 +286,7 @@ export default function ProductSalesReportPageClient({
   const searchParams = useSearchParams();
 
   const [report, setReport] = useState<ProductSalesReport>(initialReport);
-  const [selectedProduct, setSelectedProduct] = useState<ProductSalesReport["products"][number] | null>(null);
+  const [_selectedProduct, setSelectedProduct] = useState<ProductSalesReport["products"][number] | null>(null);
   const [expandedProducts, setExpandedProducts] = useState<Set<string>>(new Set());
 
   // Initialize selectedEmployeeIds from URL or initial report
@@ -452,7 +441,7 @@ export default function ProductSalesReportPageClient({
 
   const clearEmployees = () => setSelectedEmployeeIds([]);
 
-  const selectedEmployeeNames =
+  const _selectedEmployeeNames =
     selectedEmployeeIds.length > 0
       ? report.filters.employees.map((item) => item.name).join(", ")
       : "ทั้งหมด";
@@ -659,7 +648,8 @@ export default function ProductSalesReportPageClient({
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #fff;
+      background-color: #e2e8f0;
+      border-radius: 8px;
       padding: 8px;
     }
 
@@ -667,6 +657,12 @@ export default function ProductSalesReportPageClient({
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.2s ease-in-out;
+    }
+
+    .company-logo img[data-loaded="true"] {
+      opacity: 1;
     }
 
     .company-names h1 {
@@ -840,7 +836,7 @@ export default function ProductSalesReportPageClient({
     <header>
       <div class="header-left">
         <div class="company-logo">
-          ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ""}
+          ${logoUrl ? `<img src="${logoUrl}" alt="Logo" onload="this.setAttribute('data-loaded', 'true')" />` : ""}
         </div>
         <div class="company-names">
           <h1>รายงานยอดขายรายสินค้า</h1>
@@ -973,7 +969,7 @@ export default function ProductSalesReportPageClient({
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               {/* Logo - Clear and Prominent (no border) - Increased size for better visibility */}
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 rounded-xl bg-slate-100 p-2">
                 <Image
                   src={displayLogoWithCache}
                   alt="Company Logo"
@@ -981,6 +977,8 @@ export default function ProductSalesReportPageClient({
                   height={96}
                   className="object-contain"
                   priority
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e2e8f0'/%3E%3C/svg%3E"
                 />
               </div>
               <div className="space-y-1">
@@ -1298,7 +1296,7 @@ export default function ProductSalesReportPageClient({
                 <input
                   type="date"
                   value={draftRange.start}
-                  className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+                  className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none"
                   onChange={(event) =>
                     setDraftRange((prev) => ({ ...prev, start: event.target.value }))
                   }
@@ -1310,7 +1308,7 @@ export default function ProductSalesReportPageClient({
                   type="date"
                   value={draftRange.end}
                   min={draftRange.start}
-                  className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+                  className="mt-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none"
                   onChange={(event) =>
                     setDraftRange((prev) => ({ ...prev, end: event.target.value || prev.start }))
                   }

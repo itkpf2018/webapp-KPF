@@ -16,6 +16,7 @@ import { haversineDistance } from "@/lib/geo";
 import { useGeoPermission } from "@/lib/useGeoPermission";
 import { useGPSRequired } from "@/hooks/useGPSRequired";
 import { useAuth } from "@/contexts/AuthContext";
+import { useModal } from "@/contexts/ModalContext";
 import type { ProductAssignment } from "@/lib/supabaseProducts";
 import { Plus, Info } from "lucide-react";
 
@@ -109,6 +110,7 @@ function createLineItem(): SalesLineItem {
 }
 export default function SalesPage() {
   const { user } = useAuth();
+  const { openModal, closeModal } = useModal();
   const isReadOnly = user?.role === 'sales';
 
   const [formState, setFormState] = useState({
@@ -137,9 +139,9 @@ export default function SalesPage() {
   const [lineItems, setLineItems] = useState<SalesLineItem[]>(() => [createLineItem()]);
   const [assignedStores, setAssignedStores] = useState<StoreOption[]>([]);
   const [isLoadingAssignedStores, setIsLoadingAssignedStores] = useState(false);
-  const { gpsRequired, isLoading: isLoadingGPSSettings } = useGPSRequired();
+  const { gpsRequired, isLoading: _isLoadingGPSSettings } = useGPSRequired();
   const [stockInventory, setStockInventory] = useState<StockInventoryItem[]>([]);
-  const [isLoadingStockInventory, setIsLoadingStockInventory] = useState(false);
+  const [_isLoadingStockInventory, setIsLoadingStockInventory] = useState(false);
 
   // Mobile bottom sheet state
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -149,6 +151,15 @@ export default function SalesPage() {
       prev.status === "error" || prev.status === "success" ? { status: "idle" } : prev,
     );
   }, []);
+
+  // Sync modal state with ModalContext
+  useEffect(() => {
+    if (isAddProductModalOpen) {
+      openModal();
+    } else {
+      closeModal();
+    }
+  }, [isAddProductModalOpen, openModal, closeModal]);
 
   useEffect(() => {
     locationStateRef.current = locationState;
@@ -617,7 +628,7 @@ export default function SalesPage() {
 
   const canSubmit = selectedLines.length > 0 && hasEmployees && hasStores && !hasAnyStockError;
 
-  const handleSelectProduct = useCallback(
+  const _handleSelectProduct = useCallback(
     (lineId: string, assignmentId: string) => {
       setLineItems((prev) =>
         prev.map((line) => {
@@ -645,7 +656,7 @@ export default function SalesPage() {
     [productMap],
   );
 
-  const handleUnitQuantityChange = useCallback(
+  const _handleUnitQuantityChange = useCallback(
     (lineId: string, assignmentUnitId: string, quantity: string) => {
       setLineItems((prev) =>
         prev.map((line) =>
@@ -661,7 +672,7 @@ export default function SalesPage() {
     [],
   );
 
-  const handleAddLineItem = useCallback(() => {
+  const _handleAddLineItem = useCallback(() => {
     setLineItems((prev) => [...prev, createLineItem()]);
   }, []);
 

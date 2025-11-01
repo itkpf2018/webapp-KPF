@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   TrendingUp,
   Users,
@@ -15,10 +15,13 @@ import {
   BarChart3,
   ArrowUp,
   ArrowDown,
-  Zap
+  Zap,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import type { DashboardMetrics } from "@/lib/configStore";
 import dynamic from "next/dynamic";
+import { useSupabaseRealtime } from "@/hooks/useSupabaseRealtime";
 
 // Dynamic imports for heavy components
 const ThailandStoreMap = dynamic(() => import("./dashboard/ThailandStoreMap"), {
@@ -165,38 +168,55 @@ const numberFormatter = new Intl.NumberFormat("th-TH");
 export default function EnterpriseDashboardClient({
   snapshot,
   initialMetrics,
-  employees,
   stores,
 }: EnterpriseDashboardClientProps) {
-  const [metrics, setMetrics] = useState<DashboardMetrics>(initialMetrics);
-  const [isLoading, setIsLoading] = useState(false);
-  const [realtimeRevenue, setRealtimeRevenue] = useState(snapshot.kpis.sales.value);
+  const [metrics] = useState<DashboardMetrics>(initialMetrics);
+  const [realtimeRevenue] = useState(snapshot.kpis.sales.value);
   const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [showRealtimeNotification, setShowRealtimeNotification] = useState(false);
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+  const router = useRouter();
 
-  // Simulate real-time updates (in production, use SSE or WebSocket)
+  // Refetch dashboard data when realtime event occurs
+  const refetchDashboard = useCallback(async () => {
+    try {
+      // Show notification
+      setShowRealtimeNotification(true);
+      setTimeout(() => setShowRealtimeNotification(false), 3000);
+
+      // Refresh the page data using Next.js router
+      router.refresh();
+
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('[Dashboard] Failed to refetch:', error);
+    }
+  }, [router]);
+
+  // Try Supabase Realtime first, fallback to polling
+  const { isConnected } = useSupabaseRealtime({
+    onSalesInsert: refetchDashboard,
+    onAttendanceInsert: refetchDashboard,
+    enabled: true,
+  });
+
+  // Fallback: Polling every 10 seconds if Realtime is not connected
+  // (Realtime requires Supabase Pro plan, so we use polling for Free tier)
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch('/api/admin/dashboard');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.metrics) {
-            // Update full metrics to refresh all dashboard KPIs
-            setMetrics(data.metrics);
-            setLastUpdate(new Date());
-            // Also update realtime revenue for animation
-            if (data.metrics.sales?.totalRevenue !== realtimeRevenue) {
-              setRealtimeRevenue(data.metrics.sales.totalRevenue);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch realtime data:', error);
-      }
-    }, 10000); // Update every 10 seconds
+    if (isConnected) {
+      console.log('[Dashboard] Using Supabase Realtime ⚡');
+      return; // Don't use polling if Realtime is connected
+    }
+
+    console.log('[Dashboard] Realtime not available, using polling fallback (10s) 🔄');
+    const interval = setInterval(() => {
+      console.log('[Dashboard] Polling for updates...');
+      router.refresh();
+      setLastUpdate(new Date());
+    }, 10000); // Poll every 10 seconds (faster updates)
 
     return () => clearInterval(interval);
-  }, []); // Empty deps - interval runs once on mount and cleans up on unmount
+  }, [isConnected, router]);
 
   // Calculate seconds since last update
   const secondsSinceUpdate = Math.floor((Date.now() - lastUpdate.getTime()) / 1000);
@@ -254,13 +274,43 @@ export default function EnterpriseDashboardClient({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-sky-50/20 pb-12">
+      {/* Realtime Update Notification */}
+      {showRealtimeNotification && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500">
+                <Zap className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-emerald-900">ข้อมูลอัปเดตแล้ว</p>
+                <p className="text-xs text-emerald-700">Dashboard รีเฟรชสำเร็จ</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Navigation */}
       <div className="sticky top-0 z-20 border-b border-blue-100 bg-white/80 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold text-slate-900">Enterprise Dashboard</h1>
-              <p className="text-xs text-slate-500">Real-time Business Intelligence</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs text-slate-500">Real-time Business Intelligence</p>
+                {isConnected ? (
+                  <div className="flex items-center gap-1 text-emerald-600">
+                    <Wifi className="h-3 w-3" />
+                    <span className="text-xs font-semibold">Live</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <WifiOff className="h-3 w-3" />
+                    <span className="text-xs">Offline</span>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -375,9 +425,10 @@ export default function EnterpriseDashboardClient({
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid gap-8 lg:grid-cols-[1fr_1.5fr]">
-          {/* Left: Quick Stats Detail */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.5fr]">
+          {/* Left: Quick Stats Detail + Store Performance List */}
           <div className="space-y-6">
+            {/* Summary Stats */}
             <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
               <h3 className="text-lg font-bold text-slate-900 mb-4">สรุปข้อมูลรวม</h3>
               <dl className="space-y-4">
@@ -407,6 +458,19 @@ export default function EnterpriseDashboardClient({
                 </div>
               </dl>
             </div>
+
+            {/* Store Performance List */}
+            <StorePerformanceList
+              stores={stores.map(store => ({
+                id: store.id,
+                name: store.name,
+                province: store.province || 'ไม่ระบุจังหวัด',
+                sales: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesTotal || 0,
+                transactions: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesCount || 0,
+              }))}
+              selectedStoreId={selectedStoreId}
+              onStoreSelect={setSelectedStoreId}
+            />
           </div>
 
           {/* Right: Thailand Store Map */}
@@ -420,6 +484,8 @@ export default function EnterpriseDashboardClient({
               sales: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesTotal || 0,
               transactions: snapshot.performance.segments.store.find(s => s.label === store.name)?.salesCount || 0,
             }))}
+            selectedStoreId={selectedStoreId}
+            onStoreSelect={setSelectedStoreId}
           />
         </div>
 
@@ -659,6 +725,119 @@ function ChartSkeleton() {
   );
 }
 
+// Store Performance List Component
+function StorePerformanceList({
+  stores,
+  selectedStoreId,
+  onStoreSelect,
+}: {
+  stores: Array<{ id: string; name: string; province: string; sales: number; transactions: number }>;
+  selectedStoreId: string | null;
+  onStoreSelect: (storeId: string) => void;
+}) {
+  // Sort stores by sales (descending)
+  const sortedStores = [...stores].sort((a, b) => b.sales - a.sales);
+
+  // Get performance level
+  const getPerformanceLevel = (sales: number) => {
+    if (sales > 500000) return { color: 'emerald', label: '⭐⭐⭐' };
+    if (sales > 200000) return { color: 'blue', label: '⭐⭐' };
+    if (sales > 100000) return { color: 'amber', label: '⭐' };
+    return { color: 'slate', label: '' };
+  };
+
+  return (
+    <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div>
+          <h3 className="text-base sm:text-lg font-bold text-slate-900">Performance by Store</h3>
+          <p className="text-xs text-slate-500">คลิกเพื่อดูตำแหน่งบนแผนที่</p>
+        </div>
+        <div className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 w-fit">
+          {sortedStores.length} ร้าน
+        </div>
+      </div>
+
+      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+        {sortedStores.map((store, index) => {
+          const performance = getPerformanceLevel(store.sales);
+          const isSelected = selectedStoreId === store.id;
+
+          return (
+            <button
+              key={store.id}
+              type="button"
+              onClick={() => onStoreSelect(store.id)}
+              className={`w-full text-left rounded-xl border-2 p-3 transition-all duration-200 ${
+                isSelected
+                  ? 'border-blue-400 bg-blue-50 shadow-lg scale-[1.02]'
+                  : 'border-slate-200 bg-white hover:border-blue-300 hover:shadow-md hover:scale-[1.01]'
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                {/* Rank Badge */}
+                <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm ${
+                  index === 0
+                    ? 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-md'
+                    : index === 1
+                    ? 'bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-md'
+                    : index === 2
+                    ? 'bg-gradient-to-br from-orange-300 to-amber-400 text-white shadow-md'
+                    : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {index + 1}
+                </div>
+
+                {/* Store Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className={`font-semibold truncate ${
+                      isSelected ? 'text-blue-900' : 'text-slate-900'
+                    }`}>
+                      {store.name}
+                    </p>
+                    {performance.label && (
+                      <span className="text-xs">{performance.label}</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mb-2">{store.province}</p>
+
+                  {/* Sales & Transactions */}
+                  <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="h-3 w-3 text-blue-500" />
+                      <span className={`font-bold ${
+                        performance.color === 'emerald' ? 'text-emerald-600' :
+                        performance.color === 'blue' ? 'text-blue-600' :
+                        performance.color === 'amber' ? 'text-amber-600' : 'text-slate-600'
+                      }`}>
+                        {currencyFormatter.format(store.sales)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-slate-500">
+                      <ShoppingCart className="h-3 w-3" />
+                      <span>{numberFormatter.format(store.transactions)} รายการ</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Arrow Indicator */}
+                {isSelected && (
+                  <div className="flex-shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                      <MapPin className="h-4 w-4 text-white" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // Top Performers Card
 function TopPerformersCard({ data }: { data: Array<{ id: string; label: string; checkIns: number; checkOuts: number; stores: string[] }> }) {
   return (
@@ -737,7 +916,7 @@ function TopProductsCard({ products }: { products: Array<{ name: string; total: 
         </div>
       ) : (
         <div className="space-y-3">
-          {products.map((product, index) => (
+          {products.map((product) => (
             <div
               key={product.name}
               className="rounded-xl border border-slate-200 bg-gradient-to-r from-indigo-50/50 to-white p-3 hover:border-indigo-200 hover:shadow-md transition"

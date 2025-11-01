@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Database, Download, RefreshCw, Trash2, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Database, Download, RefreshCw, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 
 type BackupFile = {
   name: string;

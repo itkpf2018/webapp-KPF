@@ -38,7 +38,9 @@
       "Bash(perl:*)",
       "Bash(curl:*)",
       "Bash(for:*)",
-      "Bash(do echo \"=== $file ===\")"
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(npm i:*)",
+      "Bash(npx supabase db push)"
     ],
     "deny": [],
     "ask": []

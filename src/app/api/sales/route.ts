@@ -389,6 +389,7 @@ export async function POST(request: Request) {
       }
 
       insertedRecordIds = insertedData.map((record: StockDeductionRecord) => record.id);
+      void insertedRecordIds; // For future use (e.g., logging, debugging)
 
       // Extract employee_id and store_id from raw payload
       const employeeId = raw.employeeId?.trim();

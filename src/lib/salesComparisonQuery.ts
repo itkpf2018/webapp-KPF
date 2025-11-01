@@ -10,7 +10,7 @@ import type {
   ProductSalesComparison,
   MonthlySales,
   UnitTypeSales,
-  UnitType,
+  
   SalesComparisonResponse,
 } from '@/types/sales-comparison';
 
@@ -85,7 +85,7 @@ export async function fetchSalesRecordsForYear(
 
   // Debug: Log first 3 records to see unit_name values
   if (data && data.length > 0) {
-    data.slice(0, 3).forEach((record, idx) => {
+    data.slice(0, 3).forEach((record,_idx) => {
     });
   }
 
@@ -156,7 +156,7 @@ export function aggregateSalesByProduct(
   }
 
   // Log unit type mappings for debugging
-  unitTypeMappings.forEach((products, mapping) => {
+  unitTypeMappings.forEach((products,_mapping) => {
   });
 
   // Log aggregation results for first product

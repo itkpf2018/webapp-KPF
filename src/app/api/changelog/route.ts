@@ -6,7 +6,7 @@ import { join } from 'path';
  * GET /api/changelog
  * Returns the current version info and release notes
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Read version.json from public directory
     const versionPath = join(process.cwd(), 'public', 'version.json');

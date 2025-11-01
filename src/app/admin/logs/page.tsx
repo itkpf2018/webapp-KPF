@@ -41,6 +41,10 @@ export default function LogsPage() {
   const [logsError, setLogsError] = useState<string | null>(null);
   const [scopeFilter, setScopeFilter] = useState<"all" | LogScope>("all");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const LOGS_PER_PAGE = 20;
+
   // GPS state
   const [isGPSEnabled, setIsGPSEnabled] = useState(true);
   const [isSavingGPS, setIsSavingGPS] = useState(false);
@@ -80,6 +84,17 @@ export default function LogsPage() {
     if (scopeFilter === "all") return logs;
     return logs.filter((log) => log.scope === scopeFilter);
   }, [logs, scopeFilter]);
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredLogs.length / LOGS_PER_PAGE);
+  const startIndex = (currentPage - 1) * LOGS_PER_PAGE;
+  const endIndex = startIndex + LOGS_PER_PAGE;
+  const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [scopeFilter]);
 
   // Fetch GPS settings
   const { data: gpsSettings, isLoading: isLoadingGPS } = useQuery({
@@ -487,36 +502,265 @@ export default function LogsPage() {
             ไม่พบข้อมูลในช่วงที่เลือก
           </p>
         ) : (
-          <ul className="space-y-2">
-            {filteredLogs.map((log) => (
-              <li
-                key={log.id}
-                className="rounded-2xl border border-blue-100 bg-white px-4 py-3 text-sm text-slate-600"
-              >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="font-semibold text-slate-700">{log.message}</p>
-                    <p className="text-xs text-slate-400">
-                      ประเภท: {log.scope} • กิจกรรม: {log.action}
-                    </p>
-                    {log.meta && (
-                      <details className="mt-2 text-xs text-slate-500">
-                        <summary className="cursor-pointer text-blue-500">
-                          รายละเอียดเพิ่มเติม
-                        </summary>
-                        <pre className="mt-2 rounded-2xl bg-slate-50 px-3 py-2">
-                          {JSON.stringify(log.meta, null, 2)}
-                        </pre>
-                      </details>
+          <>
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm lg:block">
+              <table className="w-full">
+                <thead className="border-b border-blue-100 bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                      เวลา
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                      กิจกรรม
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                      ผู้ใช้
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-700">
+                      ข้อมูลเพิ่มเติม
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {paginatedLogs.map((log) => (
+                    <tr key={log.id} className="transition hover:bg-blue-50/30">
+                      <td className="px-4 py-3 text-xs text-slate-600">
+                        {new Date(log.timestamp).toLocaleString("th-TH", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-semibold text-slate-900">{log.message}</p>
+                        <p className="text-xs text-slate-500">
+                          {log.scope} • {log.action}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        {log.userName ? (
+                          <div className="text-xs">
+                            <p className="font-medium text-slate-900">{log.userName}</p>
+                            <p className="text-slate-500">
+                              {log.userRole ? `Role: ${log.userRole}` : "—"}
+                            </p>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="space-y-1 text-xs text-slate-600">
+                          {log.ipAddress && (
+                            <p className="flex items-center gap-1">
+                              <span className="font-medium">IP:</span> {log.ipAddress}
+                            </p>
+                          )}
+                          {log.device && (
+                            <p className="flex items-center gap-1">
+                              <span className="font-medium">Device:</span> {log.device}
+                            </p>
+                          )}
+                          {log.browser && (
+                            <p className="flex items-center gap-1">
+                              <span className="font-medium">Browser:</span> {log.browser}
+                            </p>
+                          )}
+                          {log.location && (
+                            <p className="flex items-center gap-1">
+                              <span className="font-medium">Location:</span> {log.location}
+                            </p>
+                          )}
+                          {log.meta && (
+                            <details className="mt-1">
+                              <summary className="cursor-pointer text-blue-600 hover:text-blue-700">
+                                Meta
+                              </summary>
+                              <pre className="mt-1 max-h-32 overflow-auto rounded bg-slate-50 p-2 text-xs">
+                                {JSON.stringify(log.meta, null, 2)}
+                              </pre>
+                            </details>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile/Tablet Card View (hidden on desktop) */}
+            <div className="space-y-3 lg:hidden">
+              {paginatedLogs.map((log) => (
+                <div
+                  key={log.id}
+                  className="rounded-2xl border border-blue-100 bg-white p-4 shadow-sm"
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between gap-3 border-b border-blue-50 pb-3">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-slate-900">{log.message}</p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {log.scope} • {log.action}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                      {new Date(log.timestamp).toLocaleString("th-TH", {
+                        day: "2-digit",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+
+                  {/* User Info */}
+                  {log.userName && (
+                    <div className="mt-3 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700">
+                        {log.userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 text-xs">
+                        <p className="font-medium text-slate-900">{log.userName}</p>
+                        {log.userRole && (
+                          <p className="text-slate-500">Role: {log.userRole}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Technical Details */}
+                  {(log.ipAddress || log.device || log.browser || log.location) && (
+                    <div className="mt-3 space-y-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs">
+                      {log.ipAddress && (
+                        <div className="flex items-start gap-2">
+                          <span className="font-semibold text-slate-700">IP:</span>
+                          <span className="text-slate-600">{log.ipAddress}</span>
+                        </div>
+                      )}
+                      {log.device && (
+                        <div className="flex items-start gap-2">
+                          <span className="font-semibold text-slate-700">Device:</span>
+                          <span className="text-slate-600">{log.device}</span>
+                        </div>
+                      )}
+                      {log.browser && (
+                        <div className="flex items-start gap-2">
+                          <span className="font-semibold text-slate-700">Browser:</span>
+                          <span className="text-slate-600">{log.browser}</span>
+                        </div>
+                      )}
+                      {log.location && (
+                        <div className="flex items-start gap-2">
+                          <span className="font-semibold text-slate-700">Location:</span>
+                          <span className="text-slate-600">{log.location}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Meta Details */}
+                  {log.meta && (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer text-xs font-medium text-blue-600">
+                        📋 รายละเอียดเพิ่มเติม
+                      </summary>
+                      <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+                        {JSON.stringify(log.meta, null, 2)}
+                      </pre>
+                    </details>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                {/* Page Info */}
+                <div className="text-sm text-slate-600">
+                  แสดง {startIndex + 1}-{Math.min(endIndex, filteredLogs.length)} จากทั้งหมด{" "}
+                  {filteredLogs.length} รายการ
+                </div>
+
+                {/* Navigation Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="inline-flex items-center justify-center rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                  >
+                    ← ก่อนหน้า
+                  </button>
+
+                  <div className="flex items-center gap-1">
+                    {/* First Page */}
+                    {currentPage > 2 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPage(1)}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-white text-sm font-medium text-slate-700 transition hover:bg-blue-50"
+                        >
+                          1
+                        </button>
+                        {currentPage > 3 && (
+                          <span className="px-2 text-slate-400">...</span>
+                        )}
+                      </>
+                    )}
+
+                    {/* Current Page neighbors */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((page) => Math.abs(page - currentPage) <= 1)
+                      .map((page) => (
+                        <button
+                          key={page}
+                          type="button"
+                          onClick={() => setCurrentPage(page)}
+                          className={`inline-flex h-10 w-10 items-center justify-center rounded-lg border text-sm font-medium transition ${
+                            page === currentPage
+                              ? "border-blue-500 bg-blue-500 text-white"
+                              : "border-blue-100 bg-white text-slate-700 hover:bg-blue-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+
+                    {/* Last Page */}
+                    {currentPage < totalPages - 1 && (
+                      <>
+                        {currentPage < totalPages - 2 && (
+                          <span className="px-2 text-slate-400">...</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setCurrentPage(totalPages)}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-blue-100 bg-white text-sm font-medium text-slate-700 transition hover:bg-blue-50"
+                        >
+                          {totalPages}
+                        </button>
+                      </>
                     )}
                   </div>
-                  <span className="text-xs text-slate-400">
-                    {new Date(log.timestamp).toLocaleString("th-TH")}
-                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="inline-flex items-center justify-center rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
+                  >
+                    ถัดไป →
+                  </button>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            )}
+          </>
         )}
       </section>
     </div>

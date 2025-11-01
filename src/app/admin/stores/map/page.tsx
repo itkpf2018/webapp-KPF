@@ -1,11 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import type { StoreRecord } from "@/lib/configStore";
-import type { Layer, Map as LeafletMap } from "leaflet";
-import Link from "next/link";
+/**
+ * Stores Map Page
+ * Displays all stores on an interactive map with geofence visualization
+ */
 
-type LeafletModule = typeof import("leaflet");
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import Link from "next/link";
+import type { StoreRecord } from "@/lib/configStore";
+import { RefreshCw } from "lucide-react";
+
+// Dynamic import for map component (only loads on client-side)
+const StoresMapClient = dynamic(() => import("./StoresMapClient"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[600px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
+      <div className="text-center">
+        <RefreshCw className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+        <p className="mt-3 text-sm text-slate-600">กำลังโหลดแผนที่...</p>
+      </div>
+    </div>
+  ),
+});
 
 type StoreWithLocation = StoreRecord & {
   latitude: number;
@@ -13,13 +30,9 @@ type StoreWithLocation = StoreRecord & {
 };
 
 export default function StoresMapPage() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
-  const leafletRef = useRef<LeafletModule | null>(null);
   const [stores, setStores] = useState<StoreRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isMapReady, setIsMapReady] = useState(false);
   const [selectedStore, setSelectedStore] = useState<StoreRecord | null>(null);
 
   // Fetch stores
@@ -46,179 +59,6 @@ export default function StoresMapPage() {
 
     void fetchStores();
   }, []);
-
-  // Initialize map
-  useEffect(() => {
-    let leafletModule: LeafletModule | null = null;
-    let map: LeafletMap | null = null;
-
-    const initMap = async () => {
-      if (!mapContainerRef.current || mapRef.current) return;
-
-      try {
-        // Dynamically import Leaflet
-        const imported = await import("leaflet");
-        leafletModule = (imported.default ?? imported) as LeafletModule;
-
-        // Import Leaflet CSS once on the client
-        await import("leaflet/dist/leaflet.css");
-
-        // Fix default marker icons
-        const iconProto = leafletModule.Icon.Default.prototype as unknown as {
-          _getIconUrl?: () => void;
-        };
-        if (iconProto._getIconUrl) {
-          delete iconProto._getIconUrl;
-        }
-        leafletModule.Icon.Default.mergeOptions({
-          iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-          iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-          shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        });
-
-        // Initialize map centered on Thailand
-        map = leafletModule.map(mapContainerRef.current, {
-          center: [13.7563, 100.5018], // Bangkok
-          zoom: 6,
-          zoomControl: true,
-        });
-
-        // Add OpenStreetMap tiles
-        leafletModule.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          maxZoom: 19,
-        }).addTo(map);
-
-        mapRef.current = map;
-        leafletRef.current = leafletModule;
-        setIsMapReady(true);
-      } catch (error) {
-        console.error("Failed to initialize map:", error);
-        setError("ไม่สามารถโหลดแผนที่ได้");
-      }
-    };
-
-    void initMap();
-
-    // Cleanup
-    return () => {
-      if (map) {
-        map.remove();
-        mapRef.current = null;
-      }
-      leafletRef.current = null;
-    };
-  }, []);
-
-  // Add markers when map is ready and stores are loaded
-  useEffect(() => {
-    if (!isMapReady || !mapRef.current || stores.length === 0) return;
-
-    const leaflet = leafletRef.current;
-    if (!leaflet) return;
-    const map = mapRef.current;
-
-    // Clear existing markers
-    map.eachLayer((layer: Layer) => {
-      if (layer instanceof leaflet.Marker || layer instanceof leaflet.Circle) {
-        map.removeLayer(layer);
-      }
-    });
-
-    const storesWithLocation = stores.filter(
-      (store): store is StoreWithLocation =>
-        store.latitude !== null &&
-        store.longitude !== null &&
-        Number.isFinite(store.latitude) &&
-        Number.isFinite(store.longitude),
-    );
-
-    if (storesWithLocation.length === 0) {
-      return;
-    }
-
-    // Province colors mapping
-    const provinceColors: Record<string, string> = {
-      กรุงเทพมหานคร: "#3b82f6", // blue
-      เชียงใหม่: "#10b981", // green
-      ภูเก็ต: "#f59e0b", // orange
-      ขอนแก่น: "#8b5cf6", // purple
-      สงขลา: "#ec4899", // pink
-    };
-
-    const getMarkerColor = (province: string | null | undefined): string => {
-      if (!province) return "#6b7280"; // gray for unknown
-      return provinceColors[province] || "#6b7280";
-    };
-
-    // Create custom marker icon function
-    const createColoredIcon = (color: string) => {
-      return leaflet.divIcon({
-        className: "custom-marker",
-        html: `<div style="background-color: ${color}; width: 25px; height: 25px; border-radius: 50% 50% 50% 0; border: 3px solid white; transform: rotate(-45deg); box-shadow: 0 2px 10px rgba(0,0,0,0.3);"><div style="transform: rotate(45deg); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;"></div></div>`,
-        iconSize: [25, 25],
-        iconAnchor: [12, 25],
-        popupAnchor: [0, -25],
-      });
-    };
-
-    const bounds = leaflet.latLngBounds([]);
-
-    // Add markers for each store
-    storesWithLocation.forEach((store) => {
-      const markerColor = getMarkerColor(store.province);
-      const marker = leaflet.marker([store.latitude, store.longitude], {
-        icon: createColoredIcon(markerColor),
-      }).addTo(map);
-
-      // Add circle for geofence radius
-      const radius = store.radius ?? 100;
-      leaflet.circle([store.latitude, store.longitude], {
-        radius,
-        color: markerColor,
-        fillColor: markerColor,
-        fillOpacity: 0.1,
-        weight: 2,
-      }).addTo(map);
-
-      // Create popup content
-      const popupContent = `
-        <div style="min-width: 200px;">
-          <h3 style="font-size: 14px; font-weight: 600; margin: 0 0 8px 0; color: #1e293b;">${store.name}</h3>
-          ${
-            store.province
-              ? `<p style="font-size: 12px; margin: 4px 0; color: #64748b;"><strong>จังหวัด:</strong> ${store.province}</p>`
-              : ""
-          }
-          ${
-            store.address
-              ? `<p style="font-size: 12px; margin: 4px 0; color: #64748b;"><strong>ที่อยู่:</strong> ${store.address}</p>`
-              : ""
-          }
-          <p style="font-size: 12px; margin: 4px 0; color: #64748b;">
-            <strong>พิกัด:</strong> ${store.latitude.toFixed(6)}, ${store.longitude.toFixed(6)}
-          </p>
-          <p style="font-size: 12px; margin: 4px 0; color: #64748b;">
-            <strong>รัศมีเช็กอิน:</strong> ${radius}m
-          </p>
-        </div>
-      `;
-
-      marker.bindPopup(popupContent);
-
-      marker.on("click", () => {
-        setSelectedStore(store);
-      });
-
-      bounds.extend([store.latitude, store.longitude]);
-    });
-
-    // Fit map to show all markers
-    if (storesWithLocation.length > 0) {
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [isMapReady, stores]);
 
   const storesWithLocation = stores.filter(
     (store): store is StoreWithLocation =>
@@ -253,7 +93,10 @@ export default function StoresMapPage() {
 
       {isLoading ? (
         <div className="flex h-96 items-center justify-center rounded-3xl border border-blue-100 bg-white/85">
-          <p className="text-sm text-slate-500">กำลังโหลดข้อมูล...</p>
+          <div className="text-center">
+            <RefreshCw className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+            <p className="mt-3 text-sm text-slate-500">กำลังโหลดข้อมูล...</p>
+          </div>
         </div>
       ) : storesWithLocation.length === 0 ? (
         <div className="flex h-96 flex-col items-center justify-center rounded-3xl border border-blue-100 bg-white/85">
@@ -270,9 +113,10 @@ export default function StoresMapPage() {
           {/* Map */}
           <div className="lg:col-span-2">
             <div className="rounded-3xl border border-blue-100 bg-white p-4 shadow-inner shadow-blue-100/50">
-              <div
-                ref={mapContainerRef}
-                className="h-[600px] w-full rounded-2xl border border-slate-200 shadow-inner"
+              <StoresMapClient
+                stores={stores}
+                selectedStoreId={selectedStore?.id}
+                onStoreSelect={setSelectedStore}
               />
             </div>
           </div>
@@ -341,12 +185,7 @@ export default function StoresMapPage() {
                   <button
                     key={store.id}
                     type="button"
-                    onClick={() => {
-                      setSelectedStore(store);
-                      if (mapRef.current && store.latitude && store.longitude) {
-                        mapRef.current.setView([store.latitude, store.longitude], 15);
-                      }
-                    }}
+                    onClick={() => setSelectedStore(store)}
                     className={`w-full rounded-xl border p-3 text-left text-sm transition hover:border-blue-300 hover:bg-blue-50 ${
                       selectedStore?.id === store.id
                         ? "border-blue-300 bg-blue-50"

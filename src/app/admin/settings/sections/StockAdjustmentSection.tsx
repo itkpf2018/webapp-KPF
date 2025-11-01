@@ -179,10 +179,11 @@ export default function StockAdjustmentSection() {
     },
   });
 
-  const employees = employeesData ?? [];
-  const stores = storesData ?? [];
-  const products = productsData ?? [];
-  const inventory = inventoryData ?? [];
+  // Variables derived from React Query (wrapped in useMemo to stabilize references)
+  const employees = useMemo(() => employeesData ?? [], [employeesData]);
+  const stores = useMemo(() => storesData ?? [], [storesData]);
+  const products = useMemo(() => productsData ?? [], [productsData]);
+  const inventory = useMemo(() => inventoryData ?? [], [inventoryData]);
 
   const selectedAdjustProduct = useMemo(
     () => products.find((prod) => prod.productId === adjustProductId),

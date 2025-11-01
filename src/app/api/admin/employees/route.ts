@@ -1,9 +1,22 @@
 ﻿import { NextResponse } from "next/server";
 import { createEmployee, getEmployees } from "@/lib/configStore";
+import { getEmployeeStoreAssignments } from "@/lib/supabaseEmployeeStores";
 
 export async function GET() {
   const employees = await getEmployees();
-  return NextResponse.json({ employees });
+
+  // Fetch store assignments for each employee
+  const employeesWithStores = await Promise.all(
+    employees.map(async (employee) => {
+      const assignments = await getEmployeeStoreAssignments(employee.id);
+      return {
+        ...employee,
+        storeIds: assignments.map(a => a.storeId),
+      };
+    })
+  );
+
+  return NextResponse.json({ employees: employeesWithStores });
 }
 
 export async function POST(request: Request) {

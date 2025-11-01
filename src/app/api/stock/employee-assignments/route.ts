@@ -33,7 +33,7 @@ interface ErrorResponse {
  * GET /api/stock/employee-assignments
  * Returns all employee-store assignments for filtering and auto-selection
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   return withTelemetrySpan<NextResponse>(
     "stock.employee-assignments.get",
     async (span) => {

@@ -1,8 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+/**
+ * Thailand Store Map with Professional Pulse Markers
+ * Interactive map showing store performance across Thailand
+ */
+
+import { useEffect, useState, useRef } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { MapPin, TrendingUp, ShoppingBag } from "lucide-react";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 interface StoreMarker {
@@ -17,6 +23,8 @@ interface StoreMarker {
 
 interface ThailandStoreMapProps {
   stores: StoreMarker[];
+  selectedStoreId?: string | null;
+  onStoreSelect?: (storeId: string) => void;
 }
 
 const currencyFormatter = new Intl.NumberFormat("th-TH", {
@@ -28,7 +36,80 @@ const currencyFormatter = new Intl.NumberFormat("th-TH", {
 
 const numberFormatter = new Intl.NumberFormat("th-TH");
 
-export default function ThailandStoreMap({ stores }: ThailandStoreMapProps) {
+// Get performance level based on sales
+function getPerformanceLevel(sales: number): 'excellent' | 'good' | 'fair' | 'poor' {
+  if (sales > 500000) return 'excellent';
+  if (sales > 200000) return 'good';
+  if (sales > 100000) return 'fair';
+  return 'poor';
+}
+
+// Create Professional Pulse Marker Icon
+function createPulseMarkerIcon(store: StoreMarker): L.DivIcon {
+  const level = getPerformanceLevel(store.sales);
+  const salesFormatted = currencyFormatter.format(store.sales);
+
+  return L.divIcon({
+    html: `
+      <div class="pulse-marker-container">
+        <div class="pulse-rings pulse-rings-${level}">
+          <div class="pulse-ring"></div>
+        </div>
+        <div class="marker-pin marker-pin-${level}"></div>
+        <div class="marker-badge" style="border-color: ${
+          level === 'excellent' ? '#10b981' :
+          level === 'good' ? '#3b82f6' :
+          level === 'fair' ? '#f59e0b' : '#ef4444'
+        }">
+          <div class="marker-badge-content">
+            <span class="marker-store-name">${store.name}</span>
+            <span class="marker-store-sales">${salesFormatted}</span>
+          </div>
+        </div>
+      </div>
+    `,
+    className: '',
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+    popupAnchor: [0, -16],
+  });
+}
+
+// Component to handle map view updates
+function MapViewController({ selectedStoreId, stores }: { selectedStoreId?: string | null; stores: StoreMarker[] }) {
+  const map = useMap();
+  const prevStoreIdRef = useRef<string | null>(null);
+  const isInitialLoadRef = useRef(true);
+
+  // Fly to selected store
+  useEffect(() => {
+    if (!selectedStoreId || selectedStoreId === prevStoreIdRef.current) return;
+
+    const store = stores.find(s => s.id === selectedStoreId);
+    if (store && store.lat && store.lng) {
+      map.flyTo([store.lat, store.lng], 14, {
+        animate: true,
+        duration: 1.5,
+      });
+      prevStoreIdRef.current = selectedStoreId;
+    }
+  }, [selectedStoreId, stores, map]);
+
+  // Fit bounds on initial load only
+  useEffect(() => {
+    if (!isInitialLoadRef.current || stores.length === 0) return;
+
+    const bounds = stores.map(store => [store.lat, store.lng] as [number, number]);
+    if (bounds.length > 0) {
+      map.fitBounds(bounds, { padding: [50, 50], animate: false });
+      isInitialLoadRef.current = false;
+    }
+  }, [stores, map]);
+
+  return null;
+}
+
+export default function ThailandStoreMap({ stores, selectedStoreId, onStoreSelect }: ThailandStoreMapProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -42,24 +123,6 @@ export default function ThailandStoreMap({ stores }: ThailandStoreMapProps) {
   // Thailand center coordinates (Bangkok)
   const thailandCenter: [number, number] = [13.7563, 100.5018];
 
-  // Calculate max sales for sizing markers
-  const maxSales = Math.max(...stores.map((s) => s.sales), 1);
-
-  // Get marker size based on sales volume
-  const getMarkerSize = (sales: number) => {
-    const minSize = 8;
-    const maxSize = 25;
-    if (maxSales === 0) return minSize;
-    return minSize + ((sales / maxSales) * (maxSize - minSize));
-  };
-
-  // Get marker color based on sales volume
-  const getMarkerColor = (sales: number) => {
-    if (sales > 500000) return "#0ea5e9"; // sky-500 - high sales
-    if (sales > 200000) return "#38bdf8"; // sky-400 - medium sales
-    return "#7dd3fc"; // sky-300 - low sales
-  };
-
   // Calculate total sales
   const totalSales = stores.reduce((sum, store) => sum + store.sales, 0);
   const avgSalesPerStore = stores.length > 0 ? totalSales / stores.length : 0;
@@ -68,46 +131,48 @@ export default function ThailandStoreMap({ stores }: ThailandStoreMapProps) {
   return (
     <div className="rounded-3xl border-2 border-blue-100 bg-white p-6 shadow-xl">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-bold text-slate-900">Store Performance Map</h3>
-          <p className="text-sm text-slate-500">ยอดขายตามสถานที่ทั่วประเทศไทย</p>
+          <h3 className="text-base sm:text-lg font-bold text-slate-900">Store Performance Map</h3>
+          <p className="text-xs sm:text-sm text-slate-500">ยอดขายตามสถานที่ทั่วประเทศไทย</p>
         </div>
-        <div className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-600">
+        <div className="rounded-full border border-blue-200 bg-blue-50 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-blue-600 w-fit">
           {stores.length} ร้าน
         </div>
       </div>
 
       {/* Map Container */}
-      <div className="relative h-[500px] overflow-hidden rounded-2xl border-2 border-blue-100">
+      <div className="relative h-[300px] sm:h-[400px] lg:h-[500px] overflow-hidden rounded-2xl border-2 border-blue-100">
         <MapContainer
           center={thailandCenter}
           zoom={6}
-          style={{ height: "100%", width: "100%" }}
+          style={{ height: "100%", width: "100%", zIndex: 1 }}
           scrollWheelZoom={true}
           zoomControl={true}
         >
-          {/* OpenStreetMap Tiles - FREE */}
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={19}
           />
 
-          {/* Store Markers */}
+          <MapViewController selectedStoreId={selectedStoreId} stores={stores} />
+
+          {/* Store Markers with Pulse Animation */}
           {stores.map((store) => {
-            const markerSize = getMarkerSize(store.sales);
-            const markerColor = getMarkerColor(store.sales);
+            const icon = createPulseMarkerIcon(store);
 
             return (
-              <CircleMarker
+              <Marker
                 key={store.id}
-                center={[store.lat, store.lng]}
-                radius={markerSize}
-                pathOptions={{
-                  fillColor: markerColor,
-                  fillOpacity: 0.8,
-                  color: "#0284c7",
-                  weight: 2,
+                position={[store.lat, store.lng]}
+                icon={icon}
+                eventHandlers={{
+                  click: () => {
+                    if (onStoreSelect) {
+                      onStoreSelect(store.id);
+                    }
+                  },
                 }}
               >
                 <Popup>
@@ -152,16 +217,9 @@ export default function ThailandStoreMap({ stores }: ThailandStoreMapProps) {
                         </div>
                       )}
                     </div>
-
-                    <button
-                      type="button"
-                      className="mt-3 w-full rounded-lg bg-blue-500 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-600 transition"
-                    >
-                      ดูรายละเอียด →
-                    </button>
                   </div>
                 </Popup>
-              </CircleMarker>
+              </Marker>
             );
           })}
         </MapContainer>
@@ -170,16 +228,20 @@ export default function ThailandStoreMap({ stores }: ThailandStoreMapProps) {
       {/* Legend */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-6 rounded-2xl border border-blue-100 bg-blue-50/30 p-4">
         <div className="flex items-center gap-2">
-          <div className="h-4 w-4 rounded-full bg-sky-300 border-2 border-blue-600" />
-          <span className="text-xs font-medium text-slate-700">&lt; ฿200K</span>
+          <div className="h-4 w-4 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-white shadow" />
+          <span className="text-xs font-medium text-slate-700">&gt; ฿500K (ดีเยี่ยม)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-5 w-5 rounded-full bg-sky-400 border-2 border-blue-600" />
-          <span className="text-xs font-medium text-slate-700">฿200K - ฿500K</span>
+          <div className="h-4 w-4 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-2 border-white shadow" />
+          <span className="text-xs font-medium text-slate-700">฿200K - ฿500K (ดี)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 rounded-full bg-sky-500 border-2 border-blue-600" />
-          <span className="text-xs font-medium text-slate-700">&gt; ฿500K</span>
+          <div className="h-4 w-4 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 border-2 border-white shadow" />
+          <span className="text-xs font-medium text-slate-700">฿100K - ฿200K (พอใช้)</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 rounded-full bg-gradient-to-br from-red-500 to-red-600 border-2 border-white shadow" />
+          <span className="text-xs font-medium text-slate-700">&lt; ฿100K (ต้องเร่ง)</span>
         </div>
       </div>
 
@@ -217,6 +279,7 @@ function MapSkeleton() {
       </div>
       <div className="h-[500px] animate-pulse rounded-2xl bg-slate-200" />
       <div className="mt-4 flex justify-center gap-6">
+        <div className="h-6 w-24 animate-pulse rounded-lg bg-slate-200" />
         <div className="h-6 w-24 animate-pulse rounded-lg bg-slate-200" />
         <div className="h-6 w-24 animate-pulse rounded-lg bg-slate-200" />
         <div className="h-6 w-24 animate-pulse rounded-lg bg-slate-200" />

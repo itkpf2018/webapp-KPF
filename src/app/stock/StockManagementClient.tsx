@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { haversineDistance } from "@/lib/geo";
 import { useGeoPermission } from "@/lib/useGeoPermission";
 import { useAuth } from "@/contexts/AuthContext";
+import { useModal } from "@/contexts/ModalContext";
 import {
   PackagePlus,
   PackageMinus,
@@ -16,8 +17,6 @@ import {
   Building2,
   MapPin,
   Layers,
-  TrendingUp,
-  TrendingDown,
   Clock,
   Calendar,
   CheckCircle2,
@@ -123,6 +122,7 @@ const LAST_STORE_STORAGE_KEY = "stock:last-store-id";
 
 export default function StockManagementClient() {
   const { user } = useAuth();
+  const { openModal, closeModal } = useModal();
   const isReadOnly = user?.role === 'sales';
   const queryClient = useQueryClient();
 
@@ -170,6 +170,15 @@ export default function StockManagementClient() {
   const [isInitialModalOpen, setIsInitialModalOpen] = useState(false);
   const [adjustmentCart, setAdjustmentCart] = useState<CartItem[]>([]);
   const [adjustmentGlobalNote, setAdjustmentGlobalNote] = useState<string>("");
+
+  // Sync modal state with ModalContext
+  useEffect(() => {
+    if (isReceiveModalOpen || isReturnModalOpen || isInitialModalOpen) {
+      openModal();
+    } else {
+      closeModal();
+    }
+  }, [isReceiveModalOpen, isReturnModalOpen, isInitialModalOpen, openModal, closeModal]);
 
   // Sync locationStateRef
   useEffect(() => {
@@ -353,12 +362,13 @@ export default function StockManagementClient() {
     },
   });
 
-  const employees = employeesData ?? [];
-  const stores = storesData ?? [];
-  const products = productsData ?? [];
-  const inventory = inventoryData ?? [];
-  const recentTransactions: RecentTransaction[] = transactionsData ?? [];
-  const assignments = assignmentsData ?? [];
+  // These variables are derived from React Query data (wrapped in useMemo to stabilize references)
+  const employees = useMemo(() => employeesData ?? [], [employeesData]);
+  const stores = useMemo(() => storesData ?? [], [storesData]);
+  const products = useMemo(() => productsData ?? [], [productsData]);
+  const inventory = useMemo(() => inventoryData ?? [], [inventoryData]);
+  const recentTransactions = useMemo<RecentTransaction[]>(() => transactionsData ?? [], [transactionsData]);
+  const assignments = useMemo(() => assignmentsData ?? [], [assignmentsData]);
 
   // GPS Location Logic
   const ensureLocation = useCallback(
@@ -661,7 +671,7 @@ export default function StockManagementClient() {
   }, [locationState]);
 
   // Summary metrics with unit breakdowns
-  const totalProducts = inventory.length;
+  const _totalProducts = inventory.length;
 
   // Calculate totalIn by unit: group all positive quantity transactions by unit
   const totalInByUnit = useMemo(() => {
@@ -698,7 +708,7 @@ export default function StockManagementClient() {
   }, [inventory]);
 
   // Legacy totals for low stock calculation
-  const totalBalance = inventory.reduce((sum, item) => sum + item.balance, 0);
+  const _totalBalance = inventory.reduce((sum, item) => sum + item.balance, 0);
   const lowStockCount = inventory.filter((item) => item.balance > 0 && item.balance <= 10).length;
 
   // Helper function to format unit breakdown (e.g., "20 ลัง 20แพ็ค 10ซอง")
@@ -2177,7 +2187,7 @@ export default function StockManagementClient() {
       {/* Receive Modal */}
       {isReceiveModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsReceiveModalOpen(false)}
         >
           <div
@@ -2361,7 +2371,7 @@ export default function StockManagementClient() {
       {/* Return Modal */}
       {isReturnModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsReturnModalOpen(false)}
         >
           <div
@@ -2563,7 +2573,7 @@ export default function StockManagementClient() {
       {/* Initial/Adjustment Modal */}
       {isInitialModalOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
           onClick={() => setIsInitialModalOpen(false)}
         >
           <div

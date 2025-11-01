@@ -60,6 +60,14 @@ export default async function RootLayout({
   const brandingLogo = getBrandingLogoSrc(branding.logoPath, branding.updatedAt, null) ?? "";
   return (
     <html lang="th" className="h-full bg-slate-50">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-slate-50 text-slate-900`}
         data-branding-logo={brandingLogo}
